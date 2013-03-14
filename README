@@ -1,0 +1,9 @@
+Dice
+
+Dice is a minimalist Dependency Injection Cotainer
+
+Installation
+
+Simply include dice.php in your project. 
+
+For full documentation please refer to: http://r.je/dice.html
