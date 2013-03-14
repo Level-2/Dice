@@ -123,7 +123,7 @@ class DiceXmlLoader {
 		else return (strpos((string) $str, '{') === 0) ? array(new DiceXmlCallback($str), 'create') : (string) $str;
 	}
 
-	public function loadMap(SimpleXmlElement $map, Dice $dic) {
+	public function loadXml(SimpleXmlElement $map, Dice $dic) {
 		$rules = array();
 		foreach ($map as $key => $value) {
 			$rule = clone $dic->getRule((string) $value->name);				
