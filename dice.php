@@ -1,7 +1,7 @@
 <?php 
 /* @description 	Dice - A minimal Dependency Injection Container for PHP  
  * @author 			Tom Butler tom@r.je
- * @copyright  		20012-2013 Tom Butler <tom@r.je>
+ * @copyright  		2012-2013 Tom Butler <tom@r.je>
  * @link 			http://r.je/dice.html
  * @license 		http://www.opensource.org/licenses/bsd-license.php  BSD License 
  * @version			1.0
@@ -27,7 +27,7 @@ class Dice {
 		return isset($this->rules['*']) ? $this->rules['*'] : new DiceRule;
 	}
 	
-	public function create($component, $args = array(), $callback = null, $forceNewInstance = false) {
+	public function create($component, array $args = array(), $callback = null, $forceNewInstance = false) {
 		if ($component instanceof DiceInstance) $component = $component->name;
 		
 		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new Exception('Class does not exist for creation: ' . $component);
@@ -36,7 +36,8 @@ class Dice {
 		
 		$rule = $this->getRule($component);
 		$className = (!empty($rule->instanceOf)) ? strtolower($rule->instanceOf) : $component;		
-		$params = $this->getMethodParams($className, '__construct', $rule, array_merge($args, $this->getParams($rule->constructParams)));
+		$share = $this->getParams($rule->shareInstances);		
+		$params = $this->getMethodParams($className, '__construct', $rule, array_merge($share, $args, $this->getParams($rule->constructParams)), $share);
 		
 		if (is_callable($callback, true)) call_user_func_array($callback, array($params));
 		
@@ -47,7 +48,7 @@ class Dice {
 		return $object;
 	}
 	
-	private function getParams($params = array(), $newInstances = array()) {
+	private function getParams(array $params = array(),array $newInstances = array()) {
 		for ($i = 0; $i < count($params); $i++) {
 			if ($params[$i] instanceof DiceInstance) $params[$i] = $this->create($params[$i]->name, array(), null, in_array(strtolower($params[$i]->name), array_map('strtolower', $newInstances)));
 			else $params[$i] = ( !(is_array($params[$i]) && isset($params[$i][0]) && is_string($params[$i][0])) && is_callable($params[$i])) ? call_user_func($params[$i], $this) : $params[$i];
@@ -55,7 +56,7 @@ class Dice {
 		return $params;
 	}
 	
-	private function getMethodParams($className, $method, DiceRule $rule, $args = array()) {
+	private function getMethodParams($className, $method, DiceRule $rule, array $args = array(), array $share = array()) {
 		if (!method_exists($className, $method)) return array();
 		$reflectionMethod = new ReflectionMethod($className, $method);
 		$params = $reflectionMethod->getParameters();
@@ -71,7 +72,7 @@ class Dice {
 			}
 			$paramClassName = $param->getClass() ? strtolower($param->getClass()->name) : false;			
 			if ($paramClassName && isset($rule->substitutions[$paramClassName])) $parameters[] = is_string($rule->substitutions[$paramClassName]) ? new DiceInstance($rule->substitutions[$paramClassName]) : $rule->substitutions[$paramClassName];
-			else if ($paramClassName && class_exists($paramClassName)) $parameters[] = $this->create($paramClassName, array(), null, in_array($paramClassName, array_map('strtolower', $rule->newInstances)));
+			else if ($paramClassName && class_exists($paramClassName)) $parameters[] = $this->create($paramClassName, $share, null, in_array($paramClassName, array_map('strtolower', $rule->newInstances)));
 			else if (is_array($args) && count($args) > 0) $parameters[] = array_shift($args);
 			else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;			
 		}
@@ -87,6 +88,7 @@ class DiceRule {
 	public $instanceOf;
 	public $call = array();
 	public $inherit = true;
+	public $shareInstances = array();
 }
 
 class DiceInstance {
@@ -141,6 +143,7 @@ class DiceXmlLoader {
 			if ($value->newinstances) $rule->newInstances = explode(',', $value->newinstances);
 			if ($value->substitute) foreach ($value->use as $use) $rule->substitutions[(string) $use->as] = $this->getComponent((string) $use->use, true);
 			if ($value->construct) 	foreach ($value->construct->children() as $child) $rule->constructParams[] = $this->getComponent((string) $child);
+			if ($value->shareinstances) foreach ($value->shareinstances as $share) $rule->shareInstances[] = $this->getComponent((string) $share, true);
 			$dic->addRule((string) $value->name, $rule);
 		}
 	}

@@ -4,7 +4,7 @@ require_once 'PHPUnit\Framework\TestCase.php';
 
 
 class DiceTest extends PHPUnit_Framework_TestCase {
-	private $injection;
+	private $dice;
 
 
 	protected function setUp() {
@@ -415,7 +415,88 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('A', $bestMatch->a);
 	}
 	
+	
+	public function testShareInstances() {
+		$rule = new DiceRule();
+		$rule->shareInstances = array(new DiceInstance('Shared'));
+		$this->dice->addRule('TestSharedInstancesTop', $rule);
+		
+		
+		$shareTest = $this->dice->create('TestSharedInstancesTop');
+		
+		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+		
+		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
+		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+		
+		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
+		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
+		
+	}
+	
+	public function testShareInstancesMultiple() {
+		$rule = new DiceRule();
+		$rule->shareInstances = array(new DiceInstance('Shared'));
+		$this->dice->addRule('TestSharedInstancesTop', $rule);
+	
+	
+		$shareTest = $this->dice->create('TestSharedInstancesTop');
+	
+		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+	
+		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
+		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+	
+		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
+		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
+		
+		
+		$shareTest2 = $this->dice->create('TestSharedInstancesTop');
+		$this->assertSame($shareTest2->share1->shared, $shareTest2->share2->shared);
+		$this->assertEquals($shareTest2->share1->shared->uniq, $shareTest2->share2->shared->uniq);
+		
+		$this->assertNotSame($shareTest->share1->shared, $shareTest2->share2->shared);
+		$this->assertNotEquals($shareTest->share1->shared->uniq, $shareTest2->share2->shared->uniq);
+	
+	}
+	
 
+}
+
+class Shared {
+	public $uniq;
+	
+	public function __construct() {
+		$this->uniq = uniqid();
+	}
+}
+
+class TestSharedInstancesTop {
+	public $share1;
+	public $share2;
+	
+	public function __construct(SharedInstanceTest1 $share1, SharedInstanceTest2 $share2) {
+		$this->share1 = $share1;
+		$this->share2 = $share2;
+	}	
+}
+
+
+class SharedInstanceTest1 {
+	public $shared;
+	
+	public function __construct(Shared $shared) {
+		$this->shared = $shared;		
+	}
+}
+
+
+class SharedInstanceTest2 {
+	public $shared;
+
+	public function __construct(Shared $shared) {
+		$this->shared = $shared;
+	}
 }
 
 class TestCall {
