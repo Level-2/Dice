@@ -30,6 +30,12 @@ local.properties
 
 
 #################
+## PHPStorm
+#################
+
+.idea
+
+#################
 ## Visual Studio
 #################
 
@@ -159,5 +165,9 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-# Mac crap
+#############
+## Mac OS
+#############
+
 .DS_Store
+.AppleDouble
