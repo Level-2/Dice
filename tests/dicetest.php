@@ -475,4 +475,22 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		
 	}
 
+	
+	public function testNamespaceRule() {
+		$rule = new \Dice\Rule;
+		$this->dice->addRule('Foo\\A', $rule);
+		$this->assertSame($this->dice->getRule('Foo\\A'), $rule);
+	}
+	
+	
+	public function testNamespaceRuleSubstitution() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['Foo\\A'] = 'Foo\\ExtendedA';
+		$this->dice->addRule('Foo\\B', $rule);
+		
+		$b = $this->dice->create('Foo\\B');
+		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
+	}
+	
+	
 }

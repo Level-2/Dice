@@ -12,3 +12,7 @@ class B {
 		$this->a = $a;	
 	}
 }
+
+class ExtendedA extends A {
+	
+}
