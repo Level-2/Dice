@@ -1,4 +1,11 @@
 <?php
+/* @description 		Dice - A minimal Dependency Injection Container for PHP
+ * @author				Tom Butler tom@r.je
+* @copyright			2012-2014 Tom Butler <tom@r.je>
+* @link				http://r.je/dice.html
+* @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
+* @version				1.1
+*/
 require_once '../dice.php';
 require_once './testclasses.php';
 require_once './testclasses_namespace.php';
@@ -463,19 +470,16 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testNamespaceBasic() {
-		$a = $this->dice->create('\\Foo\\A');
-		$this->assertInstanceOf('\\Foo\\A', $a);
+		$a = $this->dice->create('Foo\\A');
+		$this->assertInstanceOf('Foo\\A', $a);
 	}
 	
 	public function testNamespaceInjection() {
-		$b = $this->dice->create('\\Foo\\B');
-		$this->assertInstanceOf('\\Foo\\B', $b);
-		$this->assertInstanceOf('\\Foo\\A', $b->a);
-		
-		
+		$b = $this->dice->create('Foo\\B');
+		$this->assertInstanceOf('Foo\\B', $b);
+		$this->assertInstanceOf('Foo\\A', $b->a);		
 	}
-
-	
+		
 	public function testNamespaceRule() {
 		$rule = new \Dice\Rule;
 		$this->dice->addRule('Foo\\A', $rule);

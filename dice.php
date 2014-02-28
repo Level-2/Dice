@@ -1,10 +1,10 @@
 <?php 
-/* @description 	Dice - A minimal Dependency Injection Container for PHP  
- * @author 			Tom Butler tom@r.je
- * @copyright  		2012-2013 Tom Butler <tom@r.je>
- * @link 			http://r.je/dice.html
- * @license 		http://www.opensource.org/licenses/bsd-license.php  BSD License 
- * @version			1.0
+/* @description 		Dice - A minimal Dependency Injection Container for PHP  
+ * @author				Tom Butler tom@r.je
+ * @copyright			2012-2014 Tom Butler <tom@r.je>
+ * @link				http://r.je/dice.html
+ * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License 
+ * @version				1.1
  */
 namespace Dice;
 class Dice {
@@ -29,13 +29,12 @@ class Dice {
 	}
 	
 	public function create($component, array $args = array(), $callback = null, $forceNewInstance = false) {
-		if ($component instanceof Instance) $component = $component->name;
+		if ($component instanceof Instance) $component = $component->name;		
+		$component = strtolower(trim($component, '\\'));
 		
-		$component = trim($component, '\\');
+		if (!isset($this->rules[$component]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
 		
-		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
-		
-		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
+		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
 		
 		$rule = $this->getRule($component);
 		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;		
@@ -44,9 +43,8 @@ class Dice {
 		
 		if (is_callable($callback, true)) call_user_func_array($callback, array($params));
 		
-		$reflection = new \ReflectionClass($className);
-		$object = (count($params) > 0) ? $reflection->newInstanceArgs($params) : $object = new $className;
-		if ($rule->shared == true) $this->instances[strtolower($component)] = $object;
+		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : $object = new $className;
+		if ($rule->shared == true) $this->instances[$component] = $object;
 		foreach ($rule->call as $call) call_user_func_array(array($object, $call[0]), $this->getMethodParams($className, $call[0], $rule, array_merge($this->getParams($call[1]), $args)));
 		return $object;
 	}
@@ -61,8 +59,7 @@ class Dice {
 	
 	private function getMethodParams($className, $method, Rule $rule, array $args = array(), array $share = array()) {
 		if (!method_exists($className, $method)) return array();
-		$reflectionMethod = new \ReflectionMethod($className, $method);
-		$params = $reflectionMethod->getParameters();
+		$params = (new \ReflectionMethod($className, $method))->getParameters();
 		$parameters = array();
 		foreach ($params as $param) {			
 			foreach ($args as $argName => $arg) {
@@ -100,4 +97,3 @@ class Instance {
 		$this->name = $instance;
 	}
 }
-?>
