@@ -169,6 +169,16 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('ExtendedB', $a->b);
 	}
 	
+	public function testSubstitutionTextMixedCase() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['B'] = new \Dice\Instance('exTenDedb');
+		$this->dice->addRule('A', $rule);
+	
+		$a = $this->dice->create('A');
+	
+		$this->assertInstanceOf('ExtendedB', $a->b);
+	}
+	
 	public function testSubstitutionCallback() {
 		$rule = new \Dice\Rule;
 		$injection = $this->dice;

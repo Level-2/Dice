@@ -4,7 +4,7 @@
  * @copyright			2012-2014 Tom Butler <tom@r.je>
  * @link				http://r.je/dice.html
  * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License 
- * @version				1.1
+ * @version				1.1.1
  */
 namespace Dice;
 class Dice {
@@ -30,11 +30,11 @@ class Dice {
 	
 	public function create($component, array $args = array(), $callback = null, $forceNewInstance = false) {
 		if ($component instanceof Instance) $component = $component->name;		
-		$component = strtolower(trim($component, '\\'));
+		$component = trim($component, '\\');
 		
-		if (!isset($this->rules[$component]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
+		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
 		
-		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
+		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
 		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;		
@@ -44,7 +44,7 @@ class Dice {
 		if (is_callable($callback, true)) call_user_func_array($callback, array($params));
 		
 		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : $object = new $className;
-		if ($rule->shared == true) $this->instances[$component] = $object;
+		if ($rule->shared == true) $this->instances[strtolower($component)] = $object;
 		foreach ($rule->call as $call) call_user_func_array(array($object, $call[0]), $this->getMethodParams($className, $call[0], $rule, array_merge($this->getParams($call[1]), $args)));
 		return $object;
 	}
