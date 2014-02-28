@@ -1,6 +1,7 @@
 <?php
 require_once '../dice.php';
-require_once 'PHPUnit\Framework\TestCase.php';
+require_once './testclasses.php';
+require_once './testclasses_namespace.php';
 
 
 class DiceTest extends PHPUnit_Framework_TestCase {
@@ -9,7 +10,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 
 	protected function setUp() {
 		parent::setUp ();
-		$this->dice = new Dice();	
+		$this->dice = new \Dice\Dice();	
 	}
 
 	protected function tearDown() {
@@ -28,7 +29,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testSetDefaultRule() {
-		$defaultBehaviour = new DiceRule();
+		$defaultBehaviour = new \Dice\Rule();
 		$defaultBehaviour->shared = true;
 		$defaultBehaviour->newInstances = array('Foo', 'Bar');
 		$this->dice->addRule('*', $defaultBehaviour);		
@@ -36,7 +37,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testDefaultRuleWorks() {
-		$defaultBehaviour = new DiceRule();
+		$defaultBehaviour = new \Dice\Rule();
 		$defaultBehaviour->shared = true;
 		
 		$this->dice->addRule('*', $defaultBehaviour);
@@ -85,11 +86,11 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	} 
 
 	public function testNewInstances() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->shared = true;
 		$this->dice->addRule('B', $rule);
 		
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->newInstances[] = 'B';
 		$this->dice->addRule('A', $rule);
 		
@@ -100,7 +101,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testSharedNamed() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->shared = true;
 		$rule->instanceOf = 'A';
 		
@@ -112,7 +113,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testForceNewInstance() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->shared = true;
 		$this->dice->addRule('A', $rule);
 		
@@ -129,7 +130,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testSharedRule() {
-		$shared = new DiceRule;
+		$shared = new \Dice\Rule;
 		$shared->shared = true;
 	
 		$this->dice->addRule('MyObj', $shared);
@@ -152,8 +153,8 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testSubstitutionText() {
-		$rule = new DiceRule;
-		$rule->substitutions['B'] = new DiceInstance('ExtendedB');
+		$rule = new \Dice\Rule;
+		$rule->substitutions['B'] = new \Dice\Instance('ExtendedB');
 		$this->dice->addRule('A', $rule);
 		
 		$a = $this->dice->create('A');
@@ -162,7 +163,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testSubstitutionCallback() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$injection = $this->dice;
 		$rule->substitutions['B'] = function() use ($injection) {
 			return $injection->create('ExtendedB');
@@ -176,7 +177,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testSubstitutionObject() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 
 		$rule->substitutions['B'] = $this->dice->create('ExtendedB');
 				
@@ -187,9 +188,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testSubstitutionString() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 	
-		$rule->substitutions['B'] = new DiceInstance('ExtendedB');
+		$rule->substitutions['B'] = new \Dice\Instance('ExtendedB');
 	
 		$this->dice->addRule('A', $rule);
 	
@@ -199,7 +200,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testConstructParams() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->constructParams = array('foo', 'bar');
 		$this->dice->addRule('RequiresConstructorArgsA', $rule);
 		
@@ -210,7 +211,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testConstructParamsMixed() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->constructParams = array('foo', 'bar');
 		$this->dice->addRule('RequiresConstructorArgsB', $rule);
 		
@@ -276,21 +277,21 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testMultipleSharedInstancesByNameMixed() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->shared = true;
 		$rule->constructParams[] = 'FirstY';
 		
 		$this->dice->addRule('Y', $rule);
 		
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->instanceOf = 'Y';
 		$rule->shared = true;
 		$rule->constructParams[] = 'SecondY';
 		
 		$this->dice->addRule('[Y2]', $rule);
 		
-		$rule = new DiceRule;
-		$rule->constructParams = array(new DiceInstance('Y'), new DiceInstance('[Y2]'));
+		$rule = new \Dice\Rule;
+		$rule->constructParams = array(new \Dice\Instance('Y'), new \Dice\Instance('[Y2]'));
 		
 		$this->dice->addRule('Z', $rule);
 		
@@ -301,12 +302,12 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testNonSharedComponentByNameA() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->instanceOf = 'ExtendedB';
 		$this->dice->addRule('$B', $rule);
 		
-		$rule = new DiceRule;
-		$rule->constructParams[] = new DiceInstance('$B');
+		$rule = new \Dice\Rule;
+		$rule->constructParams[] = new \Dice\Instance('$B');
 		$this->dice->addRule('A', $rule);
 		
 		$a = $this->dice->create('A');
@@ -315,7 +316,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNonSharedComponentByName() {
 		
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->instanceOf = 'Y3';
 		$rule->constructParams[] = 'test';
 		
@@ -323,13 +324,13 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice->addRule('$Y2', $rule);
 		
 		
-		$y2 = $this->dice->create(new DiceInstance('$Y2'));
+		$y2 = $this->dice->create(new \Dice\Instance('$Y2'));
 		//echo $y2->name;
 		$this->assertInstanceOf('Y3', $y2);
 		
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 
-		$rule->constructParams[] = new DiceInstance('$Y2');
+		$rule->constructParams[] = new \Dice\Instance('$Y2');
 		$this->dice->addRule('Y1', $rule);
 		
 		$y1 = $this->dice->create('Y1');
@@ -337,12 +338,12 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testSubstitutionByName() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->instanceOf = 'ExtendedB';
 		$this->dice->addRule('$B', $rule);
 		
-		$rule = new DiceRule;
-		$rule->substitutions['B'] = new DiceInstance('$B');
+		$rule = new \Dice\Rule;
+		$rule->substitutions['B'] = new \Dice\Instance('$B');
 				
 		$this->dice->addRule('A', $rule);		
 		$a = $this->dice->create('A');
@@ -351,18 +352,18 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testMultipleSubstitutions() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->instanceOf = 'Y2';
 		$rule->constructParams[] = 'first';
 		$this->dice->addRule('$Y2A', $rule);
 		
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->instanceOf = 'Y2';
 		$rule->constructParams[] = 'second';
 		$this->dice->addRule('$Y2B', $rule);
 		
-		$rule = new DiceRule;
-		$rule->constructParams = array(new DiceInstance('$Y2A'), new DiceInstance('$Y2B'));
+		$rule = new \Dice\Rule;
+		$rule->constructParams = array(new \Dice\Instance('$Y2A'), new \Dice\Instance('$Y2B'));
 		$this->dice->addRule('HasTwoSameDependencies', $rule);
 		
 		$twodep = $this->dice->create('HasTwoSameDependencies');
@@ -374,7 +375,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testCall() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->call[] = array('callMe', array());
 		$this->dice->addRule('TestCall', $rule);
 		$object = $this->dice->create('TestCall');
@@ -382,7 +383,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testCallWithParameters() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 		$rule->call[] = array('callMe', array('one', 'two'));
 		$this->dice->addRule('TestCall2', $rule);
 		$object = $this->dice->create('TestCall2');
@@ -393,7 +394,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	//
 	public function testInterfaceRule() {
-		$rule = new DiceRule;
+		$rule = new \Dice\Rule;
 
 		$rule->shared = true;
 		$this->dice->addRule('interfaceTest', $rule);
@@ -417,8 +418,8 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	
 	public function testShareInstances() {
-		$rule = new DiceRule();
-		$rule->shareInstances = array(new DiceInstance('Shared'));
+		$rule = new \Dice\Rule();
+		$rule->shareInstances = array(new \Dice\Instance('Shared'));
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
 		
 		
@@ -435,8 +436,8 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testShareInstancesMultiple() {
-		$rule = new DiceRule();
-		$rule->shareInstances = array(new DiceInstance('Shared'));
+		$rule = new \Dice\Rule();
+		$rule->shareInstances = array(new \Dice\Instance('Shared'));
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
 	
 	
@@ -460,239 +461,18 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-
-}
-
-class Shared {
-	public $uniq;
 	
-	public function __construct() {
-		$this->uniq = uniqid();
+	public function testNamespaceBasic() {
+		$a = $this->dice->create('\\Foo\\A');
+		$this->assertInstanceOf('\\Foo\\A', $a);
 	}
-}
-
-class TestSharedInstancesTop {
-	public $share1;
-	public $share2;
 	
-	public function __construct(SharedInstanceTest1 $share1, SharedInstanceTest2 $share2) {
-		$this->share1 = $share1;
-		$this->share2 = $share2;
-	}	
-}
-
-
-class SharedInstanceTest1 {
-	public $shared;
-	
-	public function __construct(Shared $shared) {
-		$this->shared = $shared;		
+	public function testNamespaceInjection() {
+		$b = $this->dice->create('\\Foo\\B');
+		$this->assertInstanceOf('\\Foo\\B', $b);
+		$this->assertInstanceOf('\\Foo\\A', $b->a);
+		
+		
 	}
-}
-
-
-class SharedInstanceTest2 {
-	public $shared;
-
-	public function __construct(Shared $shared) {
-		$this->shared = $shared;
-	}
-}
-
-class TestCall {
-	public $isCalled = false;
-	
-	public function callMe() {
-		$this->isCalled = true;
-	}
-}
-
-class TestCall2 {
-	public $foo;
-	public $bar;
-
-	public function callMe($foo, $bar) {
-		$this->foo = $foo;
-		$this->bar = $bar;
-	}
-}
-
-
-class TestCall3 {
-	public $a;
-
-	public function callMe(A $a) {
-		$this->a = $a;
-	}
-}
-
-class HasTwoSameDependencies {
-	public $y2a;
-	public $y2b;
-	
-	public function __construct(Y2 $y2a, Y2 $y2b) {
-		$this->y2a = $y2a;
-		$this->y2b = $y2b;
-	}
-}
-
-class Y1 {
-	public $y2;
-	
-	public function __construct(Y2 $y2) {
-		$this->y2 = $y2;
-	}
-}
-
-
-class Y2 {
-	public $name; 
-	
-	public function __construct($name) {
-		$this->name = $name;
-	}
-}
-
-class Y3 extends Y2 {
-	
-}
-class Z {
-	public $y1;
-	public $y2;
-	public function __construct(Y $y1, Y $y2) {
-		$this->y1 = $y1;
-		$this->y2 = $y2;
-	}
-}
-
-class Y {
-	public $name;
-	public function __construct($name) {
-		$this->name = $name;
-	}
-}
-
-class BestMatch {
-	public $a;
-	public $string;
-	public $b;
-	
-	public function __construct($string, A $a, B $b) {
-		$this->a = $a;
-		$this->string = $string;
-		$this->b = $b;
-	}	
-}
-
-
-//Because the DIC's job is to create other classes, some dummy class definitions are required.
-//Mocks cannot be used because the DIC relies on class definitions
-
-class MyObj {
-	private $foo;
-
-	public function setFoo($foo) {
-		$this->foo = $foo;
-	}
-
-	public function getFoo() {
-		return $this->foo;
-	}
-}
-
-
-class A2 {
-	public $b;
-	public $c;
-	public $foo;
-
-	public function __construct(B $b, C $c, $foo) {
-		$this->b = $b;
-		$this->foo = $foo;
-		$this->c = $c;
-	}
-}
-
-
-class A3 {
-	public $b;
-	public $c;
-	public $foo;
-
-	public function __construct(C $c, $foo, B $b) {
-		$this->b = $b;
-		$this->foo = $foo;
-		$this->c = $c;
-	}
-}
-class A {
-	public $b;
-
-	public function __construct(B $b) {
-		$this->b = $b;
-	}
-}
-
-class B {
-	public $c;
-
-	public function __construct(C $c) {
-		$this->c = $c;
-	}
-}
-
-class ExtendedB extends B {
-
-}
-
-class C {
-	public $d;
-	public $e;
-
-	public function __construct(D $d, E $e) {
-		$this->d = $d;
-		$this->e = $e;
-	}
-}
-
-
-class D {
-
-}
-
-class E {
-	public $f;
-	public function __construct(F $f) {
-		$this->f = $f;
-	}
-}
-
-class F {}
-
-class RequiresConstructorArgsA {
-	public $foo;
-	public $bar;
-
-	public function __construct($foo, $bar) {
-		$this->foo = $foo;
-		$this->bar = $bar;
-	}
-}
-
-class RequiresConstructorArgsB {
-	public $a;
-	public $foo;
-	public $bar;
-
-	public function __construct(A $a, $foo, $bar) {
-		$this->a = $a;
-		$this->foo = $foo;
-		$this->bar = $bar;
-	}
-}
-
-interface interfaceTest {}
-
-class InterfaceTestClass implements interfaceTest {
 
 }
