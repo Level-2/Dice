@@ -10,3 +10,10 @@ Installation
 Just require dice.php in your project and you're good to go.
 
 For full documentation see http://r.je/dice.html
+
+
+Updates
+------------
+
+28/02/2014 - Added basic namespace support. Documentation update will follow shortly.
+			 Also moved the XML loader into its own file, you'll need to include it separately if you're using it.
