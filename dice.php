@@ -38,7 +38,7 @@ class Dice {
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
-		$className = (!empty($rule->instanceOf)) ? strtolower($rule->instanceOf) : $component;		
+		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;		
 		$share = $this->getParams($rule->shareInstances);		
 		$params = $this->getMethodParams($className, '__construct', $rule, array_merge($share, $args, $this->getParams($rule->constructParams)), $share);
 		
