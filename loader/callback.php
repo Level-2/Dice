@@ -8,7 +8,7 @@
 */
 
 namespace Dice\Loader;
-
+/* Would be a private class if php supported it. This should never be created outside a Dice Loader */
 class Callback {
 	private $str;
 
@@ -16,13 +16,13 @@ class Callback {
 		$this->str = $str;
 	}
 
-	public function create(\Dice\Dice $dic) {
+	public function run(\Dice\Dice $dic) {
 		$parts = explode('::', trim($this->str, '{}'));
 		$object = $dic->create(array_shift($parts));
 		while ($var = array_shift($parts)) {
 			if (strpos($var, '(') !== false) {
 				$args = explode(',', substr($var, strpos($var, '(')+1, strpos($var, ')')-strpos($var, '(')-1));
-				$object = call_user_func_array(array($object, substr($var, 0, strpos($var, '('))), ($args[0] == null) ? array() : $args);
+				$object = call_user_func_array([$object, substr($var, 0, strpos($var, '('))], ($args[0] == null) ? [] : $args);
 			}
 			else $object = $object->$var;
 		}

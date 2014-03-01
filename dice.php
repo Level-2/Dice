@@ -8,9 +8,9 @@
  */
 namespace Dice;
 class Dice {
-	private $rules = array();
-	private $instances = array();
-	
+	private $rules = [];
+	private $instances = [];
+		
 	public function assign($object) {
 		$this->instances[strtolower(get_class($object))] = $object;
 	}
@@ -23,12 +23,12 @@ class Dice {
 	public function getRule($name) {
 		if (isset($this->rules[strtolower(trim($name, '\\'))])) return $this->rules[strtolower(trim($name, '\\'))];
 		foreach ($this->rules as $key => $value) {
-			if ($key !== '*' && is_subclass_of($name, $key) && $value->inherit == true) return $value;
+			if ($value->instanceOf === null && $key !== '*' && is_subclass_of($name, $key) && $value->inherit === true) return $value;
 		}
 		return isset($this->rules['*']) ? $this->rules['*'] : new Rule;
 	}
 	
-	public function create($component, array $args = array(), $callback = null, $forceNewInstance = false) {
+	public function create($component, array $args = [], $callback = null, $forceNewInstance = false) {
 		if ($component instanceof Instance) $component = $component->name;		
 		$component = trim($component, '\\');
 		
@@ -41,26 +41,26 @@ class Dice {
 		$share = $this->getParams($rule->shareInstances);		
 		$params = $this->getMethodParams($className, '__construct', $rule, array_merge($share, $args, $this->getParams($rule->constructParams)), $share);
 		
-		if (is_callable($callback, true)) call_user_func_array($callback, array($params));
+		if (is_callable($callback, true)) call_user_func($callback, $params);
 		
-		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : new $className;
-		if ($rule->shared == true) $this->instances[strtolower($component)] = $object;
-		foreach ($rule->call as $call) call_user_func_array(array($object, $call[0]), $this->getMethodParams($className, $call[0], $rule, array_merge($this->getParams($call[1]), $args)));
+		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : $object = new $className;
+		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
+		foreach ($rule->call as $call) call_user_func_array([$object, $call[0]], $this->getMethodParams($className, $call[0], $rule, array_merge($this->getParams($call[1]), $args)));
 		return $object;
 	}
-	
-	private function getParams(array $params = array(),array $newInstances = array()) {
+		
+	private function getParams(array $params = [],array $newInstances = []) {
 		for ($i = 0; $i < count($params); $i++) {
-			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]->name, array(), null, in_array(strtolower($params[$i]->name), array_map('strtolower', $newInstances)));
+			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]->name, [], null, in_array(strtolower($params[$i]->name), array_map('strtolower', $newInstances)));
 			else $params[$i] = ( !(is_array($params[$i]) && isset($params[$i][0]) && is_string($params[$i][0])) && is_callable($params[$i])) ? call_user_func($params[$i], $this) : $params[$i];
 		}
 		return $params;
 	}
 	
-	private function getMethodParams($className, $method, Rule $rule, array $args = array(), array $share = array()) {
-		if (!method_exists($className, $method)) return array();
+	private function getMethodParams($className, $method, Rule $rule, array $args = [], array $share = []) {
+		if (!method_exists($className, $method)) return [];
 		$params = (new \ReflectionMethod($className, $method))->getParameters();
-		$parameters = array();
+		$parameters = [];
 		foreach ($params as $param) {			
 			foreach ($args as $argName => $arg) {
 				$class = $param->getClass();
@@ -82,13 +82,13 @@ class Dice {
 
 class Rule {
 	public $shared = false;
-	public $constructParams = array();
-	public $substitutions = array();
-	public $newInstances = array();
+	public $constructParams = [];
+	public $substitutions = [];
+	public $newInstances = [];
 	public $instanceOf;
-	public $call = array();
+	public $call = [];
 	public $inherit = true;
-	public $shareInstances = array();
+	public $shareInstances = [];
 }
 
 class Instance {

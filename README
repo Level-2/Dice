@@ -12,16 +12,30 @@ Just require dice.php in your project and you're good to go.
 For full documentation see http://r.je/dice.html
 
 
+
+
+
+PHP version compatibility
+-------------------------
+
+Dice is compatible with PHP5.4 and up, however there is a PHP5.3 branch available for PHP5.3. 5.2 and lower are no longer supported.
+
+
 Updates
 ------------
 
+01/03/2013
++ Added test cases for the Xml Loader and Loader Callback classes
++ Added a JSON loader + test case
++ Added all test cases to a test suite
++ Moved to PHP5.4 array syntax. A PHP5.3 compatible version is now available in the PHP5.3 branch.
++ Fixed an issue where using named instances would trigger the autoloader with an invalid class name every time a class was created 
+
+
 28/02/2014
-Added basic namespace support. Documentation update will follow shortly. Also moved the XML loader into its own file, you'll need to include it separately if you're using it.
++ Added basic namespace support. Documentation update will follow shortly. Also moved the XML loader into its own file, you'll need to include it separately if you're using it.
++ Please note: CHANGES ARE NOT BACKWARDS COMPATIBLE. However they are easily fixed by doing the following find/replaces:
 
-Please note: CHANGES WERE NOT BACKWARDS COMPATIBLE. However they are easily fixed by doing the following find/replaces:
-
-new Dice => new \Dice\Dice
-new DiceInstance => new \Dice\Instance
-new DiceRule => new \Dice\Rule
-
-This version is no longer compatible with PHP5.2 or lower.
+	new Dice => new \Dice\Dice
+	new DiceInstance => new \Dice\Instance
+	new DiceRule => new \Dice\Rule

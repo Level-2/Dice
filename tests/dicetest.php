@@ -6,10 +6,10 @@
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1
 */
-require_once '../dice.php';
-require_once './testclasses.php';
-require_once './testclasses_namespace.php';
 
+require_once 'dice.php';
+require_once 'tests/testdata/testclasses.php';
+require_once 'tests/testdata/testclasses_namespace.php';
 
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;

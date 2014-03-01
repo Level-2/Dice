@@ -7,9 +7,9 @@
 * @version				1.1.1
 */
 
-require_once '../dice.php';
-require_once '../loader/json.php';
-require_once '../loader/callback.php';
+require_once 'dice.php';
+require_once 'loader/json.php';
+require_once 'loader/callback.php';
 
 
 class JsonLoaderTest extends PHPUnit_Framework_TestCase {

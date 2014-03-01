@@ -7,9 +7,9 @@
 * @version				1.1.1
 */
 
-require_once '../dice.php';
-require_once '../loader/xml.php';
-require_once '../loader/callback.php';
+require_once 'dice.php';
+require_once 'loader/xml.php';
+require_once 'loader/callback.php';
 
 
 class XmlLoaderTest extends PHPUnit_Framework_TestCase {

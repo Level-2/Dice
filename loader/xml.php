@@ -10,8 +10,8 @@ namespace Dice\Loader;
 
 class XML {
 	private function getComponent($str, $createInstance = false) {
-		if ($createInstance) return (strpos((string) $str, '{') === 0) ? array(new Callback($str), 'create') : new \Dice\Instance((string) $str);
-		else return (strpos((string) $str, '{') === 0) ? array(new Callback($str), 'create') : (string) $str;
+		if ($createInstance) return (strpos((string) $str, '{') === 0) ? [new Callback($str), 'run'] : new \Dice\Instance((string) $str);
+		else return (strpos((string) $str, '{') === 0) ? [new Callback($str), 'run'] : (string) $str;
 	}
 
 	public function load($map, \Dice\Dice $dic) {
@@ -22,9 +22,9 @@ class XML {
 			$rule->inherit = ($value->inherit == 'false') ? false : true;
 			if ($value->call) {
 				foreach ($value->call as $name => $call) {
-					$callArgs = array();
+					$callArgs = [];
 					if ($call->params) 	foreach ($call->params->children() as $key => $param) 	$callArgs[] = $this->getComponent((string) $param, ($key == 'instance'));
-					$rule->call[] = array((string) $call->method, $callArgs);
+					$rule->call[] = [(string) $call->method, $callArgs];
 				}
 			}
 			if ($value->instanceof) $rule->instanceOf = (string) $value->instanceof;
