@@ -6,38 +6,16 @@
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1.1
 */
-namespace Dice\XML;
+namespace Dice\Loader;
 
-class Callback {
-	private $str;
-
-	public function __construct($str) {
-		$this->str = $str;
-	}
-
-	public function create(\Dice\Dice $dic) {
-		$parts = explode('::', trim($this->str, '{}'));
-		$object = $dic->create(array_shift($parts));
-		while ($var = array_shift($parts)) {
-			if (strpos($var, '(') !== false) {
-				$args = explode(',', substr($var, strpos($var, '(')+1, strpos($var, ')')-strpos($var, '(')-1));
-				$object = call_user_func_array(array($object, substr($var, 0, strpos($var, '('))), ($args[0] == null) ? array() : $args);
-			}
-			else $object = $object->$var;
-		}
-		return $object;
-	}
-}
-
-class Loader {
+class XML {
 	private function getComponent($str, $createInstance = false) {
 		if ($createInstance) return (strpos((string) $str, '{') === 0) ? array(new Callback($str), 'create') : new \Dice\Instance((string) $str);
 		else return (strpos((string) $str, '{') === 0) ? array(new Callback($str), 'create') : (string) $str;
 	}
 
-	public function loadXml($map, \Dice\Dice $dic) {
+	public function load($map, \Dice\Dice $dic) {
 		if (!($map instanceof \SimpleXmlElement)) $map = simplexml_load_file($map);
-		$rules = array();
 		foreach ($map as $key => $value) {
 			$rule = clone $dic->getRule((string) $value->name);
 			$rule->shared = ($value->shared == 'true');

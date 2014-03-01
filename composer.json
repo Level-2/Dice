@@ -1,6 +1,6 @@
 {
     "name": "tombzombie/dice",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "A minimalist Dependency injection container (DIC) for PHP.",
     "license": "BSD-2-Clause",
     "homepage": "http://r.je/dice.html",
@@ -16,6 +16,6 @@
         "php": ">=5.3.0"
     },
     "autoload": {
-    	"files": ["dice.php", "xmlloader.php"]
+    	"classmap": ["loader/", "dice.php"]
     }
 }
