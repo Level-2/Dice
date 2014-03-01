@@ -1,5 +1,5 @@
 {
-    "name": "dice",
+    "name": "tombzombie/dice",
     "description": "A minimalist Dependency injection container (DIC) for PHP.",
     "require": {
         "php": ">=5.3.0"
