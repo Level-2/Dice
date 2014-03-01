@@ -5,6 +5,7 @@
     "license": "BSD-2-Clause",
     "homepage": "http://r.je/dice.html",
     "keywords": ["Dependency injection", "ioc", "Dependency injection container", "DI"],
+    "minimum-stability": "dev",
     "authors": [
     	{
     		"name": "Tom Butler",
