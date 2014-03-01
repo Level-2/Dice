@@ -24,7 +24,7 @@ Dice is compatible with PHP5.4 and up, however there is a PHP5.3 branch availabl
 Updates
 ------------
 
-01/03/2013
+01/03/2014
 + Added test cases for the Xml Loader and Loader Callback classes
 + Added a JSON loader + test case
 + Added all test cases to a test suite
