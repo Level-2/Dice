@@ -1,6 +1,7 @@
 {
     "name": "tombzombie/dice",
     "description": "A minimalist Dependency injection container (DIC) for PHP.",
+    "license": "BSD-2-Clause",
     "require": {
         "php": ">=5.3.0"
     },
