@@ -2,6 +2,14 @@
     "name": "tombzombie/dice",
     "description": "A minimalist Dependency injection container (DIC) for PHP.",
     "license": "BSD-2-Clause",
+    "homepage": "http://r.je/dice.html",
+    "keywords": ["Dependency injection, "ioc", "Dependency injection container", "DI"],
+    "authors": [
+    	{
+    		"name": "Tom Butler",
+    		"email": "tom@r.je"
+    	}
+    ],
     "require": {
         "php": ">=5.3.0"
     },
