@@ -1,0 +1,10 @@
+{
+    "name": "TomBZombie/Dice",
+    "description": "A minimalist Dependency injection container (DIC) for PHP.",
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+    	"files": ["dice.php", "xmlloader.php"]
+    }
+}
