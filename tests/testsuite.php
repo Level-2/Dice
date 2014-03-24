@@ -1,8 +1,8 @@
 <?php
-require_once 'tests/dicetest.php';
-require_once 'tests/loaders/jsonloadertest.php';
-require_once 'tests/loaders/xmlloadertest.php';
-require_once 'tests/loaders/callbacktest.php';
+require_once 'dicetest.php';
+require_once 'loaders/jsonloadertest.php';
+require_once 'loaders/xmlloadertest.php';
+require_once 'loaders/callbacktest.php';
 /**
 /**
  * Static test suite.

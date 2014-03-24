@@ -39,7 +39,7 @@ class Dice {
 		$rule = $this->getRule($component);
 		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;		
 		$share = $this->getParams($rule->shareInstances);		
-		$params = $this->getMethodParams($className, '__construct', $rule, array_merge($share, $args, $this->getParams($rule->constructParams)), $share);
+		$params = $this->getmethodParams($className, '__construct', $rule, array_merge($share, $args, $this->getParams($rule->constructParams)), $share);
 		
 		if (is_callable($callback, true)) call_user_func($callback, $params);
 		

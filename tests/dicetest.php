@@ -6,10 +6,9 @@
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1
 */
-
 require_once 'dice.php';
-require_once 'tests/testdata/testclasses.php';
-require_once 'tests/testdata/testclasses_namespace.php';
+require_once 'testdata/testclasses.php';
+require_once 'testdata/testclasses_namespace.php';
 
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
@@ -24,8 +23,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice = null;		
 		parent::tearDown ();
 	}
-	
-	
+		
 	public function testAssign() {
 		$obj = $this->getMock('stdClass', array(), array(), 'AssignMe');
 		$this->dice->assign($obj);
@@ -105,6 +103,11 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$a2 = $this->dice->create('A');
 		
 		$this->assertNotSame($a1->b, $a2->b);
+	}
+	
+	public function testDefaultValueAssigned() {
+		$obj = $this->dice->create('MethodWithDefaultValue');
+		$this->assertEquals($obj->foo, 'bar');
 	}
 	
 	public function testSharedNamed() {
