@@ -4,7 +4,7 @@
  * @copyright			2012-2014 Tom Butler <tom@r.je>
  * @link				http://r.je/dice.html
  * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License 
- * @version				1.1.1
+ * @version				1.2.0
  */
 namespace Dice;
 class Dice {
