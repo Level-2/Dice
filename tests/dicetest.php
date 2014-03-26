@@ -14,6 +14,15 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
 
 
+	public function __construct() {
+		parent::__construct();
+		spl_autoload_register(array($this, 'autoload'));
+	}
+	
+	public function autoload($class) {
+		$this->fail('Autoload triggered: ' . $class);
+	}
+	
 	protected function setUp() {
 		parent::setUp ();
 		$this->dice = new \Dice\Dice();	
@@ -23,15 +32,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice = null;		
 		parent::tearDown ();
 	}
-		
-	public function testAssign() {
-		$obj = $this->getMock('stdClass', array(), array(), 'AssignMe');
-		$this->dice->assign($obj);
-		$result = $this->dice->create('AssignMe');		
-		$this->assertSame($obj, $result);
-	}
-	
-	
+
 	
 	public function testSetDefaultRule() {
 		$defaultBehaviour = new \Dice\Rule();
@@ -130,7 +131,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$a1 = $this->dice->create('A');
 		$a2 = $this->dice->create('A');
 		
-		$a3 = $this->dice->create('A', array(), null, true);
+		$a3 = $this->dice->create('A', array(), true);
 		
 		$this->assertSame($a1, $a2);
 		$this->assertNotSame($a1, $a3);
@@ -255,18 +256,6 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('A', $obj->a);
 	}
 	
-	public function testCreateCallback() {
-		$result = false;
-		$callback = function($params) use (&$result) {
-			$result = $params;
-		};
-		
-		$this->dice->create('A', array(), $callback);
-		
-		$this->assertTrue(is_array($result));
-		$this->assertInstanceOf('B', $result[0]);
-	}
-	
 	public function testCreateArgs1() {
 		$a = $this->dice->create('A', array($this->dice->create('ExtendedB')));
 		$this->assertInstanceOf('ExtendedB', $a->b);
@@ -318,7 +307,6 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$z = $this->dice->create('Z');
 		$this->assertEquals($z->y1->name, 'FirstY');
 		$this->assertEquals($z->y2->name, 'SecondY');		
-		
 	}
 	
 	public function testNonSharedComponentByNameA() {

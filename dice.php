@@ -11,10 +11,6 @@ class Dice {
 	private $rules = [];
 	private $instances = [];
 		
-	public function assign($object) {
-		$this->instances[strtolower(get_class($object))] = $object;
-	}
-	
 	public function addRule($name, Rule $rule) {
 		$rule->substitutions = array_change_key_case($rule->substitutions);
 		$this->rules[strtolower(trim($name, '\\'))] = $rule;
@@ -28,7 +24,7 @@ class Dice {
 		return isset($this->rules['*']) ? $this->rules['*'] : new Rule;
 	}
 	
-	public function create($component, array $args = [], $callback = null, $forceNewInstance = false) {
+	public function create($component, array $args = [], $forceNewInstance = false) {
 		if ($component instanceof Instance) $component = $component->name;		
 		$component = trim($component, '\\');
 		
@@ -38,45 +34,42 @@ class Dice {
 		
 		$rule = $this->getRule($component);
 		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;		
-		$share = $this->getParams($rule->shareInstances);		
-		$params = $this->getmethodParams($className, '__construct', $rule, array_merge($share, $args, $this->getParams($rule->constructParams)), $share);
-		
-		if (is_callable($callback, true)) call_user_func($callback, $params);
-		
+		$share = $this->expandParams($rule->shareInstances);		
+		$params = $this->getMethodParams($className, '__construct', $rule->substitutions, $rule->newInstances, array_merge($share, $args, $this->expandParams($rule->constructParams)), $share);
+				
 		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : $object = new $className;
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
-		foreach ($rule->call as $call) call_user_func_array([$object, $call[0]], $this->getMethodParams($className, $call[0], $rule, array_merge($this->getParams($call[1]), $args)));
+		foreach ($rule->call as $call) call_user_func_array([$object, $call[0]], $this->getMethodParams($className, $call[0], [], [], array_merge($this->expandParams($call[1]), $args)));
 		return $object;
 	}
 		
-	private function getParams(array $params = [],array $newInstances = []) {
+	private function expandParams(array $params = [], array $newInstances = []) {
 		for ($i = 0; $i < count($params); $i++) {
-			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]->name, [], null, in_array(strtolower($params[$i]->name), array_map('strtolower', $newInstances)));
-			else $params[$i] = ( !(is_array($params[$i]) && isset($params[$i][0]) && is_string($params[$i][0])) && is_callable($params[$i])) ? call_user_func($params[$i], $this) : $params[$i];
+			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]->name, []);
+			else $params[$i] = is_callable($params[$i]) ? call_user_func($params[$i], $this) : $params[$i];
 		}
 		return $params;
 	}
 	
-	private function getMethodParams($className, $method, Rule $rule, array $args = [], array $share = []) {
+	private function getMethodParams($className, $method, array $substitutions = [], array $newInstances = [], array $args = [], array $share = []) {
 		if (!method_exists($className, $method)) return [];
 		$params = (new \ReflectionMethod($className, $method))->getParameters();
-		$parameters = [];
-		foreach ($params as $param) {			
-			foreach ($args as $argName => $arg) {
-				$class = $param->getClass();
-				if ($class && is_object($arg) && $arg instanceof $class->name) {
+		$parameters = [];		
+		foreach ($params as $param) {
+			$class = $param->getClass() ? $param->getClass()->name : false;	
+			foreach ($args as $argName => $arg) {				
+				if ($class && $arg instanceof $class) {
 					$parameters[] = $arg;
 					unset($args[$argName]);
 					continue 2;
 				}
 			}
-			$paramClassName = $param->getClass() ? strtolower($param->getClass()->name) : false;			
-			if ($paramClassName && isset($rule->substitutions[$paramClassName])) $parameters[] = is_string($rule->substitutions[$paramClassName]) ? new Instance($rule->substitutions[$paramClassName]) : $rule->substitutions[$paramClassName];
-			else if ($paramClassName && class_exists($paramClassName)) $parameters[] = $this->create($paramClassName, $share, null, in_array($paramClassName, array_map('strtolower', $rule->newInstances)));
+			if ($class && isset($substitutions[strtolower($class)])) $parameters[] = is_string($substitutions[strtolower($class)]) ? new Instance($substitutions[strtolower($class)]) : $substitutions[strtolower($class)];
+			else if ($class) $parameters[] = $this->create($class, $share, in_array(strtolower($class), array_map('strtolower', $newInstances)));
 			else if (is_array($args) && count($args) > 0) $parameters[] = array_shift($args);
 			else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;			
 		}
-		return $this->getParams($parameters, $rule->newInstances);
+		return $this->expandParams($parameters, $newInstances);
 	}
 }
 
