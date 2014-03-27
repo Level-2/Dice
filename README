@@ -7,10 +7,34 @@ Dice is a minimalist Dependency Injection Container for PHP.
 Installation
 ------------
 
-Just require dice.php in your project and you're good to go.
+Just include the lightweight dice.php in your project and it's usable without any further configuration:
+
+Simple example:
+
+<?php
+class A {
+	public $b;
+	
+	public function __construct(B $b) {
+		$this->b = $b;
+	}
+}
+
+class B {
+	
+}
+
+require_once 'dice.php';
+$dice = new \Dice\Dice;
+
+$a = $dice->create('A');
+
+var_dump($a->b); //B object
+
+?>
+
 
 For full documentation see http://r.je/dice.html
-
 
 
 
@@ -23,6 +47,14 @@ Dice is compatible with PHP5.4 and up, however there is a PHP5.3 branch availabl
 
 Updates
 ------------
+
+27/03/2013
++ Removed assign() method as this duplicated functionality available using $rule->shared
++ Removed $callback argument in $dice->create() as the only real use for this feature can be better achieved using $rule->shareInstances
++ Tidied up code, removing unused/undocumented features. Dice is now even more lightweight and faster.
++ Fixed a bug where when using $rule->call it would use the substitution rules from the constructor on each method called
++ Updated documentation ( http://r.je/dice.html ) to use shorthand array syntax
+
 
 01/03/2014
 + Added test cases for the Xml Loader and Loader Callback classes

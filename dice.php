@@ -18,16 +18,15 @@ class Dice {
 	
 	public function getRule($name) {
 		if (isset($this->rules[strtolower(trim($name, '\\'))])) return $this->rules[strtolower(trim($name, '\\'))];
-		foreach ($this->rules as $key => $value) {
-			if ($value->instanceOf === null && $key !== '*' && is_subclass_of($name, $key) && $value->inherit === true) return $value;
+		foreach ($this->rules as $key => $rule) {
+			if ($rule->instanceOf === null && $key !== '*' && is_subclass_of($name, $key) && $rule->inherit === true) return $rule;
 		}
 		return isset($this->rules['*']) ? $this->rules['*'] : new Rule;
 	}
 	
-	public function create($component, array $args = [], $forceNewInstance = false) {
-		if ($component instanceof Instance) $component = $component->name;		
-		$component = trim($component, '\\');
-		
+	public function create($component, array $args = [], $forceNewInstance = false) {		
+		$component = trim(($component instanceof Instance) ? $component->name : $component, '\\');		
+				
 		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
 		
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
@@ -43,10 +42,10 @@ class Dice {
 		return $object;
 	}
 		
-	private function expandParams(array $params = [], array $newInstances = []) {
+	private function expandParams(array $params, array $newInstances = []) {
 		for ($i = 0; $i < count($params); $i++) {
-			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]->name, []);
-			else $params[$i] = is_callable($params[$i]) ? call_user_func($params[$i], $this) : $params[$i];
+			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]);
+			else if (is_callable($params[$i])) $params[$i] = call_user_func($params[$i], $this);
 		}
 		return $params;
 	}
@@ -67,7 +66,6 @@ class Dice {
 			if ($class && isset($substitutions[strtolower($class)])) $parameters[] = is_string($substitutions[strtolower($class)]) ? new Instance($substitutions[strtolower($class)]) : $substitutions[strtolower($class)];
 			else if ($class) $parameters[] = $this->create($class, $share, in_array(strtolower($class), array_map('strtolower', $newInstances)));
 			else if (is_array($args) && count($args) > 0) $parameters[] = array_shift($args);
-			else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;			
 		}
 		return $this->expandParams($parameters, $newInstances);
 	}
