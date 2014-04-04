@@ -4,7 +4,7 @@
  * @copyright			2012-2014 Tom Butler <tom@r.je>
  * @link				http://r.je/dice.html
  * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License 
- * @version				1.2.0
+ * @version				1.2.1
  */
 namespace Dice;
 class Dice {
@@ -25,16 +25,16 @@ class Dice {
 	}
 	
 	public function create($component, array $args = [], $forceNewInstance = false) {		
-		$component = trim(($component instanceof Instance) ? $component->name : $component, '\\');		
+		$component = trim(($component instanceof Instance) ? $component->name : $component, '\\');
 				
 		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
 		
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
-		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;		
-		$share = $this->expandParams($rule->shareInstances);		
-		$params = $this->getMethodParams($className, '__construct', $rule->substitutions, $rule->newInstances, array_merge($share, $args, $this->expandParams($rule->constructParams)), $share);
+		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;
+		$share = $this->expandParams($rule->shareInstances);
+		$params = $this->getMethodParams($className, '__construct', $rule->substitutions, $rule->newInstances, array_merge($args, $this->expandParams($rule->constructParams, $share), $share), $share);
 				
 		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : $object = new $className;
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
@@ -42,9 +42,9 @@ class Dice {
 		return $object;
 	}
 		
-	private function expandParams(array $params, array $newInstances = []) {
+	private function expandParams(array $params, array $share = []) {
 		for ($i = 0; $i < count($params); $i++) {
-			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i]);
+			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i], $share);
 			else if (is_callable($params[$i])) $params[$i] = call_user_func($params[$i], $this);
 		}
 		return $params;
@@ -53,10 +53,10 @@ class Dice {
 	private function getMethodParams($className, $method, array $substitutions = [], array $newInstances = [], array $args = [], array $share = []) {
 		if (!method_exists($className, $method)) return [];
 		$params = (new \ReflectionMethod($className, $method))->getParameters();
-		$parameters = [];		
+		$parameters = [];
 		foreach ($params as $param) {
-			$class = $param->getClass() ? $param->getClass()->name : false;	
-			foreach ($args as $argName => $arg) {				
+			$class = $param->getClass() ? $param->getClass()->name : false;
+			foreach ($args as $argName => $arg) {
 				if ($class && $arg instanceof $class) {
 					$parameters[] = $arg;
 					unset($args[$argName]);
@@ -67,7 +67,7 @@ class Dice {
 			else if ($class) $parameters[] = $this->create($class, $share, in_array(strtolower($class), array_map('strtolower', $newInstances)));
 			else if (is_array($args) && count($args) > 0) $parameters[] = array_shift($args);
 		}
-		return $this->expandParams($parameters, $newInstances);
+		return $this->expandParams($parameters, $share);
 	}
 }
 
