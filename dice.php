@@ -36,7 +36,7 @@ class Dice {
 		$share = $this->expandParams($rule->shareInstances);
 		$params = $this->getMethodParams($className, '__construct', $rule->substitutions, $rule->newInstances, array_merge($args, $this->expandParams($rule->constructParams, $share), $share), $share);
 				
-		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : $object = new $className;
+		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : new $className;
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
 		foreach ($rule->call as $call) call_user_func_array([$object, $call[0]], $this->getMethodParams($className, $call[0], [], [], array_merge($this->expandParams($call[1]), $args)));
 		return $object;
