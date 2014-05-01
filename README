@@ -48,7 +48,7 @@ Dice is compatible with PHP5.4 and up, however there is a PHP5.3 branch availabl
 Updates
 ------------
 
-27/03/2013
+27/03/2014
 + Removed assign() method as this duplicated functionality available using $rule->shared
 + Removed $callback argument in $dice->create() as the only real use for this feature can be better achieved using $rule->shareInstances
 + Tidied up code, removing unused/undocumented features. Dice is now even more lightweight and faster.
