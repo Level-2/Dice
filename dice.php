@@ -26,21 +26,22 @@ class Dice {
 	
 	public function create($component, array $args = [], $forceNewInstance = false) {		
 		$component = trim(($component instanceof Instance) ? $component->name : $component, '\\');
-		
+				
 		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
 		
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
-		$share = $this->expandParams($rule->shareInstances);		
-		$object = (new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component))->newInstanceWithoutConstructor();
-		
-		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;		
-		$this->injectParams($object, '__construct', $rule->substitutions, $rule->newInstances, array_merge($args, $this->expandParams($rule->constructParams, $share), $share), $share);
-		foreach ($rule->call as $call) $this->injectParams($object, $call[0], [], [], array_merge($this->expandParams($call[1]), $args));
+		$className = (!empty($rule->instanceOf)) ? $rule->instanceOf : $component;
+		$share = $this->expandParams($rule->shareInstances);
+		$params = $this->getMethodParams($className, '__construct', $rule->substitutions, $rule->newInstances, array_merge($args, $this->expandParams($rule->constructParams, $share), $share), $share);
+				
+		$object = (count($params) > 0) ? (new \ReflectionClass($className))->newInstanceArgs($params) : new $className;
+		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
+		foreach ($rule->call as $call) call_user_func_array([$object, $call[0]], $this->getMethodParams($className, $call[0], [], [], array_merge($this->expandParams($call[1]), $args)));
 		return $object;
 	}
-	
+		
 	private function expandParams(array $params, array $share = []) {
 		for ($i = 0; $i < count($params); $i++) {
 			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i], $share);
@@ -49,9 +50,9 @@ class Dice {
 		return $params;
 	}
 	
-	private function injectParams($object, $method, array $substitutions = [], array $newInstances = [], array $args = [], array $share = []) {
-		if (!method_exists($object, $method)) return;
-		$params = (new \ReflectionMethod($object, $method))->getParameters();
+	private function getMethodParams($className, $method, array $substitutions = [], array $newInstances = [], array $args = [], array $share = []) {
+		if (!method_exists($className, $method)) return [];
+		$params = (new \ReflectionMethod($className, $method))->getParameters();
 		$parameters = [];
 		foreach ($params as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : false;
@@ -66,7 +67,7 @@ class Dice {
 			else if ($class) $parameters[] = $this->create($class, $share, in_array(strtolower($class), array_map('strtolower', $newInstances)));
 			else if (is_array($args) && count($args) > 0) $parameters[] = array_shift($args);
 		}
-		call_user_func_array([$object, $method], $this->expandParams($parameters));
+		return $this->expandParams($parameters, $share);
 	}
 }
 
