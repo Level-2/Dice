@@ -7,6 +7,46 @@
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1
 */
+
+class CyclicA {
+	public $b;
+	
+	public function __construct(CyclicB $b) {
+		$this->b = $b;
+	}
+}
+
+class CyclicB {
+	public $a;
+	
+	public function __construct(CyclicA $a) {
+		$this->a = $a;
+	}
+}
+
+class Foo77 {
+	public $bar;
+
+	public function __construct(Bar77 $bar) {
+		$this->bar = $bar;
+	}
+}
+
+class Bar77 {
+	public $a;
+
+	public function __construct($a) {
+		$this->a = $a;
+	}
+}
+
+
+class Baz77 {
+	public static function create() {
+		return new Bar77('Z');
+	}
+}
+
 class Shared {
 	public $uniq;
 	
