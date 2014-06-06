@@ -10,9 +10,11 @@ require_once 'dice.php';
 require_once 'testdata/testclasses.php';
 require_once 'testdata/testclasses_namespace.php';
 
+
+
+
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
-
 
 	public function __construct() {
 		parent::__construct();
@@ -32,6 +34,35 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice = null;		
 		parent::tearDown ();
 	}
+
+	
+	public function testNoMoreAssign() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['Bar77'] = function() {
+			return Baz77::create();
+		};
+		
+		$this->dice->addRule('Foo77', $rule);
+		
+		$foo = $this->dice->create('Foo77');
+		
+		$this->assertInstanceOf('Bar77', $foo->bar);
+		$this->assertEquals('Z', $foo->bar->a);
+	}
+	
+	
+	public function testAssignSharedNamed() {
+		$rule = new \Dice\Rule;
+		$rule->shared = true;
+		$rule->instanceOf = function() {
+			return Baz77::create();
+		};
+		$this->dice->addRule('$SharedBaz', $rule);
+		
+		//$rule2 
+		
+	}
+	
 
 	
 	public function testSetDefaultRule() {
@@ -497,5 +528,18 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
 	}
 	
+	public function testCyclicReferences() {
+		$rule = new \Dice\Rule;
+		$rule->shared = true;
+		
+		$this->dice->addRule('CyclicB', $rule);
+		
+		$a = $this->dice->create('CyclicA');
+		
+		$this->assertInstanceOf('CyclicB', $a->b);
+		$this->assertInstanceOf('CyclicA', $a->b->a);
+		
+		$this->assertSame($a->b, $a->b->a->b);
+	}
 	
 }
