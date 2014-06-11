@@ -29,11 +29,12 @@ class Dice {
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
-		$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);		
-		$object = ($class->getConstructor() && $class->getConstructor()->isInternal()) || $class->isInternal()  ? $class->newInstanceArgs($this->getParams($class->getConstructor(), $args, $rule)) : $class->newInstanceWithoutConstructor();
-				
+		$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);
+		$constructor = $class->getConstructor();
+		$object = ($constructor && $constructor->isInternal()) ? $class->newInstanceArgs($this->getParams($constructor, $args, $rule)) : $class->newInstanceWithoutConstructor();
+			
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
-		if (!$class->isInternal() && $class->getConstructor()) $class->getConstructor()->invokeArgs($object, $this->getParams($class->getConstructor(), $args, $rule));
+		if ($constructor && !$constructor->isInternal()) $constructor->invokeArgs($object, $this->getParams($constructor, $args, $rule));
 		foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, $this->getParams($class->getMethod($call[0]), array_merge($this->expandParams($call[1]), $args), new Rule));
 		return $object;
 	}
