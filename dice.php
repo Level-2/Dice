@@ -29,12 +29,12 @@ class Dice {
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
-		$reflect = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);		
-		$object = $reflect->isInternal() ? $reflect->newInstanceArgs($this->getParams($reflect->getName(), '__construct', $args, $rule)) : $reflect->newInstanceWithoutConstructor();
+		$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);		
+		$object = $class->isInternal() ? $class->newInstanceArgs($this->getParams($class->getConstructor(), $args, $rule)) : $class->newInstanceWithoutConstructor();
 				
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
-		if (!$reflect->isInternal() && $reflect->getConstructor()) call_user_func_array([$object, '__construct'], $this->getParams($object, '__construct', $args, $rule));
-		foreach ($rule->call as $call) call_user_func_array([$object, $call[0]], $this->getParams($object, $call[0], array_merge($this->expandParams($call[1]), $args), new Rule));
+		if (!$class->isInternal() && $class->getConstructor()) $class->getConstructor()->invokeArgs($object, $this->getParams($class->getConstructor(), $args, $rule));
+		foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, $this->getParams($class->getMethod($call[0]), array_merge($this->expandParams($call[1]), $args), new Rule));
 		return $object;
 	}
 	
@@ -46,13 +46,13 @@ class Dice {
 		return $params;
 	}
 		
-	private function getParams($object, $method, array $args, Rule $rule) {
+	private function getParams(\ReflectionMethod $method, array $args, Rule $rule) {
 		$substitutions = array_change_key_case($rule->substitutions);
 		$share = $this->expandParams($rule->shareInstances);
 		$args = array_merge($args, $this->expandParams($rule->constructParams, $share), $share);
 		$parameters = [];
 		
-		foreach ((new \ReflectionMethod($object, $method))->getParameters() as $param) {
+		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : false;
 			foreach ($args as $argName => $arg) {
 				if ($class && $arg instanceof $class) {
@@ -63,7 +63,7 @@ class Dice {
 			}
 			if ($class && isset($substitutions[strtolower($class)])) $parameters[] = is_string($substitutions[strtolower($class)]) ? new Instance($substitutions[strtolower($class)]) : $substitutions[strtolower($class)];
 			else if ($class) $parameters[] = $this->create($class, $share, in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
-			else if (is_array($args) && count($args) > 0) $parameters[] = array_shift($args);
+			else if (count($args) > 0) $parameters[] = array_shift($args);
 		}
 		return $this->expandParams($parameters);
 	}
