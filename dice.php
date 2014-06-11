@@ -12,7 +12,6 @@ class Dice {
 	private $instances = [];
 		
 	public function addRule($name, Rule $rule) {
-		$rule->substitutions = array_change_key_case($rule->substitutions);
 		$this->rules[strtolower(trim($name, '\\'))] = $rule;
 	}
 	
@@ -26,9 +25,7 @@ class Dice {
 	
 	public function create($component, array $args = [], $forceNewInstance = false) {		
 		$component = trim(($component instanceof Instance) ? $component->name : $component, '\\');
-		
-		if (!isset($this->rules[strtolower($component)]) && !class_exists($component)) throw new \Exception('Class does not exist for creation: ' . $component);
-		
+
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 		
 		$rule = $this->getRule($component);
@@ -36,7 +33,7 @@ class Dice {
 		$object = (new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component))->newInstanceWithoutConstructor();
 		
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;		
-		$this->injectParams($object, '__construct', $rule->substitutions, $rule->newInstances, array_merge($args, $this->expandParams($rule->constructParams, $share), $share), $share);
+		$this->injectParams($object, '__construct', array_change_key_case($rule->substitutions), $rule->newInstances, array_merge($args, $this->expandParams($rule->constructParams, $share), $share), $share);
 		foreach ($rule->call as $call) $this->injectParams($object, $call[0], [], [], array_merge($this->expandParams($call[1]), $args));
 		return $object;
 	}
