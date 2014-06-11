@@ -30,7 +30,7 @@ class Dice {
 		
 		$rule = $this->getRule($component);
 		$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);		
-		$object = $class->isInternal() ? $class->newInstanceArgs($this->getParams($class->getConstructor(), $args, $rule)) : $class->newInstanceWithoutConstructor();
+		$object = ($class->getConstructor() && $class->getConstructor()->isInternal()) || $class->isInternal()  ? $class->newInstanceArgs($this->getParams($class->getConstructor(), $args, $rule)) : $class->newInstanceWithoutConstructor();
 				
 		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
 		if (!$class->isInternal() && $class->getConstructor()) $class->getConstructor()->invokeArgs($object, $this->getParams($class->getConstructor(), $args, $rule));
