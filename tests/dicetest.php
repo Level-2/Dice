@@ -12,7 +12,6 @@ require_once 'testdata/testclasses_namespace.php';
 
 
 
-
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
 
@@ -22,7 +21,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function autoload($class) {
-		$this->fail('Autoload triggered: ' . $class);
+	//	$this->fail('Autoload triggered: ' . $class);
 	}
 	
 	protected function setUp() {
@@ -35,6 +34,40 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		parent::tearDown ();
 	}
 
+	
+	public function testInternalClass() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams[] = '.';
+		
+		$this->dice->addRule('DirectoryIterator', $rule);
+		
+		$dir = $this->dice->create('DirectoryIterator');
+		
+		$this->assertInstanceOf('DirectoryIterator', $dir);
+	}
+	
+	public function testInternalClassExtended() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams[] = '.';
+	
+		$this->dice->addRule('MyDirectoryIterator', $rule);
+	
+		$dir = $this->dice->create('MyDirectoryIterator');
+	
+		$this->assertInstanceOf('MyDirectoryIterator', $dir);
+	}
+	
+	
+	public function testInternalClassExtendedConstructor() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams[] = '.';
+	
+		$this->dice->addRule('MyDirectoryIterator2', $rule);
+	
+		$dir = $this->dice->create('MyDirectoryIterator2');
+	
+		$this->assertInstanceOf('MyDirectoryIterator2', $dir);
+	}
 	
 	public function testNoMoreAssign() {
 		$rule = new \Dice\Rule;
@@ -63,7 +96,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		
 	}
 	
-
+	public function testPdo() {
+		$pdo = $this->dice->create('mysqli');
+	}
 	
 	public function testSetDefaultRule() {
 		$defaultBehaviour = new \Dice\Rule();
@@ -428,6 +463,16 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$object = $this->dice->create('TestCall2');
 		$this->assertEquals('one', $object->foo);
 		$this->assertEquals('two', $object->bar);
+	}
+	
+	public function testCallWithInstance() {
+		$rule = new \Dice\Rule;
+		$rule->call[] = array('callMe', array(new \Dice\Instance('A')));
+		$this->dice->addRule('TestCall3', $rule);
+		$object = $this->dice->create('TestCall3');
+		
+		$this->assertInstanceOf('a', $object->a);
+	
 	}
 	
 	
