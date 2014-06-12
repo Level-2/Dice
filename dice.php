@@ -40,16 +40,16 @@ class Dice {
 	}
 	
 	private function expandParams(array $params, array $share = []) {
-		for ($i = 0; $i < count($params); $i++) {
-			if ($params[$i] instanceof Instance) $params[$i] = $this->create($params[$i], $share);
-			else if (is_callable($params[$i])) $params[$i] = $params[$i]($this);
+		foreach ($params as &$param) {
+			if ($param instanceof Instance) $param = $this->create($param, $share);
+			else if (is_callable($param)) $param = $param($this);
 		}
 		return $params;
 	}
 		
 	private function getParams(\ReflectionMethod $method, array $args, Rule $rule) {
 		$subs = array_change_key_case($rule->substitutions);
-		$share = $this->expandParams($rule->shareInstances);
+		$share = array_map([$this, 'create'], $rule->shareInstances);
 		$args = array_merge($args, $this->expandParams($rule->constructParams, $share), $share);
 		$parameters = [];
 		

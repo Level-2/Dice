@@ -503,7 +503,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testShareInstances() {
 		$rule = new \Dice\Rule();
-		$rule->shareInstances = array(new \Dice\Instance('Shared'));
+		$rule->shareInstances = ['Shared'];
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
 		
 		
@@ -521,7 +521,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testShareInstancesMultiple() {
 		$rule = new \Dice\Rule();
-		$rule->shareInstances = array(new \Dice\Instance('Shared'));
+		$rule->shareInstances = ['Shared'];
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
 	
 	
