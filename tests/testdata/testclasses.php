@@ -8,6 +8,11 @@
 * @version				1.1
 */
 
+class NoConstructor {
+	public $a = 'b';
+}
+
+
 class CyclicA {
 	public $b;
 	
@@ -76,6 +81,16 @@ class MethodWithDefaultValue {
 	}
 }
 
+class MyDirectoryIterator extends DirectoryIterator {
+	
+}
+
+
+class MyDirectoryIterator2 extends DirectoryIterator {
+	public function __construct($f) {
+		parent::__construct($f);
+	}
+}
 
 class SharedInstanceTest1 {
 	public $shared;
@@ -120,6 +135,7 @@ class TestCall3 {
 		$this->a = $a;
 	}
 }
+
 
 class HasTwoSameDependencies {
 	public $y2a;

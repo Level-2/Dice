@@ -53,11 +53,14 @@ For full documentation see http://r.je/dice.html
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP5.4 and up, however there is a PHP5.3 branch available for PHP5.3. 5.2 and lower are no longer supported.
+Dice is compatible with PHP5.5 and up, however there are archived versions of Dice which support PHP5.4 and PHP5.3 however these are no longer maintanied.
 
 
 Updates
 ------------
+
+24/06/2014
++ Improved efficiency by using generators. Please note this makes Dice 1.3 compatible with PHP5.5 and higher only.
 
 06/06/2014
 + Added support for cyclic references ( https://github.com/TomBZombie/Dice/issues/7 ). Please note this is poor design but this fix will stop the infinite loop this design creates.

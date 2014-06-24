@@ -11,7 +11,6 @@ require_once 'testdata/testclasses.php';
 require_once 'testdata/testclasses_namespace.php';
 
 
-
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
 
@@ -32,6 +31,12 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	protected function tearDown() {
 		$this->dice = null;		
 		parent::tearDown ();
+	}
+	
+	public function testNoConstructor() {
+		$a = $this->dice->create('NoConstructor');
+		
+		$this->assertInstanceOf('NoConstructor', $a);
 	}
 
 	
