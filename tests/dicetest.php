@@ -403,7 +403,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice->addRule('$Y2', $rule);
 		
 		
-		$y2 = $this->dice->create(new \Dice\Instance('$Y2'));
+		$y2 = $this->dice->create('$Y2');
 		//echo $y2->name;
 		$this->assertInstanceOf('Y3', $y2);
 		
@@ -553,6 +553,36 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	public function testNamespaceBasic() {
 		$a = $this->dice->create('Foo\\A');
 		$this->assertInstanceOf('Foo\\A', $a);
+	}
+	
+	
+	public function testNamespaceWithSlash() {
+		$a = $this->dice->create('\\Foo\\A');
+		$this->assertInstanceOf('\\Foo\\A', $a);
+	}
+	
+	public function testNamespaceWithSlashrule() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['Foo\\A'] = 'Foo\\ExtendedA';
+		$this->dice->addRule('\\Foo\\B', $rule);
+		
+		$b = $this->dice->create('\\Foo\\B');
+		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
+	}
+	
+	public function testNamespaceTypeHint() {
+		$rule = new \Dice\Rule;
+		$rule->shared = true;
+		$this->dice->addRule('Bar\\A', $rule);
+		
+		$c = $this->dice->create('Foo\\C');
+		$this->assertInstanceOf('Bar\\A', $c->a);
+		
+		$c2 = $this->dice->create('Foo\\C');
+		$this->assertNotSame($c, $c2);
+		
+		//Check the rule has been correctly recognised for type hinted classes in a different namespace
+		$this->assertSame($c2->a, $c->a);
 	}
 	
 	public function testNamespaceInjection() {

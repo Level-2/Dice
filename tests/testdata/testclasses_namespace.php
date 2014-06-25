@@ -6,7 +6,7 @@
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1
 */
-namespace foo;
+namespace foo {
 
 class A {
 	
@@ -22,4 +22,25 @@ class B {
 
 class ExtendedA extends A {
 	
+}
+
+
+class C {
+	public $a;
+		
+	public function __construct(\Bar\A $a) {
+		$this->a = $a;
+	}
+}
+
+}
+
+namespace bar {
+	class A {
+		
+	}	
+	
+	class B {
+		
+	}
 }

@@ -24,8 +24,6 @@ class Dice {
 	}
 
 	public function create($component, array $args = [], $forceNewInstance = false) {
-		$component = trim(($component instanceof Instance) ? $component->name : $component, '\\');
-
 		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
 
 		$rule = $this->getRule($component);
@@ -42,7 +40,7 @@ class Dice {
 
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map([$this, 'expand'], $param);
-		else if ($param instanceof Instance) $param = $this->create($param, $share);
+		else if ($param instanceof Instance) $param = $this->create($param->name, $share);
 		else if (is_callable($param)) $param = $param($this);
 		return $param;
 	}
