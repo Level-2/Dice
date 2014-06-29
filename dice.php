@@ -1,20 +1,18 @@
 <?php 
-/* @description 		Dice - A minimal Dependency Injection Container for PHP  
- * @author				Tom Butler tom@r.je
- * @copyright			2012-2014 Tom Butler <tom@r.je>
- * @link				http://r.je/dice.html
- * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License 
- * @version				1.3.0
- */
+/* @description		Dice - A minimal Dependency Injection Container for PHP				*  
+ * @author			Tom Butler tom@r.je													*
+ * @copyright		2012-2014 Tom Butler <tom@r.je> | http://r.je/dice.html				*
+ * @license			http://www.opensource.org/licenses/bsd-license.php  BSD License 	*
+ * @version			1.3.1																*/
 namespace Dice;
 class Dice {
 	private $rules = [];
-	private $instances = [];
-
+	private $cache = ['instances' => []];
+		
 	public function addRule($name, Rule $rule) {
 		$this->rules[strtolower(trim($name, '\\'))] = $rule;
 	}
-
+	
 	public function getRule($name) {
 		if (isset($this->rules[strtolower(trim($name, '\\'))])) return $this->rules[strtolower(trim($name, '\\'))];
 		foreach ($this->rules as $key => $rule) {
@@ -22,46 +20,58 @@ class Dice {
 		}
 		return isset($this->rules['*']) ? $this->rules['*'] : new Rule;
 	}
-
-	public function create($component, array $args = [], $forceNewInstance = false) {
-		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
-
-		$rule = $this->getRule($component);
-		$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);
-		$constructor = $class->getConstructor();
-		$params = $this->getParams($constructor, $args, $rule);
-		$object = ($constructor && end(($class->getMethods()))->isInternal()) ? $class->newInstanceArgs(iterator_to_array($params)) : $class->newInstanceWithoutConstructor();
-
-		if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
-		if ($constructor && !end(($class->getMethods()))->isInternal()) $constructor->invokeArgs($object, iterator_to_array($params));
-		foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, iterator_to_array($this->getParams($class->getMethod($call[0]), $call[1], new Rule)));
-		return $object;
-	}
-
-	private function expand($param, array $share = []) {
-		if (is_array($param)) return array_map([$this, 'expand'], $param);
-		else if ($param instanceof Instance) $param = $this->create($param->name, $share);
-		else if (is_callable($param)) $param = $param($this);
-		return $param;
-	}
-
-	private function getParams(\ReflectionMethod $method, array $args, Rule $rule) {
-		$subs = array_change_key_case($rule->substitutions);
-		$share = array_map([$this, 'create'], $rule->shareInstances);
-		$args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 	
-		foreach ($method->getParameters() as $param) {
-			$class = $param->getClass() ? strtolower($param->getClass()->name) : null;
-			for ($i = 0; $i < count($args); $i++) {
-				if ($class && $args[$i] instanceof $class) {
-					yield $this->expand(array_splice($args, $i, 1)[0]);
-					continue 2;
-				}
-			}
-			if (isset($subs[$class])) yield is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
-			else if ($class) yield $this->create($param->getClass()->name, $share, in_array($class, array_map('strtolower', $rule->newInstances)));
-			else if (count($args) > 0) yield $this->expand(array_shift($args));
+	public function create($component, array $args = [], $forceNewInstance = false) {
+		if (!$forceNewInstance && isset($this->cache['instances'][strtolower($component)])) return $this->cache['instances'][strtolower($component)];
+		if (!isset($this->cache[$component])) {
+			$rule = $this->getRule($component);
+			$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);
+			$constructor = $class->getConstructor();
+			$internal = $constructor && end(($class->getMethods()))->isInternal();		
+			$params = $constructor ? $this->getParams($constructor, $rule) : null;
+			
+			$this->cache[$component] = function($args, $forceNewInstance) use ($component, $rule, $class, $constructor, $internal, $params) {				
+				$object = ($constructor && $internal) ? $class->newInstanceArgs($params($args)) : $class->newInstanceWithoutConstructor();					
+				if ($rule->shared === true) $this->cache['instances'][strtolower($component)] = $object;
+				if ($constructor && !$internal) $constructor->invokeArgs($object, $params($args));
+				foreach ($rule->call as $call) 	$class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), new Rule), $call[1]));
+				return $object;
+			};
 		}
+		return $this->cache[$component]($args, $forceNewInstance);
+	}
+	
+	private function expandParams(array $params, array $share = []) {
+		foreach ($params as &$param) {
+			if ($param instanceof Instance) $param = $this->create($param->name, $share);
+			else if (is_callable($param)) $param = $param($this);
+		}
+		return $params;
+	}
+		
+	private function getParams(\ReflectionMethod $method, Rule $rule) {	
+		$subs = !empty($rule->substitutions) ? array_change_key_case($rule->substitutions) : [];
+		$paramClasses = [];
+		foreach ($method->getParameters() as $param) $paramClasses[] = $param->getClass() ? strtolower($param->getClass()->name) : null;
+
+		return function($args) use ($paramClasses, $rule, $subs) {			
+			$share = !empty($rule->shareInstances) ? array_map([$this, 'create'], $rule->shareInstances) : [];
+			$args = array_merge($args, !empty($rule->constructParams) ? $this->expandParams($rule->constructParams, $share) : [], $share);
+			$parameters = [];
+			
+			foreach ($paramClasses as $class) {
+				for ($i = 0; $i < count($args); $i++) {
+					if ($class && $args[$i] instanceof $class) {
+						$parameters[] = array_splice($args, $i, 1)[0];
+						continue 2;
+					}
+				}
+				if (isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expandParams($subs)[$class];
+				else if ($class) $parameters[] = $this->create($class, $share, in_array($class, array_map('strtolower', $rule->newInstances)));
+				else if (count($args) > 0) $parameters[] = array_shift($args);
+			}
+			return $parameters;
+		};	
 	}
 }
 

@@ -1,7 +1,7 @@
 Dice
 ====
 
-Dice is a minimalist Dependency Injection Container for PHP.
+Dice is a minimalist Dependency Injection Container for PHP with a focus on speed. Dice is the fastest DIC available.
 
 
 Project Goals
@@ -53,14 +53,14 @@ For full documentation see http://r.je/dice.html
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP5.5 and up, however there are archived versions of Dice which support PHP5.4 and PHP5.3 however these are no longer maintanied.
+Dice is compatible with PHP5.4 and up, however there are archived versions of Dice which supports PHP5.3 however this is no longer maintanied.
 
 
 Updates
 ------------
 
-24/06/2014
-+ Improved efficiency by using generators. Please note this makes Dice 1.3 compatible with PHP5.5 and higher only.
+28/06/2014
++ Greatly improved efficienty. Dice is now the fastest Dependency Injection Container for PHP!
 
 06/06/2014
 + Added support for cyclic references ( https://github.com/TomBZombie/Dice/issues/7 ). Please note this is poor design but this fix will stop the infinite loop this design creates.
