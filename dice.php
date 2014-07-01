@@ -23,7 +23,7 @@ class Dice {
 	}
 	
 	public function create($component, array $args = [], $forceNewInstance = false) {
-		if (!$forceNewInstance && isset($this->instances[strtolower($component)])) return $this->instances[strtolower($component)];
+		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
 		if (!isset($this->cache[$component])) {			
 			$rule = $this->getRule($component);
 			$class = new \ReflectionClass((!empty($rule->instanceOf)) ? $rule->instanceOf : $component);
@@ -32,12 +32,12 @@ class Dice {
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
 			$this->cache[$component] = function($args, $forceNewInstance) use ($component, $rule, $class, $constructor, $internal, $params) {
-				$object = ($constructor && $internal) ? $class->newInstanceArgs($params($args)) : $class->newInstanceWithoutConstructor();					
-				if ($rule->shared === true) $this->instances[strtolower($component)] = $object;
-				if ($constructor && !$internal) $constructor->invokeArgs($object, $params($args));
-				foreach ($rule->call as $call) 	$class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), new Rule), $call[1]));
+				$object = $internal ? $class->newInstanceArgs($params($args)) : $class->newInstanceWithoutConstructor();
+				if ($rule->shared === true) $this->instances[$component] =  $object;
+				if ($constructor && !$internal) $constructor->invokeArgs($object, $params($args));				
+				foreach ($rule->call as $call) 	$class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($this->expand($call[0])), new Rule), $call[1]));
 				return $object;
-			};
+			};			
 		}
 		return $this->cache[$component]($args, $forceNewInstance);
 	}
@@ -55,7 +55,7 @@ class Dice {
 
 		return function($args) use ($paramClasses, $rule, $subs) {			
 			$share = !empty($rule->shareInstances) ? array_map([$this, 'create'], $rule->shareInstances) : [];
-			$args = array_merge($args, !empty($rule->constructParams) ? $this->expand($rule->constructParams, $share) : [], $share);
+			if (!empty($share) || !empty($rule->constructParams)) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 			
 			foreach ($paramClasses as $class) {
@@ -66,8 +66,8 @@ class Dice {
 					}
 				}
 				if (isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
-				else if ($class) $parameters[] = $this->create($class, $share, in_array($class, array_map('strtolower', $rule->newInstances)));
-				else if (count($args) > 0) $parameters[] = array_shift($args);
+				else if ($class) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array($class, array_map('strtolower', $rule->newInstances)));
+				else if (!empty($args)) $parameters[] = array_shift($args);
 			}
 			return $parameters;
 		};	

@@ -39,7 +39,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('NoConstructor', $a);
 	}
 
-	
+		
 	public function testInternalClass() {
 		$rule = new \Dice\Rule;
 		$rule->constructParams[] = '.';
