@@ -570,6 +570,15 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
 	}
 	
+	public function testNamespaceWithSlashruleInstance() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['Foo\\A'] = new \Dice\Instance('Foo\\ExtendedA');
+		$this->dice->addRule('\\Foo\\B', $rule);
+	
+		$b = $this->dice->create('\\Foo\\B');
+		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
+	}
+	
 	public function testNamespaceTypeHint() {
 		$rule = new \Dice\Rule;
 		$rule->shared = true;
