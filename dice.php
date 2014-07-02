@@ -51,7 +51,7 @@ class Dice {
 		
 	private function getParams(\ReflectionMethod $method, Rule $rule) {	
 		$subs = !empty($rule->substitutions) ? array_change_key_case($rule->substitutions) : [];
-		$paramClasses = array_map(function($p) { return $p->getClass() ? strtolower($p->getClass()->name) : null;}, $method->getParameters());
+		$paramClasses = array_map(function($p) { return $p->getClass() ? $p->getClass()->name : null;}, $method->getParameters());
 
 		return function($args) use ($paramClasses, $rule, $subs) {			
 			$share = !empty($rule->shareInstances) ? array_map([$this, 'create'], $rule->shareInstances) : [];
@@ -65,7 +65,7 @@ class Dice {
 						continue 2;
 					}
 				}
-				if (isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
+				if (isset($subs[strtolower($class)])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
 				else if ($class) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array($class, array_map('strtolower', $rule->newInstances)));
 				else if (!empty($args)) $parameters[] = array_shift($args);
 			}
