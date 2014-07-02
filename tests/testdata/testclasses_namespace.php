@@ -6,7 +6,7 @@
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1
 */
-namespace foo {
+namespace Foo {
 
 class A {
 	
@@ -35,7 +35,7 @@ class C {
 
 }
 
-namespace bar {
+namespace Bar {
 	class A {
 		
 	}	
