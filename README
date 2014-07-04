@@ -13,7 +13,7 @@ Project Goals
 
 3) Where configuration is required, it should be as minimal and reusable as possible
 
-4) To be a lightning fast container. Dice is the fastest Container for PHP (Benchmarks to follow in the next few weeks)
+4) To be a lightning fast container. 
 
 
 Installation
