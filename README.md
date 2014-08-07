@@ -47,7 +47,11 @@ var_dump($a->b); //B object
 ?>
 ```
 
-For full documentation see https://r.je/dice.html
+
+Full Documentation
+------------------
+
+For complete documentation see https://r.je/dice.html
 
 
 
