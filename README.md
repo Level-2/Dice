@@ -1,5 +1,5 @@
-Dice
-====
+Dice PHP Dependency Injection Container
+======================================
 
 Dice is a minimalist Dependency Injection Container for PHP with a focus on being lightweight and fast as well as requiring as little configuration as possible.
 
