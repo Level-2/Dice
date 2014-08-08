@@ -1,4 +1,4 @@
-Dice PHP Dependency Injection Container
+[Dice PHP Dependency Injection Container](https://r.je/dice.html)
 ======================================
 
 Dice is a minimalist Dependency Injection Container for PHP with a focus on being lightweight and fast as well as requiring as little configuration as possible.
@@ -51,8 +51,7 @@ var_dump($a->b); //B object
 Full Documentation
 ------------------
 
-For complete documentation see https://r.je/dice.html
-
+For complete documentation please see the [Dice PHP Dependency Injection container home page](https://r.je/dice.html)
 
 
 PHP version compatibility
@@ -75,7 +74,7 @@ Updates
 * Removed $callback argument in $dice->create() as the only real use for this feature can be better achieved using $rule->shareInstances
 * Tidied up code, removing unused/undocumented features. Dice is now even more lightweight and faster.
 * Fixed a bug where when using $rule->call it would use the substitution rules from the constructor on each method called
-* Updated documentation ( http://r.je/dice.html ) to use shorthand array syntax
+* Updated [Dice documentation](https://r.je/dice.html) to use shorthand array syntax
 
 
 01/03/2014
