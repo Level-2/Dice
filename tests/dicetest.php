@@ -629,5 +629,18 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		
 		$this->assertSame($a->b, $a->b->a->b);
 	}
+
+	public function testSharedClassWithTraitExtendsInternalClass()
+	{
+		$rule = new \Dice\Rule;
+		$rule->shared = true;
+		$rule->constructParams = ['.'];
+
+		$this->dice->addRule('MyDirectoryIteratorWithTrait', $rule);
+
+		$dir = $this->dice->create('MyDirectoryIteratorWithTrait');
+
+		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
+	}
 	
 }
