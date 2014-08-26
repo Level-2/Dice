@@ -63,6 +63,9 @@ Dice is compatible with PHP5.4 and up, there are archived versions of Dice which
 Updates
 ------------
 
+26/08/2014
+* Added PHP5.6 branch. Tidied up code by using PHP5.6 features. This will be moved to master when PHP5.6 is released
+
 28/06/2014
 * Greatly improved efficienty. Dice is now the fastest Dependency Injection Container for PHP!
 
