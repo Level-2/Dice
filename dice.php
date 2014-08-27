@@ -1,9 +1,9 @@
 <?php 
-/* @description		Dice - A minimal Dependency Injection Container for PHP				*  
- * @author			Tom Butler tom@r.je													*
- * @copyright		2012-2014 Tom Butler <tom@r.je> | http://r.je/dice.html				*
- * @license			http://www.opensource.org/licenses/bsd-license.php  BSD License 	*
- * @version			1.3.1																*/
+/* @description		Dice - A minimal Dependency Injection Container for PHP				  
+ * @author		Tom Butler tom@r.je													*
+ * @copyright		2012-2014 Tom Butler <tom@r.je> | http://r.je/dice.html				
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License 	
+ * @version		1.3.2									*/
 namespace Dice;
 class Dice {
 	private $rules = [];
@@ -24,9 +24,9 @@ class Dice {
 		
 	public function create($component, array $args = [], $forceNewInstance = false) {
 		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
-		if (!isset($this->cache[$component])) {
+		if (empty($this->cache[$component])) {
 			$rule = $this->getRule($component);
-			$class = new \ReflectionClass(empty($rule->instanceOf) ? $component : $rule->instanceOf);
+			$class = new \ReflectionClass($rule->instanceOf ? $component : $rule->instanceOf);
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
@@ -67,8 +67,8 @@ class Dice {
 						continue 2;
 					}
 				}
-				if (!empty($subs) && isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
-				else if (!empty($class)) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
+				if ($subs && isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
+				else if ($class) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
 				else if (!empty($args)) $parameters[] = array_shift($args);
 			}
 			return $parameters;
