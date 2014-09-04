@@ -63,6 +63,10 @@ Dice is compatible with PHP5.4 and up, there are archived versions of Dice which
 Updates
 ------------
 
+04/09/2014
+* Pushed PHP5.6 branch live. This is slightly more efficient using PHP5.6 features. For PHP5.4-PHP5.5 please see the relevant branch. This version will be maintained until PHP5.6 is more widespread.
+
+
 26/08/2014
 * Added PHP5.6 branch. Tidied up code by using PHP5.6 features. This will be moved to master when PHP5.6 is released
 
