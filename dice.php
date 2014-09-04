@@ -24,26 +24,18 @@ class Dice {
 		
 	public function create($component, array $args = [], $forceNewInstance = false) {
 		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
-		if (!isset($this->cache[$component])) {
+		if (empty($this->cache[$component])) {
 			$rule = $this->getRule($component);
-			$class = new \ReflectionClass(empty($rule->instanceOf) ? $component : $rule->instanceOf);
+			$class = new \ReflectionClass($rule->instanceOf ? $rule->instanceOf : $component);
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
 			$this->cache[$component] = function($args, $forceNewInstance) use ($component, $rule, $class, $constructor, $params) {
 				if ($rule->shared) {
-                                        if ($constructor) {
-                                                try {
-                                                        $this->instances[$component] = $object = $class->newInstanceWithoutConstructor();
-                                                        $constructor->invokeArgs($object, $params($args));
-                                                } catch (\ReflectionException $r) {
-                                                        $this->instances[$component] = $object = $class->newInstanceArgs($params($args));
-                                                }
-					} else {
-						$this->instances[$component] = $object = $class->newInstanceWithoutConstructor();
-					}
+					$this->instances[$component] = $object = $class->isInternal() && $constructor ? $class->newInstanceArgs($params($args)) : $class->newInstanceWithoutConstructor();
+					if ($constructor && !$class->isInternal()) $constructor->invokeArgs($object, $params($args));
 				}
-				else $object = $params ? $class->newInstanceArgs($params($args)) : new $class->name;
+				else $object = $params ? new $class->name(...$params($args)) : new $class->name;
 				if (!empty($rule->call)) foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($this->expand($call[0])), new Rule), $call[1]));
 				return $object;
 			};			
@@ -75,8 +67,8 @@ class Dice {
 						continue 2;
 					}
 				}
-				if (!empty($subs) && isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
-				else if (!empty($class)) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
+				if ($subs && isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
+				else if ($class) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
 				else if (!empty($args)) $parameters[] = array_shift($args);
 			}
 			return $parameters;
