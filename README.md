@@ -57,7 +57,7 @@ For complete documentation please see the [Dice PHP Dependency Injection contain
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP5.4 and up, there are archived versions of Dice which supports PHP5.3 however this is no longer maintanied.
+Dice is compatible with PHP5.4 and up, the master branch is for PHP5.6+ with a PHP5.4-PHP5.5 branch also being maintained for earlier versions. There are archived versions of Dice which supports PHP5.3 however these are no longer maintanied.
 
 
 Updates
