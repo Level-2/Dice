@@ -57,11 +57,58 @@ For complete documentation please see the [Dice PHP Dependency Injection contain
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP5.4 and up, the master branch is for PHP5.6+ with a PHP5.4-PHP5.5 branch also being maintained for earlier versions. There are archived versions of Dice which supports PHP5.3 however these are no longer maintanied.
+Dice is compatible with PHP5.4 and up, there are archived versions of Dice which supports PHP5.3 however this is no longer maintanied.
 
 
 Updates
 ------------
+
+
+29/10/2014
+* Based on [Issue #15](https://github.com/TomBZombie/Dice/issues/15), Dice will now only call closures if they are wrapped in \Dice\Instance. **PLEASE NOTE: THIS IS BACKWARDS INCOMPATIBLE **. 
+
+Previously Dice ran closures that were passed as substitutions, constructParams and when calling methods:
+
+```php
+
+$rule->substitutions['A'] = function() {
+	return new A;
+};
+
+$rule->call[] = ['someMethod', function() {
+// '2' will be provided as the first argument when someMethod is called
+return 2;
+}];
+
+$rule->constructParams[] = function() {
+	//'abc' will be providedas the first constructor parameter
+	return 'abc';
+};
+``` 
+
+This behaviour has changed as it makes it impossible to provide a closure as a construct parameter or when calling a method because the closure was always called and executed. 
+
+To overcome this, Dice will now only call a closures if they're wrapped in \Dice\Instance:
+
+```php
+$rule->substitutions['A'] = new \Dice\Instance(function() {
+	return new A;
+});
+
+$rule->call[] = ['someMethod', new \Dice\Instance(function() {
+// '2' will be provided as the first argument when someMethod is called
+return 2;
+}]);
+
+$rule->constructParams[] = new \Dice\Instance(function() {
+	//'abc' will be providedas the first constructor parameter
+	return 'abc';
+});
+``` 
+
+
+
+
 
 04/09/2014
 * Pushed PHP5.6 branch live. This is slightly more efficient using PHP5.6 features. For PHP5.4-PHP5.5 please see the relevant branch. This version will be maintained until PHP5.6 is more widespread.
