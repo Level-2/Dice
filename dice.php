@@ -45,8 +45,8 @@ class Dice {
 	
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
-		if ($param instanceof Instance) return $this->create($param->name, $share);
-		else if (is_callable($param)) return $param($this);
+		if ($param instanceof Instance && $param->name instanceof \Closure) return call_user_func($param->name, $this, $share);
+		else if ($param instanceof Instance) return $this->create($param->name, $share);
 		return $param;
 	}
 		
