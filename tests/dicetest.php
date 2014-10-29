@@ -76,9 +76,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNoMoreAssign() {
 		$rule = new \Dice\Rule;
-		$rule->substitutions['Bar77'] = function() {
+		$rule->substitutions['Bar77'] = new \Dice\Instance(function() {
 			return Baz77::create();
-		};
+		});
 		
 		$this->dice->addRule('Foo77', $rule);
 		
@@ -257,9 +257,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	public function testSubstitutionCallback() {
 		$rule = new \Dice\Rule;
 		$injection = $this->dice;
-		$rule->substitutions['B'] = function() use ($injection) {
+		$rule->substitutions['B'] = new \Dice\Instance(function() use ($injection) {
 			return $injection->create('ExtendedB');
-		};
+		});
 		
 		$this->dice->addRule('A', $rule);
 		
