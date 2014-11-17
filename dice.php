@@ -1,9 +1,9 @@
 <?php 
-/* @description		Dice - A minimal Dependency Injection Container for PHP				*  
- * @author			Tom Butler tom@r.je													*
- * @copyright		2012-2014 Tom Butler <tom@r.je> | http://r.je/dice.html				*
- * @license			http://www.opensource.org/licenses/bsd-license.php  BSD License 	*
- * @version			1.3.1																*/
+/* @description		Dice - A minimal Dependency Injection Container for PHP			*  
+ * @author		Tom Butler tom@r.je							*
+ * @copyright		2012-2014 Tom Butler <tom@r.je> | http://r.je/dice.html			*
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License 	*
+ * @version		1.3.1									*/
 namespace Dice;
 class Dice {
 	private $rules = [];
@@ -36,7 +36,7 @@ class Dice {
 					if ($constructor && !$class->isInternal()) $constructor->invokeArgs($object, $params($args));
 				}
 				else $object = $params ? new $class->name(...$params($args)) : new $class->name;
-				if ($rule->call) foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), new Rule), $this->expand($call[1])));
+				if ($rule->call) foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), $rule), $this->expand($call[1])));
 				return $object;
 			};			
 		}
