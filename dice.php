@@ -30,7 +30,7 @@ class Dice {
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
-			$this->cache[$component] = function($args, $forceNewInstance) use ($component, $rule, $class, $constructor, $params) {
+			$this->cache[$component] = function($args) use ($component, $rule, $class, $constructor, $params) {
 				if ($rule->shared) {
 					$this->instances[$component] = $object = $class->isInternal() && $constructor ? $class->newInstanceArgs($params($args)) : $class->newInstanceWithoutConstructor();
 					if ($constructor && !$class->isInternal()) $constructor->invokeArgs($object, $params($args));
@@ -40,7 +40,7 @@ class Dice {
 				return $object;
 			};			
 		}
-		return $this->cache[$component]($args, $forceNewInstance);
+		return $this->cache[$component]($args);
 	}
 	
 	private function expand($param, array $share = []) {
