@@ -1,9 +1,9 @@
 <?php 
 /* @description		Dice - A minimal Dependency Injection Container for PHP			*  
- * @author		Tom Butler tom@r.je							*
+ * @author			Tom Butler tom@r.je												*
  * @copyright		2012-2014 Tom Butler <tom@r.je> | http://r.je/dice.html			*
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License 	*
- * @version		1.3.1									*/
+ * @license			http://www.opensource.org/licenses/bsd-license.php  BSD License	*
+ * @version			1.3.2															*/
 namespace Dice;
 class Dice {
 	private $rules = [];
@@ -11,11 +11,11 @@ class Dice {
 	private $instances = [];
 	
 	public function addRule($name, Rule $rule) {
-		$this->rules[ltrim($name, '\\')] = $rule;
+		$this->rules[ltrim(strtolower($name), '\\')] = $rule;
 	}
 
 	public function getRule($name) {
-		if (isset($this->rules[ltrim($name, '\\')])) return $this->rules[ltrim($name, '\\')];
+		if (isset($this->rules[strtolower(ltrim($name, '\\'))])) return $this->rules[strtolower(ltrim($name, '\\'))];
 		foreach ($this->rules as $key => $rule) {
 			if ($rule->instanceOf === null && $key !== '*' && is_subclass_of($name, $key) && $rule->inherit === true) return $rule;
 		}
