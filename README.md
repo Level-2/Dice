@@ -123,13 +123,12 @@ $rule->constructParams[] = new \Dice\Instance(function() {
 06/06/2014
 * Added support for cyclic references ( https://github.com/TomBZombie/Dice/issues/7 ). Please note this is poor design but this fix will stop the infinite loop this design creates.
 
-27/03/2013
+27/03/2014
 * Removed assign() method as this duplicated functionality available using $rule->shared
 * Removed $callback argument in $dice->create() as the only real use for this feature can be better achieved using $rule->shareInstances
 * Tidied up code, removing unused/undocumented features. Dice is now even more lightweight and faster.
 * Fixed a bug where when using $rule->call it would use the substitution rules from the constructor on each method called
 * Updated [Dice documentation](https://r.je/dice.html) to use shorthand array syntax
-
 
 01/03/2014
 * Added test cases for the Xml Loader and Loader Callback classes
