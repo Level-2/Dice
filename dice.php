@@ -42,7 +42,7 @@ class Dice {
 		}
 		return $this->cache[$component]($args);
 	}
-	
+		
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
@@ -53,21 +53,21 @@ class Dice {
 	private function getParams(\ReflectionMethod $method, Rule $rule) {	
 		$subs = $rule->substitutions ? $rule->substitutions : [];
 		$paramClasses = [];
-		foreach ($method->getParameters() as $param) $paramClasses[] = $param->getClass() ? $param->getClass()->name : null;
+		foreach ($method->getParameters() as $param) $paramClasses[] = [$param->getClass() ? $param->getClass()->name : null, $param->allowsNull()];
 		
 		return function($args) use ($paramClasses, $rule, $subs) {
 			$share = $rule->shareInstances ?  array_map([$this, 'create'], $rule->shareInstances) : [];
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 			
-			foreach ($paramClasses as $class) {
+			foreach ($paramClasses as list($class, $allowsNull)) {
 				if ($args) for ($i = 0; $i < count($args); $i++) {
-					if ($class && $args[$i] instanceof $class) {
+					if ($class && $args[$i] instanceof $class || !$args[$i] && $allowsNull) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
 				}
-				if ($subs && isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
+				if ($subs && array_key_exists($class, $subs)) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
 				else if ($class) $parameters[] = $this->create($class, $share, $rule->newInstances && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
 				else if ($args) $parameters[] = array_shift($args);
 			}

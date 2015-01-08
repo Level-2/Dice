@@ -32,7 +32,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice = null;		
 		parent::tearDown ();
 	}
-	
+		
 	public function testNoConstructor() {
 		$a = $this->dice->create('NoConstructor');
 		
@@ -181,6 +181,23 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$obj = $this->dice->create('MethodWithDefaultValue');
 		$this->assertEquals($obj->foo, 'bar');
 	}
+	
+	public function testDefaultNullAssigned() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = [new Dice\Instance('A'), null];
+		$this->dice->addRule('MethodWithDefaultNull', $rule);
+		$obj = $this->dice->create('MethodWithDefaultNull');
+		$this->assertNull($obj->b);
+	}
+	
+	public function testNullSubstitution() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['B'] = null;
+		$this->dice->addRule('MethodWithDefaultNull', $rule);
+		$obj = $this->dice->create('MethodWithDefaultNull');
+		$this->assertNull($obj->b);
+	}
+	
 	
 	public function testSharedNamed() {
 		$rule = new \Dice\Rule;
