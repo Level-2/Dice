@@ -579,7 +579,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNamespaceWithSlashrule() {
 		$rule = new \Dice\Rule;
-		$rule->substitutions['Foo\\A'] = 'Foo\\ExtendedA';
+		$rule->substitutions['Foo\\A'] = new \Dice\Instance('Foo\\ExtendedA');
 		$this->dice->addRule('\\Foo\\B', $rule);
 		
 		$b = $this->dice->create('\\Foo\\B');
@@ -625,7 +625,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNamespaceRuleSubstitution() {
 		$rule = new \Dice\Rule;
-		$rule->substitutions['Foo\\A'] = 'Foo\\ExtendedA';
+		$rule->substitutions['Foo\\A'] = new \Dice\Instance('Foo\\ExtendedA');
 		$this->dice->addRule('Foo\\B', $rule);
 		
 		$b = $this->dice->create('Foo\\B');
