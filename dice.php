@@ -61,16 +61,16 @@ class Dice {
 	private function getParams(\ReflectionMethod $method, Rule $rule) {	
 		$subs = empty($rule->substitutions) ? null :$rule->substitutions;
 		$paramClasses = [];
-		foreach ($method->getParameters() as $param) $paramClasses[] = $param->getClass() ? $param->getClass()->name : null;
+		foreach ($method->getParameters() as $param) $paramClasses[] = [$param->getClass() ? $param->getClass()->name : null, $param->allowsNull()];
 		
 		return function($args) use ($paramClasses, $rule, $subs) {
 			$share = empty($rule->shareInstances) ? [] : array_map([$this, 'create'], $rule->shareInstances);
 			if (!empty($share) || !empty($rule->constructParams)) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 			
-			foreach ($paramClasses as $class) {
+			foreach ($paramClasses as list($class, $allowsNull)) {
 				if (!empty($args)) for ($i = 0; $i < count($args); $i++) {
-					if ($class && $args[$i] instanceof $class) {
+					if ($class && $args[$i] instanceof $class || !$args[$i] && $allowsNull) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
