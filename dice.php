@@ -75,7 +75,7 @@ class Dice {
 						continue 2;
 					}
 				}
-				if (!empty($subs) && isset($subs[$class])) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
+				if ($subs && array_key_exists($class, $subs)) $parameters[] = is_string($subs[$class]) ? $this->create($subs[$class]) : $this->expand($subs[$class]);
 				else if (!empty($class)) $parameters[] = $this->create($class, $share, !empty($rule->newInstances) && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
 				else if (!empty($args)) $parameters[] = array_shift($args);
 			}
