@@ -42,7 +42,7 @@ class Dice {
 		}
 		return $this->cache[$component]($args);
 	}
-		
+			
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);

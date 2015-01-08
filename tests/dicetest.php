@@ -10,7 +10,6 @@ require_once 'dice.php';
 require_once 'testdata/testclasses.php';
 require_once 'testdata/testclasses_namespace.php';
 
-
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
 

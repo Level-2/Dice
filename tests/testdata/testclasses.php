@@ -90,6 +90,7 @@ class MethodWithDefaultNull {
 	}
 }
 
+
 class MyDirectoryIterator extends DirectoryIterator {
 	
 }
