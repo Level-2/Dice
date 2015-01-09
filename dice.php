@@ -51,25 +51,25 @@ class Dice {
 	}
 		
 	private function getParams(\ReflectionMethod $method, Rule $rule) {	
-		$subs = $rule->substitutions ? $rule->substitutions : [];
-		$paramClasses = [];
-		foreach ($method->getParameters() as $param) $paramClasses[] = [$param->getClass() ? $param->getClass()->name : null, $param->allowsNull()];
-		
-		return function($args) use ($paramClasses, $rule, $subs) {
+		$paramInfo = [];
+		foreach ($method->getParameters() as $param) {
+			$class = $param->getClass() ? $param->getClass()->name : null;
+			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
+		}		
+		return function($args) use ($paramInfo, $rule) {
 			$share = $rule->shareInstances ?  array_map([$this, 'create'], $rule->shareInstances) : [];
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 			
-			foreach ($paramClasses as list($class, $allowsNull)) {
+			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
 				if ($args) for ($i = 0; $i < count($args); $i++) {
 					if ($class && $args[$i] instanceof $class || !$args[$i] && $allowsNull) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
 				}
-				if ($subs && array_key_exists($class, $subs)) $parameters[] = $this->expand($subs[$class]);
-				else if ($class) $parameters[] = $this->create($class, $share, $rule->newInstances && in_array(strtolower($class), array_map('strtolower', $rule->newInstances)));
-				else if ($args) $parameters[] = array_shift($args);
+				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class]) : $this->create($class, $share, $new);
+				else if ($args) $parameters[] = $this->expand(array_shift($args));
 			}
 			return $parameters;
 		};	
