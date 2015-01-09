@@ -32,8 +32,8 @@ class Dice {
 			
 			$this->cache[$component] = function($args) use ($component, $rule, $class, $constructor, $params, $share) {
 				if ($rule->shared) {
-					$this->instances[$component] = $object = $class->isInternal() && $constructor ? $class->newInstanceArgs($params($args, $share)) : $class->newInstanceWithoutConstructor();
-					if ($constructor && !$class->isInternal()) $constructor->invokeArgs($object, $params($args, $share));
+					$this->instances[$component] = $object = $class->newInstanceWithoutConstructor();
+					if ($constructor) $constructor->invokeArgs($object, $params($args, $share));
 				}
 				else $object = $params ? new $class->name(...$params($args, $share)) : new $class->name;
 				if ($rule->call) foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), $rule), $this->expand($call[1])));

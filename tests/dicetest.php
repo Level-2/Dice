@@ -668,5 +668,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
 	}
-	
+
+
 }
+
