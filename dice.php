@@ -22,7 +22,7 @@ class Dice {
 		return isset($this->rules['*']) ? $this->rules['*'] : new Rule;
 	}
 		
-	public function create($component, array $args = [], $forceNewInstance = false) {
+	public function create($component, array $args = [], $forceNewInstance = false, $share = []) {
 		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
 		if (empty($this->cache[$component])) {
 			$rule = $this->getRule($component);
@@ -30,12 +30,12 @@ class Dice {
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
-			$this->cache[$component] = function($args) use ($component, $rule, $class, $constructor, $params) {
+			$this->cache[$component] = function($args) use ($component, $rule, $class, $constructor, $params, $share) {
 				if ($rule->shared) {
-					$this->instances[$component] = $object = $class->isInternal() && $constructor ? $class->newInstanceArgs($params($args)) : $class->newInstanceWithoutConstructor();
-					if ($constructor && !$class->isInternal()) $constructor->invokeArgs($object, $params($args));
+					$this->instances[$component] = $object = $class->isInternal() && $constructor ? $class->newInstanceArgs($params($args, $share)) : $class->newInstanceWithoutConstructor();
+					if ($constructor && !$class->isInternal()) $constructor->invokeArgs($object, $params($args, $share));
 				}
-				else $object = $params ? new $class->name(...$params($args)) : new $class->name;
+				else $object = $params ? new $class->name(...$params($args, $share)) : new $class->name;
 				if ($rule->call) foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), $rule), $this->expand($call[1])));
 				return $object;
 			};			
@@ -46,7 +46,7 @@ class Dice {
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
-		else if ($param instanceof Instance) return $this->create($param->name, $share);
+		else if ($param instanceof Instance) return $this->create($param->name, $share, false, $share);
 		return $param;
 	}
 		
@@ -56,8 +56,8 @@ class Dice {
 			$class = $param->getClass() ? $param->getClass()->name : null;
 			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
 		}		
-		return function($args) use ($paramInfo, $rule) {
-			$share = $rule->shareInstances ?  array_map([$this, 'create'], $rule->shareInstances) : [];
+		return function($args, $share = []) use ($paramInfo, $rule) {
+			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));			
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 			
@@ -68,7 +68,7 @@ class Dice {
 						continue 2;
 					}
 				}
-				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class]) : $this->create($class, $share, $new);
+				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, $share, $new, $share);
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
 			}
 			return $parameters;

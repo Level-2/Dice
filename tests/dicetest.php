@@ -540,6 +540,16 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		
 	}
 	
+	
+	public function testShareInstancesNested() {
+		$rule = new \Dice\Rule();
+		$rule->shareInstances = ['F'];
+		$this->dice->addRule('A4',$rule);
+		$a = $this->dice->create('A4');
+		$this->assertTrue($a->m1->f === $a->m2->e->f);
+	}
+	
+	
 	public function testShareInstancesMultiple() {
 		$rule = new \Dice\Rule();
 		$rule->shareInstances = ['Shared'];

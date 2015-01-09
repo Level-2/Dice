@@ -246,6 +246,31 @@ class A3 {
 		$this->c = $c;
 	}
 }
+
+class A4 {
+	public $m1;
+	public $m2;
+	public function __construct(M1 $m1, M2 $m2) {
+		$this->m1 = $m1;
+		$this->m2 = $m2;
+	}
+}
+
+class M1 {
+	public $f;
+	public function __construct(F $f) {
+		$this->f = $f;
+	}
+}
+
+class M2 {
+	public $e;
+	public function __construct(E $e) {
+		$this->e = $e;
+	}
+}
+
+
 class A {
 	public $b;
 
