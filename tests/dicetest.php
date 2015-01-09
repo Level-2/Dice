@@ -658,5 +658,19 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
 	}
+
+	public function testSharedFinalInternalClass()
+	{
+		$rule = new \Dice\Rule;
+		$rule->shared = true;
+
+		$class = 'mysqli_driver';
+		$this->dice->addRule($class, $rule);
+
+		$driver = $this->dice->create($class);
+
+		$this->assertInstanceOf($class, $driver);
+	}
 	
 }
+
