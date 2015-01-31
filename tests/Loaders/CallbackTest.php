@@ -1,7 +1,7 @@
 <?php
 
-require_once 'dice.php';
-require_once 'loader/callback.php';
+require_once 'Dice.php';
+require_once 'Loader/Callback.php';
 
 class TestConfig {
 	public $dbServer = '127.0.0.1';

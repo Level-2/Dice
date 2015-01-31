@@ -26,7 +26,7 @@ class Dice {
 		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
 		if (empty($this->cache[$component])) {
 			$rule = $this->getRule($component);
-			$class = new \ReflectionClass($rule->instanceOf ? $rule->instanceOf : $component);
+			$class = new \ReflectionClass($rule->instanceOf ?: $component);
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
