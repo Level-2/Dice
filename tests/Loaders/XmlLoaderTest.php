@@ -7,97 +7,99 @@
 * @version				1.1.1
 */
 
-require_once 'dice.php';
-require_once 'loader/json.php';
-require_once 'loader/callback.php';
+require_once 'Dice.php';
+require_once 'Loader/Xml.php';
+require_once 'Loader/Callback.php';
 
 
-class JsonLoaderTest extends PHPUnit_Framework_TestCase {
+class XmlLoaderTest extends PHPUnit_Framework_TestCase {
 	private $dice;
-	private $jsonLoader;
+	private $xmlLoader;
 
 	protected function setUp() {
 		parent::setUp ();
 		$this->dice = $this->getMock('\\Dice\\Dice', array('getRule', 'addRule'));		
 		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue(new \Dice\Rule));
-		$this->jsonLoader = new \Dice\Loader\Json;
+		$this->xmlLoader = new \Dice\Loader\XML;
 	}
 
 	protected function tearDown() {
 		$this->dice = null;	
-		$this->jsonLoader = null;
+		$this->xmlLoader = null;
 		parent::tearDown ();
 	}
 	
 	
 	public function testSetDefaultRule() {
-		$json = '{
-"rules": [				
-		{
-			"name": "*",
-			"shared": true
-		}
-	]
-}';
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>*</name>
+		<shared>true</shared>
+	</rule>
+</dice>';
 		
 	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->shared = true;
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('*'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 		
 	}
 	
 	public function testShared() {
-		$json = '{
-"rules": [				
-		{
-			"name": "A",
-			"shared": true
-		}
-	]
-}';
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<shared>true</shared>
+	</rule>
+</dice>';
 		
 		
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->shared = true;
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 	
 	public function testConstructParams() {
-		$json = '{
-"rules": [				
-		{
-			"name": "A",
-			"construct": ["A", "B"]
-		}
-	]
-}';	
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<construct>
+			<param>A</param>
+			<param>B</param>
+		</construct>
+	</rule>
+</dice>';
+	
 	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->constructParams[] = 'A';
 		$equivalentRule->constructParams[] = 'B';
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 	public function testSubstitutions() {
-		$json = '{
-"rules": [				
-		{
-			"name": "A",
-			"substitute": {"B": "C"}
-		}
-	]
-}';	
-	
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<substitute>
+			<use>C</use>
+			<as>B</as>
+		</substitute>
+	</rule>
+</dice>';
 	
 	
 		$equivalentRule = new \Dice\Rule;
@@ -105,19 +107,27 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 		
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 	public function testSubstitutions2() {
-		$json = '{
-"rules": [				
-		{
-			"name": "A",
-			"substitute": {"B": "C", "F": "E"}
-		}
-	]
-}';	
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<substitute>
+			<use>C</use>
+			<as>B</as>
+		</substitute>
+				
+		<substitute>
+			<use>E</use>
+			<as>F</as>
+		</substitute>
+	</rule>
+</dice>';
+	
 	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->substitutions['B'] = new \Dice\Instance('C');
@@ -125,116 +135,117 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 	public function testNewInstances() {
-		$json = '{
-"rules": [
-		{
-			"name": "A",
-			"newinstances": ["C", "D", "E"]
-		}
-	]
-}';		
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<newinstance>C</newinstance>
+		<newinstance>D</newinstance>
+		<newinstance>E</newinstance>
+	</rule>
+</dice>';
+		
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->newInstances = ['C', 'D', 'E'];	
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
-
 	public function testInstanceOf() {
-		$json = '{
-"rules": [
-		{
-			"name": "[C]",
-			"instanceof": "C"
-		}
-	]
-}';		
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>[C]</name>
+		<instanceof>C</instanceof>
+	</rule>
+</dice>';
+	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->instanceOf = 'C';
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('[C]'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 	public function testCall() {
-		$json = '{
-"rules": [
-		{
-			"name": "A",
-			"call": [
-					["setFoo", ["Foo", "Bar"]]
-				]
-		}
-	]
-}';		
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<call>
+			<method>setFoo</method> 
+           <params> 
+                <param>Foo</param> 
+                <param>Bar</param> 
+            </params>
+		</call> 
+	</rule>
+</dice>';
 	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->call[] = ['setFoo', ['Foo', 'Bar']];
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 
 	public function testInherit() {
-		$json = '{
-"rules": [
-		{
-			"name": "A",
-			"inherit": true
-		}
-	]
-}';		
-	
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<inherit>true</inherit>
+	</rule>
+</dice>';
 	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->inherit = true;
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
 	public function testInherit2() {
-		$json = '{
-"rules": [
-		{
-			"name": "A",
-			"inherit": false
-		}
-	]
-}';		
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<inherit>false</inherit>
+	</rule>
+</dice>';
+	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->inherit = false;
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
-	
-	
 	public function testShareInstance() {
-		$json = '{
-"rules": [
-		{
-			"name": "A",
-			"shareinstances": ["C", "D"]
-		}
-	]
-}';		
+		$xml = '<?xml version="1.0"?>
+<dice>
+	<rule>
+		<name>A</name>
+		<shareinstance>C</shareinstance>
+		<shareinstance>D</shareinstance>
+	</rule>
+</dice>';
+	
 		$equivalentRule = new \Dice\Rule;
 		$equivalentRule->shareInstances = ['C', 'D'];
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
+		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
 	
