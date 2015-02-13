@@ -17,7 +17,7 @@ class XML {
 		if ($dice === null) $dice = new \Dice\Dice;
 		if (!($map instanceof \SimpleXmlElement)) $map = simplexml_load_file($map);
 		foreach ($map as $key => $value) {
-			$rule = clone $dic->getRule((string) $value->name);
+			$rule = clone $dice->getRule((string) $value->name);
 			$rule->shared = ($value->shared == 'true');
 			$rule->inherit = ($value->inherit == 'false') ? false : true;
 			if ($value->call) {
@@ -32,7 +32,7 @@ class XML {
 			if ($value->substitute) foreach ($value->substitute as $use) 	$rule->substitutions[(string) $use->as] = $this->getComponent((string) $use->use, true);
 			if ($value->construct) 	foreach ($value->construct->children() as $child) $rule->constructParams[] = $this->getComponent((string) $child);
 			if ($value->shareinstance) foreach ($value->shareinstance as $share) $rule->shareInstances[] = $this->getComponent((string) $share, false);
-			$dic->addRule((string) $value->name, $rule);
+			$dice->addRule((string) $value->name, $rule);
 		}
 	}
 }
