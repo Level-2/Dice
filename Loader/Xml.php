@@ -13,7 +13,7 @@ class XML {
 		else return (strpos((string) $str, '{') === 0) ? [new Callback($str), 'run'] : (string) $str;
 	}
 
-	public function load($map, \Dice\Dice $dic = null) {
+	public function load($map, \Dice\Dice $dice = null) {
 		if ($dice === null) $dice = new \Dice\Dice;
 		if (!($map instanceof \SimpleXmlElement)) $map = simplexml_load_file($map);
 		foreach ($map as $key => $value) {
