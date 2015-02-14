@@ -1,5 +1,9 @@
 <?php
-
+/* @description     Dice - A minimal Dependency Injection Container for PHP         *  
+ * @author          Tom Butler tom@r.je                                             *
+ * @copyright       2012-2015 Tom Butler <tom@r.je> | http://r.je/dice.html         *
+ * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
+ * @version         1.3.2                                                           */
 require_once 'Dice.php';
 require_once 'Loader/Callback.php';
 
