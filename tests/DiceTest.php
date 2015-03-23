@@ -697,6 +697,19 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
 	}
 
+	public function testConstructParamsPrecedence() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = ['A', 'B'];
+		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+
+		$a1 = $this->dice->create('RequiresConstructorArgsA');
+		$this->assertEquals('A', $a1->foo);
+		$this->assertEquals('B', $a1->bar);
+
+		$a2 = $this->dice->create('RequiresConstructorArgsA', ['C', 'D']);
+		$this->assertEquals('C', $a2->foo);
+		$this->assertEquals('D', $a2->bar);
+	}
 
 }
 
