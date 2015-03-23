@@ -337,6 +337,14 @@ class RequiresConstructorArgsB {
 	}
 }
 
+class ParamRequiresArgs {
+    public $a;
+    
+    public function __construct(D $d, RequiresConstructorArgsA $a) {
+        $this->a = $a;
+    }
+}
+
 interface interfaceTest {}
 
 class InterfaceTestClass implements interfaceTest {

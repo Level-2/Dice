@@ -313,6 +313,22 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($obj->foo, 'foo');
 		$this->assertEquals($obj->bar, 'bar');
 	}
+
+	public function testConstructParamsNested() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = array('foo', 'bar');
+		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+
+		$rule = new \Dice\Rule;
+		$rule->shareInstances = array('D');
+		$this->dice->addRule('ParamRequiresArgs', $rule);
+		
+		$obj = $this->dice->create('ParamRequiresArgs');
+		
+		$this->assertEquals($obj->a->foo, 'foo');
+		$this->assertEquals($obj->a->bar, 'bar');
+	}
+
 	
 	public function testConstructParamsMixed() {
 		$rule = new \Dice\Rule;
@@ -517,6 +533,8 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('A', $bestMatch->a);
 	}
 	
+
+    
 	
 	public function testShareInstances() {
 		$rule = new \Dice\Rule();
