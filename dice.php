@@ -52,6 +52,7 @@ class Dice {
 			
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
+		if ($param instanceof \Closure) return call_user_func($param, $this, $share);
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
 		else if ($param instanceof Instance) return $this->create($param->name, $share, false, $share);
 		return $param;
@@ -76,6 +77,7 @@ class Dice {
 						continue 2;
 					}
 				}
+				if ($sub && is_string($rule->substitutions[$class])) $parameters[] = $this->create($rule->substitutions[$class], $share, $new, $share);
 				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, $share, $new, $share);
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
 			}
