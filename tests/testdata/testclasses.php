@@ -347,6 +347,14 @@ class ParamRequiresArgs {
     }
 }
 
+class ParamParamRequiresArgs {
+    public $p;
+    
+    public function __construct(ParamRequiresArgs $p) {
+        $this->p = $p;
+    }
+}
+
 interface interfaceTest {}
 
 class InterfaceTestClass implements interfaceTest {

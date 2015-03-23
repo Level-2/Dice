@@ -328,6 +328,21 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($obj->a->bar, 'bar');
 	}
 
+	public function testConstructParamsNestedTwo() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = array('foo', 'bar');
+		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+
+		$rule = new \Dice\Rule;
+		$rule->shareInstances = array('D');
+		$this->dice->addRule('ParamParamRequiresArgs', $rule);
+		
+		$obj = $this->dice->create('ParamParamRequiresArgs');
+		
+		$this->assertEquals($obj->p->a->foo, 'foo');
+		$this->assertEquals($obj->p->a->bar, 'bar');
+	}
+
 	
 	public function testConstructParamsMixed() {
 		$rule = new \Dice\Rule;
