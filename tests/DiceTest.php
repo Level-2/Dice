@@ -1,16 +1,11 @@
 <?php
 /* @description 		Dice - A minimal Dependency Injection Container for PHP
  * @author				Tom Butler tom@r.je
-* @copyright			2012-2014 Tom Butler <tom@r.je>
+* @copyright			2012-2015 Tom Butler <tom@r.je>
 * @link				http://r.je/dice.html
 * @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version				1.1
 */
-require_once 'dice.php';
-require_once 'testdata/testclasses.php';
-require_once 'testdata/testclasses_namespace.php';
-
-
 class DiceTest extends PHPUnit_Framework_TestCase {
 	private $dice;
 
@@ -32,10 +27,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->dice = null;		
 		parent::tearDown ();
 	}
-	
+		
 	public function testNoConstructor() {
 		$a = $this->dice->create('NoConstructor');
-		
 		$this->assertInstanceOf('NoConstructor', $a);
 	}
 
@@ -76,9 +70,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNoMoreAssign() {
 		$rule = new \Dice\Rule;
-		$rule->substitutions['Bar77'] = function() {
+		$rule->substitutions['Bar77'] = new \Dice\Instance(function() {
 			return Baz77::create();
-		};
+		});
 		
 		$this->dice->addRule('Foo77', $rule);
 		
@@ -181,7 +175,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$obj = $this->dice->create('MethodWithDefaultValue');
 		$this->assertEquals($obj->foo, 'bar');
 	}
-
+	
 	public function testDefaultNullAssigned() {
 		$rule = new \Dice\Rule;
 		$rule->constructParams = [new Dice\Instance('A'), null];
@@ -189,6 +183,15 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$obj = $this->dice->create('MethodWithDefaultNull');
 		$this->assertNull($obj->b);
 	}
+	
+	public function testNullSubstitution() {
+		$rule = new \Dice\Rule;
+		$rule->substitutions['B'] = null;
+		$this->dice->addRule('MethodWithDefaultNull', $rule);
+		$obj = $this->dice->create('MethodWithDefaultNull');
+		$this->assertNull($obj->b);
+	}
+	
 	
 	public function testSharedNamed() {
 		$rule = new \Dice\Rule;
@@ -265,9 +268,9 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	public function testSubstitutionCallback() {
 		$rule = new \Dice\Rule;
 		$injection = $this->dice;
-		$rule->substitutions['B'] = function() use ($injection) {
+		$rule->substitutions['B'] = new \Dice\Instance(function() use ($injection) {
 			return $injection->create('ExtendedB');
-		};
+		});
 		
 		$this->dice->addRule('A', $rule);
 		
@@ -531,7 +534,8 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
 		
 	}
-
+	
+	
 	public function testShareInstancesNested() {
 		$rule = new \Dice\Rule();
 		$rule->shareInstances = ['F'];
@@ -539,7 +543,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$a = $this->dice->create('A4');
 		$this->assertTrue($a->m1->f === $a->m2->e->f);
 	}
-
+	
 	
 	public function testShareInstancesMultiple() {
 		$rule = new \Dice\Rule();
@@ -580,7 +584,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNamespaceWithSlashrule() {
 		$rule = new \Dice\Rule;
-		$rule->substitutions['Foo\\A'] = 'Foo\\ExtendedA';
+		$rule->substitutions['Foo\\A'] = new \Dice\Instance('Foo\\ExtendedA');
 		$this->dice->addRule('\\Foo\\B', $rule);
 		
 		$b = $this->dice->create('\\Foo\\B');
@@ -626,7 +630,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 	public function testNamespaceRuleSubstitution() {
 		$rule = new \Dice\Rule;
-		$rule->substitutions['Foo\\A'] = 'Foo\\ExtendedA';
+		$rule->substitutions['Foo\\A'] = new \Dice\Instance('Foo\\ExtendedA');
 		$this->dice->addRule('Foo\\B', $rule);
 		
 		$b = $this->dice->create('Foo\\B');
@@ -659,5 +663,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
 	}
-	
+
+
 }
+
