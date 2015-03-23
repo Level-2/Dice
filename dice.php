@@ -65,7 +65,7 @@ class Dice {
 		}		
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));			
-			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
+			if ($share || $rule->constructParams) $args = array_merge($this->expand($rule->constructParams, $share), $args, $share);
 			$parameters = [];
 			
 			foreach ($paramInfo as $param) {
