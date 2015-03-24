@@ -29,8 +29,8 @@ class Dice {
 			$class = new \ReflectionClass($rule->instanceOf ? $rule->instanceOf : $component);
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
-			
-			$this->cache[$component] = function($args) use ($component, $rule, $class, $constructor, $params, $share) {
+
+			$this->cache[$component] = function($args, $share) use ($component, $rule, $class, $constructor, $params) {
 				if ($rule->shared) {
 					if ($constructor) {
 						try {
@@ -47,7 +47,7 @@ class Dice {
 				return $object;
 			};			
 		}
-		return $this->cache[$component]($args);
+		return $this->cache[$component]($args, $share);
 	}
 			
 	private function expand($param, array $share = []) {
@@ -65,19 +65,20 @@ class Dice {
 		}		
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));	
-			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
+			if ($share || $rule->constructParams) $mergedArgs = array_merge($args, $this->expand($rule->constructParams, $share), $share);
+            else $mergedArgs = $args;
 			$parameters = [];
-			
+
 			foreach ($paramInfo as $param) {
 				list($class, $allowsNull, $sub, $new) = $param;
-				if ($args) for ($i = 0; $i < count($args); $i++) {
-					if ($class && $args[$i] instanceof $class || !$args[$i] && $allowsNull) {
-						$parameters[] = array_splice($args, $i, 1)[0];
+				if ($mergedArgs) for ($i = 0; $i < count($mergedArgs); $i++) {
+					if ($class && $mergedArgs[$i] instanceof $class || !$mergedArgs[$i] && $allowsNull) {
+						$parameters[] = array_splice($mergedArgs, $i, 1)[0];
 						continue 2;
 					}
 				}
 				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, $args, $new, $share);
-				else if ($args) $parameters[] = $this->expand(array_shift($args));
+				else if ($mergedArgs) $parameters[] = $this->expand(array_shift($mergedArgs));
 			}
 			return $parameters;
 		};	
