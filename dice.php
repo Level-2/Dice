@@ -53,7 +53,7 @@ class Dice {
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
-		else if ($param instanceof Instance) return $this->create($param->name, $share, false, $share);
+		else if ($param instanceof Instance) return $this->create($param->name, [], false, $share);
 		return $param;
 	}
 		
@@ -65,20 +65,19 @@ class Dice {
 		}		
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));	
-			if ($share || $rule->constructParams) $mergedArgs = array_merge($args, $this->expand($rule->constructParams, $share), $share);
-            else $mergedArgs = $args;
+			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 
 			foreach ($paramInfo as $param) {
 				list($class, $allowsNull, $sub, $new) = $param;
-				if ($mergedArgs) for ($i = 0; $i < count($mergedArgs); $i++) {
-					if ($class && $mergedArgs[$i] instanceof $class || !$mergedArgs[$i] && $allowsNull) {
-						$parameters[] = array_splice($mergedArgs, $i, 1)[0];
+				if ($args) for ($i = 0; $i < count($args); $i++) {
+					if ($class && $args[$i] instanceof $class || !$args[$i] && $allowsNull) {
+						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
 				}
-				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, $args, $new, $share);
-				else if ($mergedArgs) $parameters[] = $this->expand(array_shift($mergedArgs));
+				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, [], $new, $share);
+				else if ($args) $parameters[] = $this->expand(array_shift($args));
 			}
 			return $parameters;
 		};	
