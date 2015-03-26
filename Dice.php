@@ -30,7 +30,7 @@ class Dice {
 			$constructor = $class->getConstructor();			
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
 			
-			$this->cache[$component] = function($args) use ($component, $rule, $class, $constructor, $params, $share) {
+			$this->cache[$component] = function($args, $share) use ($component, $rule, $class, $constructor, $params) {
 				if ($rule->shared) {
 					$this->instances[$component] = $object = $class->newInstanceWithoutConstructor();
 					if ($constructor) $constructor->invokeArgs($object, $params($args, $share));
@@ -40,13 +40,13 @@ class Dice {
 				return $object;
 			};			
 		}
-		return $this->cache[$component]($args);
+		return $this->cache[$component]($args, $share);
 	}
 			
 	private function expand($param, array $share = []) {
 		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
-		else if ($param instanceof Instance) return $this->create($param->name, $share, false, $share);
+		else if ($param instanceof Instance) return $this->create($param->name, [], false, $share);
 		return $param;
 	}
 		
@@ -55,20 +55,20 @@ class Dice {
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
 			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
-		}		
+		}
 		return function($args, $share = []) use ($paramInfo, $rule) {
-			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));			
+			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));	
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 			
 			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
 				if ($args) for ($i = 0; $i < count($args); $i++) {
-					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
+					if ($class && $args[$i] instanceof $class || !$args[$i] && $allowsNull) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
 				}
-				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, $share, $new, $share);
+				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, [], $new, $share);
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
 			}
 			return $parameters;
