@@ -724,7 +724,4 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$obj = $this->dice->create('NullScalarNested');
 		$this->assertEquals(null, $obj->nullScalar->string);
 	}
-
-
 }
-

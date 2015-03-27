@@ -376,3 +376,19 @@ class ConsumeArgsSub {
         $this->s = $s;
     }
 }
+
+class NullScalar {
+	public $string;
+
+	public function __construct($string = null) {
+		$this->string = $string;
+    }
+}
+
+class NullScalarNested {
+	public $nullScalar;
+
+	public function __construct(NullScalar $nullScalar) {
+		$this->nullScalar = $nullScalar;
+    }
+}
