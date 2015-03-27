@@ -369,3 +369,20 @@ trait MyTrait {
 class MyDirectoryIteratorWithTrait extends DirectoryIterator {
 	use MyTrait;
 }
+
+class ConsumeArgsTop {
+    public $s;
+    public $a;
+
+    public function __construct(ConsumeArgsSub $a, $s) {
+        $this->a = $a;
+        $this->s = $s;
+    }
+}
+class ConsumeArgsSub {
+    public $s;
+
+    public function __construct($s) {
+        $this->s = $s;
+    }
+}

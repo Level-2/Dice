@@ -81,6 +81,15 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('Bar77', $foo->bar);
 		$this->assertEquals('Z', $foo->bar->a);
 	}
+
+	public function testConsumeArgs() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = ['A'];		
+		$this->dice->addRule('ConsumeArgsSub', $rule);
+		$foo = $this->dice->create('ConsumeArgsTop',['B']);
+		
+		$this->assertEquals('A', $foo->a->s);
+	}
 	
 	
 	public function testAssignSharedNamed() {
@@ -697,6 +706,19 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
 	}
 
+	public function testConstructParamsPrecedence() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = ['A', 'B'];
+		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+
+		$a1 = $this->dice->create('RequiresConstructorArgsA');
+		$this->assertEquals('A', $a1->foo);
+		$this->assertEquals('B', $a1->bar);
+
+		$a2 = $this->dice->create('RequiresConstructorArgsA', ['C', 'D']);
+		$this->assertEquals('C', $a2->foo);
+		$this->assertEquals('D', $a2->bar);
+	}
 
 }
 
