@@ -1,11 +1,9 @@
 <?php
-/* @description 		Dice - A minimal Dependency Injection Container for PHP
- * @author				Tom Butler tom@r.je
-* @copyright			2012-2014 Tom Butler <tom@r.je>
-* @link				http://r.je/dice.html
-* @license				http://www.opensource.org/licenses/bsd-license.php  BSD License
-* @version				1.1.1
-*/
+/* @description     Dice - A minimal Dependency Injection Container for PHP         *  
+ * @author          Tom Butler tom@r.je                                             *
+ * @copyright       2012-2015 Tom Butler <tom@r.je> | http://r.je/dice.html         *
+ * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
+ * @version         1.3.2                                                           */
 
 require_once 'Dice.php';
 require_once 'Loader/Json.php';
@@ -93,7 +91,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"substitute": {"B": "C"}
+			"substitute": {"B": {"instance": "C"}}
 		}
 	]
 }';	
@@ -114,7 +112,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"substitute": {"B": "C", "F": "E"}
+			"substitute": {"B": {"instance": "C"}, "F": {"instance": "E"}}
 		}
 	]
 }';	
@@ -128,7 +126,26 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 		$this->jsonLoader->load($json, $this->dice);
 	}
 	
+
+	public function testSubstitutionsCall() {
+		$json = '{
+"rules": [				
+		{
+			"name": "A",
+			"substitute": {"B": {"call": "JsonLoaderTest::foo()"}}
+		}
+	]
+}';	
 	
+		$equivalentRule = new \Dice\Rule;
+		$equivalentRule->substitutions['B'] = new \Dice\Instance([new \Dice\Loader\Callback('JsonLoaderTest::foo()'), 'run']);
+	
+	
+		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->jsonLoader->load($json, $this->dice);
+	}
+	
+
 	public function testNewInstances() {
 		$json = '{
 "rules": [
