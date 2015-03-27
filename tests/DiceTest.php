@@ -706,5 +706,25 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('D', $a2->bar);
 	}
 
+
+	public function testNullScalar() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = [null];
+		$this->dice->addRule('NullScalar', $rule);
+
+		$obj = $this->dice->create('NullScalar');
+		$this->assertEquals(null, $obj->string);
+	}
+
+	public function testNullScalarNested() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = [null];
+		$this->dice->addRule('NullScalar', $rule);
+
+		$obj = $this->dice->create('NullScalarNested');
+		$this->assertEquals(null, $obj->nullScalar->string);
+	}
+
+
 }
 
