@@ -1,5 +1,5 @@
-<?php 
-/* @description     Dice - A minimal Dependency Injection Container for PHP         *  
+<?php
+/* @description     Dice - A minimal Dependency Injection Container for PHP         *
  * @author          Tom Butler tom@r.je                                             *
  * @copyright       2012-2015 Tom Butler <tom@r.je> | http://r.je/dice.html         *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
@@ -9,7 +9,7 @@ class Dice {
 	private $rules = [];
 	private $cache = [];
 	private $instances = [];
-	
+
 	public function addRule($name, Rule $rule) {
 		$this->rules[ltrim(strtolower($name), '\\')] = $rule;
 	}
@@ -21,15 +21,15 @@ class Dice {
 		}
 		return isset($this->rules['*']) ? $this->rules['*'] : new Rule;
 	}
-		
+
 	public function create($component, array $args = [], $forceNewInstance = false, $share = []) {
 		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
 		if (empty($this->cache[$component])) {
 			$rule = $this->getRule($component);
 			$class = new \ReflectionClass($rule->instanceOf ?: $component);
-			$constructor = $class->getConstructor();			
+			$constructor = $class->getConstructor();
 			$params = $constructor ? $this->getParams($constructor, $rule) : null;
-			
+
 			$this->cache[$component] = function($args, $share) use ($component, $rule, $class, $constructor, $params) {
 				if ($rule->shared) {
 					$this->instances[$component] = $object = $class->newInstanceWithoutConstructor();
@@ -38,29 +38,29 @@ class Dice {
 				else $object = $params ? new $class->name(...$params($args, $share)) : new $class->name;
 				if ($rule->call) foreach ($rule->call as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), $rule), $this->expand($call[1])));
 				return $object;
-			};			
+			};
 		}
 		return $this->cache[$component]($args, $share);
 	}
-			
+
 	private function expand($param, array $share = []) {
-		if (is_array($param)) return array_map(function($p) use($share) { return $this->expand($p, $share); }, $param);
+		if (is_array($param)) foreach ($param as &$key) { $key = $this->expand($key, $share); }	return $param;
 		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
 		else if ($param instanceof Instance) return $this->create($param->name, [], false, $share);
 		return $param;
 	}
-		
-	private function getParams(\ReflectionMethod $method, Rule $rule) {	
+
+	private function getParams(\ReflectionMethod $method, Rule $rule) {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
 			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
 		}
 		return function($args, $share = []) use ($paramInfo, $rule) {
-			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));	
+			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
-			
+
 			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
 				if ($args) for ($i = 0; $i < count($args); $i++) {
 					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
@@ -72,7 +72,7 @@ class Dice {
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
 			}
 			return $parameters;
-		};	
+		};
 	}
 }
 
