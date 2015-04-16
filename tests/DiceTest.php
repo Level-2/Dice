@@ -563,7 +563,33 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		
 	}
 	
-	
+	public function testNamedShareInstances() {
+
+		$rule = new \Dice\Rule();
+		$rule->instanceOf = 'Shared';
+		$this->dice->addRule('$Shared', $rule);
+
+		$rule = new \Dice\Rule();
+		$rule->shareInstances = ['$Shared'];
+		$this->dice->addRule('TestSharedInstancesTop', $rule);
+		
+		
+		$shareTest = $this->dice->create('TestSharedInstancesTop');
+		
+		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+		
+		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
+		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+		
+		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
+		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
+
+
+		$shareTest2 = $this->dice->create('TestSharedInstancesTop');
+		$this->assertNotSame($shareTest2->share1->shared, $shareTest->share2->shared);
+	}
+
+
 	public function testShareInstancesNested() {
 		$rule = new \Dice\Rule();
 		$rule->shareInstances = ['F'];
@@ -724,4 +750,5 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$obj = $this->dice->create('NullScalarNested');
 		$this->assertEquals(null, $obj->nullScalar->string);
 	}
+
 }

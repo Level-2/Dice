@@ -45,8 +45,7 @@ class Dice {
 
 	private function expand($param, array $share = []) {
 		if (is_array($param)) foreach ($param as &$key) $key = $this->expand($key, $share); 
-		if ($param instanceof Instance && is_callable($param->name)) return call_user_func($param->name, $this, $share);
-		else if ($param instanceof Instance) return $this->create($param->name, [], false, $share);
+		else if ($param instanceof Instance) return is_callable($param->name) ? call_user_func($param->name, $this, $share) : $this->create($param->name, [], false, $share);
 		return $param;
 	}
 
@@ -62,7 +61,7 @@ class Dice {
 			$parameters = [];
 
 			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
-				if ($args) for ($i = 0; $i < count($args); $i++) {
+				if ($args && $count = count($args)) for ($i = 0; $i < $count; $i++) {
 					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
