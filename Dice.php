@@ -3,7 +3,7 @@
  * @author          Tom Butler tom@r.je                                             *
  * @copyright       2012-2015 Tom Butler <tom@r.je> | http://r.je/dice.html         *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         1.3.2                                                           */
+ * @version         1.4                                                           */
 namespace Dice;
 class Dice {
 	private $rules = [];
