@@ -34,9 +34,9 @@ class Dice {
 		$params = $constructor ? $this->getParams($constructor, $rule) : null;
 
 		if ($rule['shared']) $closure = function($args, $share) use ($class, $component, $constructor, $params) {
-				$this->instances[$component] = $object = $class->newInstanceWithoutConstructor();
-				if ($constructor) $constructor->invokeArgs($object, $params($args, $share));
-				return $object;
+			$this->instances[$component] = $class->newInstanceWithoutConstructor();
+			if ($constructor) $constructor->invokeArgs($this->instances[$component], $params($args, $share));
+			return $this->instances[$component];
 		};			
 		else if ($params) $closure = function($args, $share) use ($class, $params) {
 			return new $class->name(...$params($args, $share));
@@ -62,7 +62,7 @@ class Dice {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
-			$paramInfo[] = [$class, $param->allowsNull(), isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions']), isset($rule['newInstances']) && in_array($class, $rule['newInstances'])];
+			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule['substitutions']), in_array($class, $rule['newInstances'])];
 		}
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule['shareInstances']) $share = array_merge($share, array_map([$this, 'create'], $rule['shareInstances']));
@@ -70,7 +70,7 @@ class Dice {
 			$parameters = [];
 
 			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
-				if ($args && $count = count($args)) for ($i = 0; $i < $count; $i++) {
+				if ($args) for ($i = 0, $count = count($args); $i < $count; $i++) {
 					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
@@ -83,3 +83,6 @@ class Dice {
 		};
 	}
 }
+
+
+
