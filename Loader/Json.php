@@ -20,7 +20,7 @@ class Json {
 		if (!is_object($map)) throw new \Exception('Could not decode json: ' . json_last_error_msg());
 		$rules = [];
 		foreach ($map->rules as $value) {
-			$rule = clone $dice->getRule($value->name);
+			$rule = $dice->getRule($value->name);
 			if (isset($value->shared)) $rule->shared = $value->shared;
 			if (isset($value->inherit)) $rule->inherit = $value->inherit;						
 			if (isset($value->call)) foreach ($value->call as $call) $rule->call[] = $this->getComponent($call);

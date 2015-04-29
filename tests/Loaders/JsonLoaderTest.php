@@ -17,10 +17,9 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		parent::setUp ();
 		$this->dice = $this->getMock('\\Dice\\Dice', array('getRule', 'addRule'));		
-		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue(new \Dice\Rule));
+		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue([]));
 		$this->jsonLoader = new \Dice\Loader\Json;
 	}
-
 	protected function tearDown() {
 		$this->dice = null;	
 		$this->jsonLoader = null;
@@ -39,8 +38,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 }';
 		
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->shared = true;
+		$equivalentRule = [];
+		$equivalentRule['shared'] = true;
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('*'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -58,8 +57,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 }';
 		
 		
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->shared = true;
+		$equivalentRule = [];
+		$equivalentRule['shared'] = true;
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -77,9 +76,9 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	]
 }';	
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->constructParams[] = 'A';
-		$equivalentRule->constructParams[] = 'B';
+		$equivalentRule = [];
+		$equivalentRule['constructParams'][] = 'A';
+		$equivalentRule['constructParams'][] = 'B';
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -98,8 +97,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	
 	
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->substitutions['B'] = new \Dice\Instance('C');
+		$equivalentRule = [];
+		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
 		
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
@@ -117,9 +116,9 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	]
 }';	
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->substitutions['B'] = new \Dice\Instance('C');
-		$equivalentRule->substitutions['F'] = new \Dice\Instance('E');
+		$equivalentRule = [];
+		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
+		$equivalentRule['substitutions']['F'] = ['instance' => 'E'];
 	
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
@@ -137,8 +136,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	]
 }';	
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->substitutions['B'] = new \Dice\Instance([new \Dice\Loader\Callback('JsonLoaderTest::foo()'), 'run']);
+		$equivalentRule = [];
+		$equivalentRule['substitutions']['B'] = new \Dice\Instance([new \Dice\Loader\Callback('JsonLoaderTest::foo()'), 'run']);
 	
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
@@ -155,8 +154,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 		}
 	]
 }';		
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->newInstances = ['C', 'D', 'E'];	
+		$equivalentRule = [];
+		$equivalentRule['newInstances'] = ['C', 'D', 'E'];	
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -172,8 +171,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 		}
 	]
 }';		
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->instanceOf = 'C';
+		$equivalentRule = [];
+		$equivalentRule['instanceOf'] = 'C';
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('[C]'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -192,8 +191,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	]
 }';		
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->call[] = ['setFoo', ['Foo', 'Bar']];
+		$equivalentRule = [];
+		$equivalentRule['call'][] = ['setFoo', ['Foo', 'Bar']];
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -212,8 +211,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 }';		
 	
 	
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->inherit = true;
+		$equivalentRule = [];
+		$equivalentRule['inherit'] = true;
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -229,8 +228,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 		}
 	]
 }';		
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->inherit = false;
+		$equivalentRule = [];
+		$equivalentRule['inherit'] = false;
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -247,8 +246,8 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 		}
 	]
 }';		
-		$equivalentRule = new \Dice\Rule;
-		$equivalentRule->shareInstances = ['C', 'D'];
+		$equivalentRule = [];
+		$equivalentRule['shareInstances'] = ['C', 'D'];
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
