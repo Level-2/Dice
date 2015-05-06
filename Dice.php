@@ -22,28 +22,25 @@ class Dice {
 		return isset($this->rules['*']) ? $this->rules['*'] : [];
 	}
 
-	public function create($component, array $args = [], $forceNewInstance = false, $share = []) {
-		if (!$forceNewInstance && isset($this->instances[$component])) return $this->instances[$component];
-		if (empty($this->cache[$component])) $this->cache[$component] = $this->getClosure($component, $this->getRule($component));
-		return $this->cache[$component]($args, $share);
+	public function create($name, array $args = [], $forceNewInstance = false, $share = []) {
+		if (!$forceNewInstance && isset($this->instances[$name])) return $this->instances[$name];
+		if (empty($this->cache[$name])) $this->cache[$name] = $this->getClosure($name, $this->getRule($name));
+		return $this->cache[$name]($args, $share);
 	}
 
-	private function getClosure($component, array $rule) {
-		$class = new \ReflectionClass(isset($rule['instanceOf']) ? $rule['instanceOf'] : $component);
+	private function getClosure($name, array $rule) {
+		$class = new \ReflectionClass(isset($rule['instanceOf']) ? $rule['instanceOf'] : $name);
 		$constructor = $class->getConstructor();
 		$params = $constructor ? $this->getParams($constructor, $rule) : null;
 
-		if ($rule['shared']) $closure = function($args, $share) use ($class, $component, $constructor, $params) {
-			$this->instances[$component] = $class->newInstanceWithoutConstructor();
-			if ($constructor) $constructor->invokeArgs($this->instances[$component], $params($args, $share));
-			return $this->instances[$component];
+		if ($rule['shared']) $closure = function($args, $share) use ($class, $name, $constructor, $params) {
+			$this->instances[$name] = $class->newInstanceWithoutConstructor();
+			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
+			return $this->instances[$name];
 		};			
-		else if ($params) $closure = function($args, $share) use ($class, $params) {
-			return new $class->name(...$params($args, $share));
-		};
-		else $closure = function($args, $share) use ($class) {
-			return new $class->name;
-		};			
+		else if ($params) $closure = function($args, $share) use ($class, $params) { return new $class->name(...$params($args, $share)); };
+		else $closure = function($args, $share) use ($class) { return new $class->name;	};
+
 		if (isset($rule['call'])) $closure = function ($args, $share) use ($closure, $class, $rule) {
 			$object = $closure($args, $share);
 			foreach ($rule['call'] as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), $rule), $this->expand($call[1])));	
@@ -54,7 +51,7 @@ class Dice {
 
 	private function expand($param, array $share = []) {
 		if (is_array($param) && isset($param['instance'])) return is_callable($param['instance']) ? call_user_func($param['instance'], $this, $share) : $this->create($param['instance'], [], false, $share);
-		else if (is_array($param)) foreach ($param as &$key) $key = $this->expand($key, $share); 		
+		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 		
 		return $param;
 	}
 
@@ -83,6 +80,3 @@ class Dice {
 		};
 	}
 }
-
-
-
