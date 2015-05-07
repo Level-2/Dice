@@ -6,12 +6,12 @@
  * @version         2.0                                                             */
 namespace Dice;
 class Dice {
-	private $rules = ['*' => ['shared' => false, 'constructParams' => [], 'shareInstances' => [], 'inherit' => true, 'substitutions' => [], 'instanceOf' => null]];
+	private $rules = ['*' => ['shared' => false, 'constructParams' => [], 'shareInstances' => [], 'call' => [], 'inherit' => true, 'substitutions' => [], 'instanceOf' => null]];
 	private $cache = [];
 	private $instances = [];
 
 	public function addRule($name, array $rule) {
-		$this->rules[ltrim(strtolower($name), '\\')] = array_merge($this->rules['*'], $rule);
+		$this->rules[ltrim(strtolower($name), '\\')] = array_merge($this->getRule($name), $rule);
 	}
 
 	public function getRule($name) {
@@ -19,7 +19,7 @@ class Dice {
 		foreach ($this->rules as $key => $rule) {
 			if ($rule['instanceOf'] === null && $key !== '*' && is_subclass_of($name, $key) && $rule['inherit'] === true) return $rule;
 		}
-		return isset($this->rules['*']) ? $this->rules['*'] : [];
+		return $this->rules['*'];
 	}
 
 	public function create($name, array $args = [], $forceNewInstance = false, $share = []) {
