@@ -9,12 +9,12 @@ class Json {
 	public function load($json, \Dice\Dice $dice = null) {
 		if ($dice === null) $dice = new \Dice\Dice;
 		$map = json_decode($json, true);
-		if (!is_object($map)) throw new \Exception('Could not decode json: ' . json_last_error_msg());
+		if (!is_array($map)) throw new \Exception('Could not decode json: ' . json_last_error_msg());
 
-		foreach ($map->rules as $rule) {
+		foreach ($map['rules'] as $rule) {
 			$name = $rule['name'];
 			unset($rule['name']);
-			$dice->addRule($rule['name'], $rule);
+			$dice->addRule($name, $rule);
 		}
 		return $dice;
 	}

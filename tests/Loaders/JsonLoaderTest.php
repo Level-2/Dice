@@ -89,16 +89,13 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"substitute": {"B": {"instance": "C"}}
+			"substitutions": {"B": {"instance": "C"}}
 		}
 	]
 }';	
 	
-	
-	
 		$equivalentRule = [];
-		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
-		
+		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];		
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->jsonLoader->load($json, $this->dice);
@@ -110,7 +107,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"substitute": {"B": {"instance": "C"}, "F": {"instance": "E"}}
+			"substitutions": {"B": {"instance": "C"}, "F": {"instance": "E"}}
 		}
 	]
 }';	
@@ -130,7 +127,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"substitute": {"B": {"instance": ["JsonLoaderTest", "foo"]}}
+			"substitutions": {"B": {"instance": ["JsonLoaderTest", "foo"]}}
 		}
 	]
 }';	
@@ -149,7 +146,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [
 		{
 			"name": "A",
-			"newinstances": ["C", "D", "E"]
+			"newInstances": ["C", "D", "E"]
 		}
 	]
 }';		
@@ -166,7 +163,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [
 		{
 			"name": "[C]",
-			"instanceof": "C"
+			"instanceOf": "C"
 		}
 	]
 }';		
@@ -241,7 +238,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [
 		{
 			"name": "A",
-			"shareinstances": ["C", "D"]
+			"shareInstances": ["C", "D"]
 		}
 	]
 }';		
