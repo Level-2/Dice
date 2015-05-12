@@ -6,7 +6,7 @@
  * @version         2.0                                                             */
 namespace Dice;
 class Dice {
-	private $rules = ['*' => ['shared' => false, 'constructParams' => [], 'shareInstances' => [], 'call' => [], 'inherit' => true, 'substitutions' => [], 'instanceOf' => null]];
+	private $rules = ['*' => ['shared' => false, 'constructParams' => [], 'shareInstances' => [], 'call' => [], 'inherit' => true, 'substitutions' => [], 'instanceOf' => null, 'newInstances' => []]];
 	private $cache = [];
 	private $instances = [];
 
@@ -41,16 +41,16 @@ class Dice {
 		else if ($params) $closure = function($args, $share) use ($class, $params) { return new $class->name(...$params($args, $share)); };
 		else $closure = function($args, $share) use ($class) { return new $class->name;	};
 
-		if (isset($rule['call'])) $closure = function ($args, $share) use ($closure, $class, $rule) {
+		if ($rule['call']) $closure = function ($args, $share) use ($closure, $class, $rule) {
 			$object = $closure($args, $share);
-			foreach ($rule['call'] as $call) $class->getMethod($call[0])->invokeArgs($object, call_user_func($this->getParams($class->getMethod($call[0]), $rule), $this->expand($call[1])));	
+			foreach ($rule['call'] as $call) $object->{$call[0]}(...$this->getParams($class->getMethod($call[0]), $rule)->__invoke($this->expand($call[1])));
 			return $object;
 		};
 		return $closure;
 	}
 
 	private function expand($param, array $share = []) {
-		if (is_array($param) && isset($param['instance'])) return is_callable($param['instance']) ? call_user_func($param['instance'], $this, $share) : $this->create($param['instance'], [], false, $share);
+		if (is_array($param) && isset($param['instance'])) return is_callable($param['instance']) ? call_user_func($param['instance'], $this) : $this->create($param['instance'], [], false, $share);
 		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 		
 		return $param;
 	}
@@ -59,15 +59,15 @@ class Dice {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
-			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule['substitutions']), in_array($class, $rule['newInstances'])];
+			$paramInfo[] = [$class, $param->allowsNull(), isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions']), isset($rule['newInstances']) && in_array($class, $rule['newInstances'])];
 		}
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule['shareInstances']) $share = array_merge($share, array_map([$this, 'create'], $rule['shareInstances']));
-			if ($share || $rule['constructParams']) $args = array_merge($args, $this->expand($rule['constructParams']), $share);
+			if ($share || $rule['constructParams']) $args = array_merge($args, $rule['constructParams'], $share);
 			$parameters = [];
 
 			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
-				if ($args) for ($i = 0, $count = count($args); $i < $count; $i++) {
+				if ($args && $count = count($args)) for ($i = 0; $i < $count; $i++) {
 					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
