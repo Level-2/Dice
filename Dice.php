@@ -41,12 +41,11 @@ class Dice {
 		else if ($params) $closure = function($args, $share) use ($class, $params) { return new $class->name(...$params($args, $share)); };
 		else $closure = function($args, $share) use ($class) { return new $class->name;	};
 
-		if ($rule['call']) $closure = function ($args, $share) use ($closure, $class, $rule) {
+		return $rule['call'] ? function ($args, $share) use ($closure, $class, $rule) {
 			$object = $closure($args, $share);
 			foreach ($rule['call'] as $call) $object->{$call[0]}(...$this->getParams($class->getMethod($call[0]), $rule)->__invoke($this->expand($call[1])));
 			return $object;
-		};
-		return $closure;
+		} : $closure;
 	}
 
 	private function expand($param, array $share = []) {
