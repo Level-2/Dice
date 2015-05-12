@@ -19,7 +19,7 @@ class Callback {
 		while ($var = array_shift($parts)) {
 			if (strpos($var, '(') !== false) {
 				$args = explode(',', substr($var, strpos($var, '(')+1, strpos($var, ')')-strpos($var, '(')-1));
-				$object = call_user_func_array([$object, substr($var, 0, strpos($var, '('))], ($args[0] == null) ? [] : $args);
+				$object = call_user_func_array([$object, substr($var, 0, strpos($var, '('))], ($args[0] === null) ? [] : $args);
 			}
 			else $object = $object->$var;
 		}
