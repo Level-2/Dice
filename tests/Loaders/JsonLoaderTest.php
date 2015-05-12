@@ -7,7 +7,6 @@
 
 require_once 'Dice.php';
 require_once 'Loader/Json.php';
-require_once 'Loader/Callback.php';
 
 
 class JsonLoaderTest extends PHPUnit_Framework_TestCase {
@@ -71,7 +70,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"construct": ["A", "B"]
+			"constructParams": ["A", "B"]
 		}
 	]
 }';	
@@ -131,13 +130,13 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 "rules": [				
 		{
 			"name": "A",
-			"substitute": {"B": {"call": "JsonLoaderTest::foo()"}}
+			"substitute": {"B": {"instance": ["JsonLoaderTest", "foo"]}}
 		}
 	]
 }';	
 	
 		$equivalentRule = [];
-		$equivalentRule['substitutions']['B'] = new \Dice\Instance([new \Dice\Loader\Callback('JsonLoaderTest::foo()'), 'run']);
+		$equivalentRule['substitutions']['B'] = ['instance' => ['JsonLoaderTest', 'foo']];
 	
 	
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
