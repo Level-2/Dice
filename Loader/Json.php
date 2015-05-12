@@ -18,7 +18,7 @@ class Json {
 		if ($dice === null) $dice = new \Dice\Dice;
 		$map = json_decode($json);
 		if (!is_object($map)) throw new \Exception('Could not decode json: ' . json_last_error_msg());
-		$rules = [];
+
 		foreach ($map->rules as $value) {
 			$rule = $dice->getRule($value->name);
 			if (isset($value->shared)) $rule->shared = $value->shared;
