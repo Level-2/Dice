@@ -3,7 +3,7 @@
  * @author          Tom Butler tom@r.je                                             *
  * @copyright       2012-2015 Tom Butler <tom@r.je> | http://r.je/dice.html         *
  * @license         http://www.opensource.org/licenses/bsd-license.php  BSD License *
- * @version         1.3.2                                                           */
+ * @version         2.0                                                            */
 
 require_once 'Dice.php';
 require_once 'Loader/Json.php';
@@ -15,8 +15,9 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 
 	protected function setUp() {
 		parent::setUp ();
+		$dice = new \Dice\Dice;
 		$this->dice = $this->getMock('\\Dice\\Dice', array('getRule', 'addRule'));		
-		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue([]));
+		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue($dice->getRule('*')));
 		$this->jsonLoader = new \Dice\Loader\Json;
 	}
 	protected function tearDown() {
@@ -36,7 +37,7 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	]
 }';
 		
-	
+
 		$equivalentRule = [];
 		$equivalentRule['shared'] = true;
 		
