@@ -33,15 +33,15 @@ class Dice {
 		$constructor = $class->getConstructor();
 		$params = $constructor ? $this->getParams($constructor, $rule) : null;
 
-		if ($rule['shared']) $closure = function($args, $share) use ($class, $name, $constructor, $params) {
+		if ($rule['shared']) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {
 			$this->instances[$name] = $class->newInstanceWithoutConstructor();
 			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
 			return $this->instances[$name];
 		};			
-		else if ($params) $closure = function($args, $share) use ($class, $params) { return new $class->name(...$params($args, $share)); };
-		else $closure = function($args, $share) use ($class) { return new $class->name;	};
+		else if ($params) $closure = function (array $args, array $share) use ($class, $params) { return new $class->name(...$params($args, $share)); };
+		else $closure = function () use ($class) { return new $class->name;	};
 
-		return $rule['call'] ? function ($args, $share) use ($closure, $class, $rule) {
+		return $rule['call'] ? function (array $args, array $share) use ($closure, $class, $rule) {
 			$object = $closure($args, $share);
 			foreach ($rule['call'] as $call) $object->{$call[0]}(...$this->getParams($class->getMethod($call[0]), $rule)->__invoke($this->expand($call[1])));
 			return $object;
@@ -62,14 +62,14 @@ class Dice {
 			$class = $param->getClass() ? $param->getClass()->name : null;
 			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule['substitutions']), in_array($class, $rule['newInstances'])];
 		}
-		return function($args, $share = []) use ($paramInfo, $rule) {
+		return function (array $args, array $share = []) use ($paramInfo, $rule) {
 			if ($rule['shareInstances']) $share = array_merge($share, array_map([$this, 'create'], $rule['shareInstances']));
 			if ($share || $rule['constructParams']) $args = array_merge($args, $this->expand($rule['constructParams']), $share);
 			$parameters = [];
 
 			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
 				if ($args) foreach ($args as $i => $arg) {
-					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
+					if ($class && $arg instanceof $class || ($arg === null && $allowsNull)) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
