@@ -218,6 +218,19 @@ class DiceTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($obj->a, 'first');
 		$this->assertNull($obj->b);
 	}
+
+    public function testTwoDefaultNullClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+    }
+
+    public function testTwoDefaultNullClassClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullCC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+		$this->assertInstanceOf('NC',$obj->c);
+    }
     
 	public function testSharedNamed() {
 		$rule = new \Dice\Rule;

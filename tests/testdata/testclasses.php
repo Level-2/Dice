@@ -101,6 +101,33 @@ class MethodWithTwoDefaultNull {
 	}
 }
 
+class NB {}
+
+class NC {}
+
+class MethodWithTwoDefaultNullC {
+	public $a;
+	public $b;
+
+	public function __construct($a = null, NB $b = null) {
+		$this->a = $a;
+		$this->b = $b;
+	}
+}
+
+class MethodWithTwoDefaultNullCC {
+	public $a;
+	public $b;
+	public $c;
+
+	public function __construct($a = null, NB $b = null, NC $c = null) {
+		$this->a = $a;
+		$this->b = $b;
+		$this->c = $c;
+	}
+}
+
+
 class MyDirectoryIterator extends DirectoryIterator {
 	
 }
