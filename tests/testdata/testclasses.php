@@ -91,6 +91,16 @@ class MethodWithDefaultNull {
 	}
 }
 
+class MethodWithTwoDefaultNull {
+	public $a;
+	public $b;
+
+	public function __construct($a = null, $b = null) {
+		$this->a = $a;
+		$this->b = $b;
+	}
+}
+
 class MyDirectoryIterator extends DirectoryIterator {
 	
 }
