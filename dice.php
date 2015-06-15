@@ -61,7 +61,7 @@ class Dice {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
-			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
+			$paramInfo[] = [$class, $param->allowsNull(), $param->isDefaultValueAvailable()?$param->getDefaultValue():null, array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
 		}		
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));	
@@ -69,7 +69,7 @@ class Dice {
 			$parameters = [];
 
 			foreach ($paramInfo as $param) {
-				list($class, $allowsNull, $sub, $new) = $param;
+				list($class, $allowsNull, $defaultValue, $sub, $new) = $param;
 				if ($args) for ($i = 0; $i < count($args); $i++) {
                     if ($class && ($args[$i] instanceof $class || is_null($args[$i]) && $allowsNull) ) {
 						$parameters[] = array_splice($args, $i, 1)[0];
@@ -78,6 +78,7 @@ class Dice {
 				}
 				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, [], $new, $share);
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
+                else if ($allowsNull) $parameters[] = $defaultValue;
 			}
 			return $parameters;
 		};	
