@@ -56,7 +56,7 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 		$this->assertInstanceOf('MyDirectoryIterator', $dir);
 	}
-	
+
 	
 	public function testInternalClassExtendedConstructor() {
 		$rule = new \Dice\Rule;
@@ -68,6 +68,30 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 	
 		$this->assertInstanceOf('MyDirectoryIterator2', $dir);
 	}
+
+    public function testAcceptsTwoArguments() {
+        $rule = new \Dice\Rule;
+        $rule->constructParams = ['First', 'Second'];
+
+        $this->dice->addRule('TwoArguments', $rule);
+
+        $class = $this->dice->create('TwoArguments');
+
+        $this->assertEquals('First', $class->first);
+        $this->assertEquals('Second', $class->second);
+    }
+
+    public function testAcceptsTwoArgumentsWithNull() {
+        $rule = new \Dice\Rule;
+        $rule->constructParams = ['First', null];
+
+        $this->dice->addRule('TwoArguments', $rule);
+
+        $class = $this->dice->create('TwoArguments');
+
+        $this->assertEquals('First', $class->first);
+        $this->assertEquals(null, $class->second);
+    }
 	
 	public function testNoMoreAssign() {
 		$rule = new \Dice\Rule;

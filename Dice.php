@@ -53,16 +53,16 @@ class Dice {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
-			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
+            $paramInfo[] = [$class, $param->isDefaultValueAvailable() && $param->getDefaultValue() === null, array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
 		}
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 
-			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
+			foreach ($paramInfo as list($class, $defaultsToNull, $sub, $new)) {
 				if ($args && $count = count($args)) for ($i = 0; $i < $count; $i++) {
-					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
+					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $defaultsToNull)) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
