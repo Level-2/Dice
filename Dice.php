@@ -53,22 +53,24 @@ class Dice {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
-			$paramInfo[] = [$class, $param->allowsNull(), array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
+			$defaultValue = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+			$paramInfo[] = [$class, $param->allowsNull(), $defaultValue, array_key_exists($class, $rule->substitutions), in_array($class, $rule->newInstances)];
 		}
 		return function($args, $share = []) use ($paramInfo, $rule) {
 			if ($rule->shareInstances) $share = array_merge($share, array_map([$this, 'create'], $rule->shareInstances));
 			if ($share || $rule->constructParams) $args = array_merge($args, $this->expand($rule->constructParams, $share), $share);
 			$parameters = [];
 
-			foreach ($paramInfo as list($class, $allowsNull, $sub, $new)) {
+			foreach ($paramInfo as list($class, $allowsNull, $defaultValue, $sub, $new)) {
 				if ($args && $count = count($args)) for ($i = 0; $i < $count; $i++) {
-					if ($class && $args[$i] instanceof $class || ($args[$i] === null && $allowsNull)) {
+					if ($class && ($args[$i] instanceof $class || ($args[$i] === null && $allowsNull))) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
 				}
 				if ($class) $parameters[] = $sub ? $this->expand($rule->substitutions[$class], $share) : $this->create($class, [], $new, $share);
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
+				else $parameters[] = $defaultValue;
 			}
 			return $parameters;
 		};
