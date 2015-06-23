@@ -70,7 +70,7 @@ class Dice {
 
 			foreach ($paramInfo as list($class, $allowsNull, $defaultValue, $sub, $new)) {
 				if ($args) foreach ($args as $i => $arg) {
-					if ($class && $arg instanceof $class || ($arg === null && $allowsNull)) {
+					if ($class && ($arg instanceof $class || ($arg === null && $allowsNull))) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
