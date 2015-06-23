@@ -200,8 +200,38 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$obj = $this->dice->create('MethodWithDefaultNull');
 		$this->assertNull($obj->b);
 	}
-	
-	
+
+    public function testNullSwap() {
+        $obj = $this->dice->create('RequiresConstructorArgsA', ['string', null]);
+        $this->assertEquals($obj->foo, 'string');
+        $this->assertNull($obj->bar);
+    }
+
+    public function testEmptyArraySwap() {
+        $obj = $this->dice->create('RequiresConstructorArgsA', ['string', []]);
+        $this->assertEquals($obj->foo, 'string');
+        $this->assertEquals($obj->bar, []);
+    }
+
+	public function testTwoDefaultNullAssigned() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNull', ['first', null]);
+        $this->assertEquals($obj->a, 'first');
+		$this->assertNull($obj->b);
+	}
+
+    public function testTwoDefaultNullClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+    }
+
+    public function testTwoDefaultNullClassClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullCC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+		$this->assertInstanceOf('NC',$obj->c);
+    }
+    
 	public function testSharedNamed() {
 		$rule = new \Dice\Rule;
 		$rule->shared = true;
