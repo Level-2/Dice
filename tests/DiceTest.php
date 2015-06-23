@@ -749,4 +749,23 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(null, $obj->nullScalar->string);
 	}
 
+
+	public function testTwoDefaultNullClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+    }
+
+    public function testTwoDefaultNullClassClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullCC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+		$this->assertInstanceOf('NC',$obj->c);
+    }
+
+    public function testScalarConstructorArgs() {
+    	$obj = $this->dice->create('ScalarConstructors', ['string', null]);
+    	$this->assertEquals('string', $obj->string);
+    	$this->assertEquals(null, $obj->null);
+    }
 }
