@@ -60,6 +60,12 @@ PHP version compatibility
 Dice is compatible with PHP5.4 and up, there are archived versions of Dice which supports PHP5.3 however this is no longer maintanied.
 
 
+Credits
+------------
+
+Originally developed by Tom Butler (@TomBZombie), with many thanks to daniel-meister (@daniel-meister), Garrett W. (@garrettw), maxwilms (@maxwilms) for bug fixes, suggestions and improvements.
+
+
 Updates
 ------------
 
