@@ -4,7 +4,6 @@
     "license": "BSD-2-Clause",
     "homepage": "http://r.je/dice.html",
     "keywords": ["Dependency injection", "ioc", "Dependency injection container", "DI"],
-    "minimum-stability": "dev",
     "authors": [
     	{
     		"name": "Tom Butler",
@@ -16,5 +15,8 @@
     },
     "autoload": {
     	"classmap": ["Loader/", "Dice.php"]
+    },
+    "suggest": {
+        "container-interop/container-interop": "Optional container-iterop package for projects using more than one Dependency Injection Container"
     }
 }
