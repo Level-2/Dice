@@ -34,7 +34,6 @@ class BasicTest extends DiceTest {
 	public function testSetDefaultRule() {
 		$defaultBehaviour = [];
 		$defaultBehaviour['shared'] = true;
-		$defaultBehaviour['newInstances'] = array('Foo', 'Bar');
 		$this->dice->addRule('*', $defaultBehaviour);		
 
 		$rule = $this->dice->getRule('*');
@@ -121,41 +120,6 @@ class BasicTest extends DiceTest {
 		$this->assertEquals($obj2->getFoo(), 'bar');
 	}
 
-	public function testForceNewInstance() {
-		$rule = [];
-		$rule['shared'] = true;
-		$this->dice->addRule('A', $rule);
-		
-		$a1 = $this->dice->create('A');
-		$a2 = $this->dice->create('A');
-		
-		$a3 = $this->dice->create('A', array(), true);
-		
-		$this->assertSame($a1, $a2);
-		$this->assertNotSame($a1, $a3);
-		$this->assertNotSame($a2, $a3);	
-	}	
-
-	public function testDefaultValueAssigned() {
-		$obj = $this->dice->create('MethodWithDefaultValue');
-		$this->assertEquals($obj->foo, 'bar');
-	}
-	
-	
-	public function testNewInstances() {
-		$rule = [];
-		$rule['shared'] = true;
-		$this->dice->addRule('B', $rule);
-		
-		$rule = [];
-		$rule['newInstances'][] = 'B';
-		$this->dice->addRule('A', $rule);
-		
-		$a1 = $this->dice->create('A');
-		$a2 = $this->dice->create('A');
-		
-		$this->assertNotSame($a1->b, $a2->b);
-	}
 	
 	public function testInterfaceRule() {
 		$rule = [];
