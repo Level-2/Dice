@@ -23,7 +23,6 @@ class Dice {
 	}
 
 	public function create($name, array $args = [], array $share = []) {
-		$name = ltrim($name, '\\');
 		if (!empty($this->instances[$name])) return $this->instances[$name];
 		if (empty($this->cache[$name])) $this->cache[$name] = $this->getClosure($name, $this->getRule($name));
 		return $this->cache[$name]($args, $share);
