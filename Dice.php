@@ -35,7 +35,7 @@ class Dice {
 		$params = $constructor ? $this->getParams($constructor, $rule) : null;
 
 		if ($rule['shared']) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {			
-			$this->instances[$name] = $class->newInstanceWithoutConstructor();
+			$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
 			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
 			return $this->instances[$name];
 		};			
