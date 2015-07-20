@@ -19,9 +19,10 @@ class Xml {
 		if (!($map instanceof \SimpleXmlElement)) $map = simplexml_load_file($map);
 		foreach ($map as $key => $value) {
 			$rule = $dice->getRule((string) $value->name);
-			$rule['shared'] = ((string) $value->shared === 'true');
 
-			$rule['inherit'] = ($value->inherit == 'false') ? false : true;
+			if (isset($value->shared)) $rule['shared'] = ((string) $value->shared === 'true');
+
+			if (isset($value->inherit)) $rule['inherit'] = ($value->inherit == 'false') ? false : true;
 			if ($value->call) {
 				foreach ($value->call as $name => $call) {
 					$callArgs = [];
@@ -34,7 +35,6 @@ class Xml {
 			if ($value->substitutions) foreach ($value->substitutions as $use) 	$rule['substitutions'][(string) $use->as] = $this->getComponent($use->use, true);
 			if ($value->constructParams) foreach ($value->constructParams->children() as $child) $rule['constructParams'][] = $this->getComponent($child);
 			if ($value->shareInstances) foreach ($value->shareInstances as $share) $rule['shareInstances'][] = $this->getComponent($share);
-
 			$dice->addRule((string) $value->name, $rule);
 		}
 	}

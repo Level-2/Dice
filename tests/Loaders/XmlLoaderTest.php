@@ -78,7 +78,7 @@ class XmlLoaderTest extends PHPUnit_Framework_TestCase {
 </dice>';
 	
 	
-		$equivalentRule = $this->dice->getRule('*');
+		$equivalentRule = [];
 		$equivalentRule['constructParams'][] = 'A';
 		$equivalentRule['constructParams'][] = 'B';
 	
@@ -100,7 +100,7 @@ class XmlLoaderTest extends PHPUnit_Framework_TestCase {
 </dice>';
 	
 	
-		$equivalentRule = $this->dice->getRule('*');
+		$equivalentRule = [];
 		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
@@ -238,7 +238,7 @@ class XmlLoaderTest extends PHPUnit_Framework_TestCase {
 	</rule>
 </dice>';
 	
-		$equivalentRule = $this->dice->getRule('*');
+		$equivalentRule = [];
 		$equivalentRule['shareInstances'] = ['C', 'D'];
 		
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
