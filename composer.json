@@ -15,8 +15,5 @@
     },
     "autoload": {
     	"classmap": ["Loader/", "Dice.php"]
-    },
-    "suggest": {
-        "container-interop/container-interop": "Optional container-iterop package for projects using more than one Dependency Injection Container"
     }
 }
