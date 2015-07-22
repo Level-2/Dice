@@ -322,6 +322,22 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($obj->foo, 'foo');
 		$this->assertEquals($obj->bar, 'bar');
 	}
+
+	public function testConstructParamsNested() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = array('foo', 'bar');
+		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+
+		$rule = new \Dice\Rule;
+		$rule->shareInstances = array('D');
+		$this->dice->addRule('ParamRequiresArgs', $rule);
+		
+		$obj = $this->dice->create('ParamRequiresArgs');
+		
+		$this->assertEquals($obj->a->foo, 'foo');
+		$this->assertEquals($obj->a->bar, 'bar');
+	}
+
 	
 	public function testConstructParamsMixed() {
 		$rule = new \Dice\Rule;
@@ -526,6 +542,8 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('A', $bestMatch->a);
 	}
 	
+
+    
 	
 	public function testShareInstances() {
 		$rule = new \Dice\Rule();
@@ -545,7 +563,33 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		
 	}
 	
-	
+	public function testNamedShareInstances() {
+
+		$rule = new \Dice\Rule();
+		$rule->instanceOf = 'Shared';
+		$this->dice->addRule('$Shared', $rule);
+
+		$rule = new \Dice\Rule();
+		$rule->shareInstances = ['$Shared'];
+		$this->dice->addRule('TestSharedInstancesTop', $rule);
+		
+		
+		$shareTest = $this->dice->create('TestSharedInstancesTop');
+		
+		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+		
+		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
+		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+		
+		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
+		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
+
+
+		$shareTest2 = $this->dice->create('TestSharedInstancesTop');
+		$this->assertNotSame($shareTest2->share1->shared, $shareTest->share2->shared);
+	}
+
+
 	public function testShareInstancesNested() {
 		$rule = new \Dice\Rule();
 		$rule->shareInstances = ['F'];
@@ -688,5 +732,42 @@ class DiceTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('D', $a2->bar);
 	}
 
-}
 
+	public function testNullScalar() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = [null];
+		$this->dice->addRule('NullScalar', $rule);
+
+		$obj = $this->dice->create('NullScalar');
+		$this->assertEquals(null, $obj->string);
+	}
+
+	public function testNullScalarNested() {
+		$rule = new \Dice\Rule;
+		$rule->constructParams = [null];
+		$this->dice->addRule('NullScalar', $rule);
+
+		$obj = $this->dice->create('NullScalarNested');
+		$this->assertEquals(null, $obj->nullScalar->string);
+	}
+
+	public function testTwoDefaultNullClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+    }
+
+    public function testTwoDefaultNullClassClass() {
+		$obj = $this->dice->create('MethodWithTwoDefaultNullCC');
+        $this->assertNull($obj->a);
+		$this->assertInstanceOf('NB',$obj->b);
+		$this->assertInstanceOf('NC',$obj->c);
+    }
+
+    public function testScalarConstructorArgs() {
+    	$obj = $this->dice->create('ScalarConstructors', ['string', null]);
+    	$this->assertEquals('string', $obj->string);
+    	$this->assertEquals(null, $obj->null);
+    }
+
+}
