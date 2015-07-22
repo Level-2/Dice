@@ -90,6 +90,40 @@ class MethodWithDefaultNull {
 	}
 }
 
+class NB {}
+
+class NC {}
+
+class MethodWithTwoDefaultNullC {
+	public $a;
+	public $b;
+	public function __construct($a = null, NB $b = null) {
+		$this->a = $a;
+		$this->b = $b;
+	}
+}
+
+class MethodWithTwoDefaultNullCC {
+	public $a;
+	public $b;
+	public $c;
+	public function __construct($a = null, NB $b = null, NC $c = null) {
+		$this->a = $a;
+		$this->b = $b;
+		$this->c = $c;
+	}
+}
+
+//From: https://github.com/TomBZombie/Dice/issues/62#issuecomment-112370319
+class ScalarConstructors {
+	public $string;
+	public $null;
+	
+  public function __construct($string, $null) {
+    $this->string = $string;
+    $this->null = $null;
+  }
+}
 
 class MyDirectoryIterator extends DirectoryIterator {
 	
@@ -337,6 +371,14 @@ class RequiresConstructorArgsB {
 	}
 }
 
+class ParamRequiresArgs {
+    public $a;
+    
+    public function __construct(D $d, RequiresConstructorArgsA $a) {
+        $this->a = $a;
+    }
+}
+
 interface interfaceTest {}
 
 class InterfaceTestClass implements interfaceTest {
@@ -366,5 +408,21 @@ class ConsumeArgsSub {
 
     public function __construct($s) {
         $this->s = $s;
+    }
+}
+
+class NullScalar {
+	public $string;
+
+	public function __construct($string = null) {
+		$this->string = $string;
+    }
+}
+
+class NullScalarNested {
+	public $nullScalar;
+
+	public function __construct(NullScalar $nullScalar) {
+		$this->nullScalar = $nullScalar;
     }
 }
