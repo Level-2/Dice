@@ -7,10 +7,10 @@
 * @version				1.1.1
 */
 namespace Dice\Loader;
-class XML {
+class Xml {
 	private function getComponent($str, $createInstance = false) {
-		if ($createInstance) return (strpos((string) $str, '{') === 0) ? [new Callback($str), 'run'] : new \Dice\Instance((string) $str);
-		else return (strpos((string) $str, '{') === 0) ? [new Callback($str), 'run'] : (string) $str;
+		if ($createInstance) return (strpos((string) $str, '{') === 0) ? new \Dice\Instance([new Callback($str), 'run']) : new \Dice\Instance((string) $str);
+		else return (strpos((string) $str, '{') === 0) ? new \Dice\Instance([new Callback($str), 'run']) : (string) $str;
 	}
 
 	public function load($map, \Dice\Dice $dice = null) {
