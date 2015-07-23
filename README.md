@@ -7,7 +7,7 @@ Dice is a minimalist Dependency Injection Container for PHP with a focus on bein
 Project Goals
 -------------
 
-1) To be lightweight and not a huge library with dozens of files (Currently Dice is just one 100 line file with only 3 classes) yet support all features (and more) offered by much more complex containers
+1) To be lightweight and not a huge library with dozens of files (Dice is a single 100 line class) yet support all features (and more) offered by much more complex containers
 
 2) To "just work". Basic functionality should work with zero configuration
 
