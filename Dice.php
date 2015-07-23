@@ -50,7 +50,8 @@ class Dice {
 
 	private function expand($param, array $share = []) {
 		if (is_array($param) && isset($param['instance'])) {
-			return is_callable($param['instance']) ? call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : [])) : $this->create($param['instance'], [], $share);
+			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : []));
+			else return $this->create($param['instance'], [], $share);
 		}
 		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 		
 		return $param;
@@ -60,23 +61,23 @@ class Dice {
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
 			$class = $param->getClass() ? $param->getClass()->name : null;
-			$defaultValue = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
-			$paramInfo[] = [$class, $param->allowsNull(), $defaultValue, isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions'])];
+			$paramInfo[] = [$class, $param, isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions'])];
 		}
 		return function (array $args, array $share = []) use ($paramInfo, $rule) {
 			if (isset($rule['shareInstances'])) $share = array_merge($share, array_map([$this, 'create'], $rule['shareInstances']));
 			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams']) : [], $share);
 			$parameters = [];
 
-			foreach ($paramInfo as list($class, $allowsNull, $defaultValue, $sub)) {
+			foreach ($paramInfo as list($class, $param, $sub)) {
 				if ($args) foreach ($args as $i => $arg) {
-					if ($class && ($arg instanceof $class || ($arg === null && $allowsNull))) {
+					if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
 						$parameters[] = array_splice($args, $i, 1)[0];
 						continue 2;
 					}
 				}
 				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share) : $this->create($class, [], $share);
-				else $parameters[] = $args ? $this->expand(array_shift($args)) : $defaultValue;
+				else if ($args) $parameters[] = $this->expand(array_shift($args));
+				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}
 			return $parameters;
 		};
