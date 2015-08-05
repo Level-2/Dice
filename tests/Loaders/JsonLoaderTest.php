@@ -142,23 +142,6 @@ class JsonLoaderTest extends PHPUnit_Framework_TestCase {
 	}
 	
 
-	public function testNewInstances() {
-		$json = '{
-"rules": [
-		{
-			"name": "A",
-			"newInstances": ["C", "D", "E"]
-		}
-	]
-}';		
-		$equivalentRule = [];
-		$equivalentRule['newInstances'] = ['C', 'D', 'E'];	
-	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->jsonLoader->load($json, $this->dice);
-	}
-	
-
 	public function testInstanceOf() {
 		$json = '{
 "rules": [

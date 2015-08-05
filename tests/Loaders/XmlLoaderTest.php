@@ -135,25 +135,6 @@ class XmlLoaderTest extends PHPUnit_Framework_TestCase {
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
-	
-	public function testNewInstances() {
-		$xml = '<?xml version="1.0"?>
-<dice>
-	<rule>
-		<name>A</name>
-		<newInstances>C</newInstances>
-		<newInstances>D</newInstances>
-		<newInstances>E</newInstances>
-	</rule>
-</dice>';
-		
-		$equivalentRule = $this->dice->getRule('*');
-		$equivalentRule['newInstances'] = ['C', 'D', 'E'];	
-	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
-		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
-	}
-	
 	public function testInstanceOf() {
 		$xml = '<?xml version="1.0"?>
 <dice>
