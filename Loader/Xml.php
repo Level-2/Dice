@@ -44,7 +44,7 @@ class Xml {
 			if ($value->call) {
 				foreach ($value->call as $name => $call) {
 					$callArgs = [];
-					if ($call->params) 	foreach ($call->params->children() as $key => $param) 	$callArgs[] = $this->getComponent($param);
+					foreach ($call->children() as $key => $param) 	$callArgs[] = $this->getComponent($param);
 					$rule['call'][] = [(string) $call['method'], $callArgs];
 				}
 			}

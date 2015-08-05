@@ -140,11 +140,8 @@ class XmlLoaderV2Test extends PHPUnit_Framework_TestCase {
 <dice xmlns="https://r.je/dice/2.0">
 	<rule name="A">
 		<call method="setFoo">
-			<method>setFoo</method> 
-           <params> 
-                <param>Foo</param> 
-                <param>Bar</param> 
-            </params>
+            <param>Foo</param> 
+            <param>Bar</param> 
 		</call> 
 	</rule>
 </dice>';
