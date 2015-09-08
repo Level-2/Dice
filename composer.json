@@ -1,5 +1,5 @@
 {
-    "name": "tombzombie/dice",
+    "name": "level-2/dice",
     "description": "A minimalist Dependency injection container (DIC) for PHP. Please note: This branch is only compatible with PHP5.6. 5.5, 5.4 and 5.3 compatible version is available as a separate branch on github. ",
     "license": "BSD-2-Clause",
     "homepage": "http://r.je/dice.html",
