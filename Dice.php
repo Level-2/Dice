@@ -54,13 +54,17 @@ class Dice {
 		} : $closure;
 	}
 
-	private function expand($param, array $share = []) {
+	/** looks for 'instance' array keys in $param and when found returns an object based on the value see https://r.je/dice.html#example3-1 */
+	private function expand($param, array $share = [], $createFromString = false) {
 		if (is_array($param) && isset($param['instance'])) {
-			if (is_callable($param['instance'])) return call_user_func_array($param['instance'], (isset($param['params']) ? $this->expand($param['params']) : []));
+			//Call or return the value sored under the key 'instance'
+			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : []));
 			else return $this->create($param['instance'], [], $share);
 		}
-		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 		
-		return $param;
+		//Recursively search for 'instance' keys in $param
+		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 	
+		//'instance' wasn't found, return the value unchanged
+		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
 
 	private function getParams(\ReflectionMethod $method, array $rule) {
@@ -82,7 +86,7 @@ class Dice {
 						continue 2;
 					}
 				}
-				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share) : $this->create($class, [], $share);
+				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}
