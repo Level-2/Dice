@@ -87,6 +87,30 @@ class SubstitutionsTest extends DiceTest {
 	}
 	
 	
+	public function testSubFromString() {
+		$rule = [
+			'substitutions' => ['Bar' => 'Baz']
+		];
+		$this->dice->addRule('*', $rule);
 
+		$this->dice->create('Foo');
+
+	}
+
+}
+
+
+class Foo {
+	public $bar;
+	public function __construct(Bar $bar) {
+		$this->bar = $bar;
+	}
+}
+
+interface Bar {
+
+}
+
+class Baz implements Bar {
 
 }

@@ -86,7 +86,7 @@ class Dice {
 	}
 
 	/** looks for 'instance' array keys in $param and when found returns an object based on the value see https://r.je/dice.html#example3-1 */
-	private function expand($param, array $share = []) {
+	private function expand($param, array $share = [], $createFromString = false) {
 		if (is_array($param) && isset($param['instance'])) {
 			//Call or return the value sored under the key 'instance'
 			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : []));
@@ -95,7 +95,7 @@ class Dice {
 		//Recursively search for 'instance' keys in $param
 		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 	
 		//'instance' wasn't found, return the value unchanged
-		return $param;
+		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
 
 	/** returns a closure that generates arguments for $method based on $rule and any $args passed into the closure */
@@ -129,7 +129,7 @@ class Dice {
 					}
 				}
 				//When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
-				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share) : $this->create($class, [], $share);
+				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				//There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
 				//There's no type hint and nothing left in $args, provide the default value or null
