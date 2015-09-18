@@ -78,7 +78,7 @@ class Dice {
 
 			foreach ($rule['call'] as $call) {
 				//Generate the method arguments using getParams() and call the returned closure (in php7 will be ()() rather than __invoke)
-				$params = $this->getParams($class->getMethod($call[0]), $rule)->__invoke($this->expand($call[1]));
+				$params = $this->getParams($class->getMethod($call[0]), $rule)->__invoke($this->expand(isset($call[1]) ? $call[1] : []));
 				$object->{$call[0]}(...$params);
 			}
 			return $object;
