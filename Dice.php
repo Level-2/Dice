@@ -135,7 +135,8 @@ class Dice {
 				//There's no type hint and nothing left in $args, provide the default value or null
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}
-			return $parameters;
+			//variadic functions will only have one argument. To account for those, append any remaining arguments to the list
+			return array_merge($parameters, $args);
 		};
 	}
 }
