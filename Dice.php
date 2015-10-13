@@ -15,7 +15,9 @@ class Dice {
 	}
 
 	public function getRule($name) {
-		if (isset($this->rules[strtolower(ltrim($name, '\\'))])) return $this->rules[strtolower(ltrim($name, '\\'))];
+		$lcName = strtolower(ltrim($name, '\\'));
+		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
+		
 		foreach ($this->rules as $key => $rule) {
 			if (empty($rule['instanceOf']) && $key !== '*' && is_subclass_of($name, $key) && (empty($rule['inherit']) || $rule['inherit'] === true )) return $rule;
 		}
