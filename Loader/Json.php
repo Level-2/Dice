@@ -11,11 +11,17 @@ class Json {
 		$map = json_decode($json, true);
 		if (!is_array($map)) throw new \Exception('Could not decode json: ' . json_last_error_msg());
 
-		foreach ($map['rules'] as $rule) {
-			$name = $rule['name'];
-			unset($rule['name']);
-			$dice->addRule($name, $rule);
+		if (isset($map['rules'])) {
+			foreach ($map['rules'] as $rule) {
+				$name = $rule['name'];
+				unset($rule['name']);
+				$dice->addRule($name, $rule);
+			}
 		}
+		else {
+			foreach ($map as $name => $rule) $dice->addRule($name, $rule);
+		}
+		
 		return $dice;
 	}
 }
