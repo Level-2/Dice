@@ -17,8 +17,8 @@ class Dice {
 
 	/** returns the rule that will be applied to the class $name in create() */
 	public function getRule($name) {
-		$name = strtolower(ltrim($name, '\\'));
-		if (isset($this->rules[$name])) return $this->rules[$name];
+		$lcName = strtolower(ltrim($name, '\\'));
+		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 
 		foreach ($this->rules as $key => $rule) { 							//Find a rule which matches the class described in $name where:
 			if (empty($rule['instanceOf']) 		  							//It's not a named instance, the rule is applied to a class name
