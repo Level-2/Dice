@@ -134,11 +134,13 @@ class Dice {
 				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				//There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
 				else if ($args) $parameters[] = $this->expand(array_shift($args));
+				//For variadic parameters, provide remaining $args
+				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
 				//There's no type hint and nothing left in $args, provide the default value or null
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}
 			//variadic functions will only have one argument. To account for those, append any remaining arguments to the list
-			return array_merge($parameters, $args);
+			return $parameters;
 		};
 	}
 }
