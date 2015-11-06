@@ -115,7 +115,7 @@ class Dice {
 			if (isset($rule['shareInstances'])) $share = array_merge($share, array_map([$this, 'create'], $rule['shareInstances']));
 
 			//Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
-			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams']) : [], $share);
+			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : [], $share);
 		
 			$parameters = [];
 
