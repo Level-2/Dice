@@ -92,7 +92,7 @@ class Dice {
 			//For ['instance' => ['className', 'methodName'] construct the instance before calling it
 			if (is_array($param['instance'])) $param['instance'][0] =  $this->expand($param['instance'][0], $share, true);
 			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : []));
-			else return $this->create($param['instance'], [], $share);
+			else return $this->create($param['instance'], $share);
 		}
 		//Recursively search for 'instance' keys in $param
 		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 	
