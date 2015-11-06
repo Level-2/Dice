@@ -60,7 +60,7 @@ class Dice {
 	private function expand($param, array $share = [], $createFromString = false) {
 		if (is_array($param) && isset($param['instance'])) {
 			if (is_callable($param['instance'])) return call_user_func_array($param['instance'], (isset($param['params']) ? $this->expand($param['params']) : []));
-			else return $this->create($param['instance'], [], $share);
+			else return $this->create($param['instance'], $share);
 		}
 		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 		
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
