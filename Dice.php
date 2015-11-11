@@ -69,7 +69,10 @@ class Dice {
 			//No constructor arguments, just instantiate the class
 			return new $class->name;
 		};
-
+		//If there are shared instances, create them and merge them with shared instances higher up the object graph
+		if (isset($rule['shareInstances'])) $closure = function(array $args, array $share) use ($closure, $rule) {
+			return $closure($args, array_merge($args, $share, array_map([$this, 'create'], $rule['shareInstances'])));
+		};
 		//When $rule['call'] is set, wrap the closure in another closure which will call the required methods after constructing the object
 		//By putting this in a closure, the loop is never executed unless call is actually set
 		return isset($rule['call']) ? function (array $args, array $share) use ($closure, $class, $rule) {
@@ -111,9 +114,6 @@ class Dice {
 
 		//Return a closure that uses the cached information to generate the arguments for the method
 		return function (array $args, array $share = []) use ($paramInfo, $rule) {
-			//If there are shared instances, create them and merge them with shared instances higher up the object graph
-			if (isset($rule['shareInstances'])) $share = array_merge($share, array_map([$this, 'create'], $rule['shareInstances']));
-
 			//Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
 			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : [], $share);
 		
