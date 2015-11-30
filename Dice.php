@@ -46,11 +46,8 @@ class Dice {
 			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
 			return $this->instances[$name];
 		};			
-		else if ($params) $closure = function (array $args, array $share) use ($class, $params) { 
-		//	$params = clone $params;
-			$p = $params($args, $share);
-			return new $class->name(...$p); 
-		};
+		else if ($params) $closure = function (array $args, array $share) use ($class, $params) { return $class->newInstanceArgs($params($args, $share)); };
+
 		else $closure = function () use ($class) { return new $class->name;	};
 
 		return isset($rule['call']) ? function (array $args, array $share) use ($closure, $class, $rule) {
