@@ -113,3 +113,8 @@ interface interfaceTest {}
 class InterfaceTestClass implements interfaceTest {
 
 }
+
+class ParentClass {
+}
+class Child extends ParentClass {
+}

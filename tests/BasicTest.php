@@ -147,4 +147,12 @@ class BasicTest extends DiceTest {
 		$this->assertSame($a->b, $a->b->a->b);
 	}
 
+	public function testInherit() {
+		$rule = ['shared' => true, 'inherit' => false];
+		
+		$this->dice->addRule('ParentClass', $rule);
+		$obj1 = $this->dice->create('Child');
+		$obj2 = $this->dice->create('Child');
+		$this->assertNotSame($obj1, $obj2);
+	}
 }

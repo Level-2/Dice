@@ -24,7 +24,7 @@ class Dice {
 			if (empty($rule['instanceOf']) 		  							//It's not a named instance, the rule is applied to a class name
 				&& $key !== '*' 				  							//It's not the default rule
 				&& is_subclass_of($name, $key)								//The rule is applied to a parent class
-				&& (empty($rule['inherit']) || $rule['inherit'] === true )) //And that rule should be inherited to subclasses
+				&& (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) //And that rule should be inherited to subclasses
 			return $rule;
 		}
 		//No rule has matched, return the default rule if it's set
