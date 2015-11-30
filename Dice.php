@@ -19,7 +19,7 @@ class Dice {
 		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 		
 		foreach ($this->rules as $key => $rule) {
-			if (empty($rule['instanceOf']) && $key !== '*' && is_subclass_of($name, $key) && (empty($rule['inherit']) || $rule['inherit'] === true )) return $rule;
+			if (empty($rule['instanceOf']) && $key !== '*' && is_subclass_of($name, $key) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) return $rule;
 		}
 		return isset($this->rules['*']) ? $this->rules['*'] : [];
 	}
@@ -46,7 +46,11 @@ class Dice {
 			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
 			return $this->instances[$name];
 		};			
-		else if ($params) $closure = function (array $args, array $share) use ($class, $params) { return $class->newInstanceArgs($params($args, $share)); };
+		else if ($params) $closure = function (array $args, array $share) use ($class, $params) { 
+		//	$params = clone $params;
+			$p = $params($args, $share);
+			return new $class->name(...$p); 
+		};
 		else $closure = function () use ($class) { return new $class->name;	};
 
 		return isset($rule['call']) ? function (array $args, array $share) use ($closure, $class, $rule) {
