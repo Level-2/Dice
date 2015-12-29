@@ -90,15 +90,6 @@ class Dice {
 
 	/** looks for 'instance' array keys in $param and when found returns an object based on the value see https://r.je/dice.html#example3-1 */
 	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param['instance'])) {
-			//Call or return the value sored under the key 'instance'
-			//For ['instance' => ['className', 'methodName'] construct the instance before calling it
-			if (is_array($param['instance'])) $param['instance'][0] =  $this->expand($param['instance'][0], $share, true);
-			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : []));
-			else return $this->create($param['instance'], $share);
-		}
-		//Recursively search for 'instance' keys in $param
-		else if (is_array($param)) foreach ($param as &$value) $value = $this->expand($value, $share); 	
 		//'instance' wasn't found, return the value unchanged
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
