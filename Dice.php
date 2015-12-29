@@ -62,7 +62,7 @@ class Dice {
 			return $this->instances[$name];
 		};			
 		else if ($params) $closure = function (array $args, array $share) use ($class, $params) {
-			//This class has depenencies, call the $params closure to generate them based on $args and $share
+			//This class has dependencies, call the $params closure to generate them based on $args and $share
 			return new $class->name(...$params($args, $share)); 
 		};
 		else $closure = function () use ($class) {
