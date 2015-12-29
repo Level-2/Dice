@@ -3,8 +3,8 @@ namespace Dice\Extra;
 class RuleValidator {
 	private $dice;
 
-	public function __construct() {
-		$this->dice = new \Dice\Dice;
+	public function __construct(\Dice\Dice $dice) {
+		$this->dice = $dice;
 	}
 
 	public function addRule($name, array $rule) {
@@ -19,7 +19,7 @@ class RuleValidator {
 	}
 
 	private function checkValidKeys($rule) {
-		$validKeys = ['call', 'shared', 'substitutions', 'instanceOf', 'inherit', 'shareInstances', 'substitutions', 'constructParams'];
+		$validKeys = ['call', 'shared', 'substitutions', 'instanceOf', 'inherit', 'shareInstances', 'constructParams'];
 		foreach ($rule as $name => $value) {
 			if (!in_array($name, $validKeys)) throw new \InvalidArgumentException('Invalid rule option: '. $name);
 		}
