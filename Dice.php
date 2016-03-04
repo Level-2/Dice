@@ -12,7 +12,7 @@ class Dice {
 
 	/** add a rule $rule to the class $name see https://r.je/dice.html#example3 for $rule format */
 	public function addRule($name, array $rule) {
-		$this->rules[ltrim(strtolower($name), '\\')] = array_merge($this->getRule($name), $rule);
+		$this->rules[ltrim(strtolower($name), '\\')] = array_merge_recursive($this->getRule($name), $rule);
 	}
 
 	/** returns the rule that will be applied to the class $name in create() */
