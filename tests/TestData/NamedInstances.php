@@ -48,6 +48,3 @@ class HasTwoSameDependencies {
 		$this->y2b = $y2b;
 	}
 }
-
-
-

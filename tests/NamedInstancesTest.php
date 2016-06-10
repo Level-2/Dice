@@ -17,6 +17,7 @@ class NamedInstancesTest extends DiceTest {
 		$rule = [];
 		$rule['instanceOf'] = 'Y';
 		$rule['shared'] = true;
+		$rule['inherit'] = false;
 		$rule['constructParams'][] = 'SecondY';
 		
 		$this->dice->addRule('[Y2]', $rule);
@@ -102,6 +103,42 @@ class NamedInstancesTest extends DiceTest {
 		$this->assertEquals('second', $twodep->y2b->name);		
 	}
 
+	public function testNamedInstanceCallWithInheritance() {
+		$rule1 = [];
+		$rule1['call'] = [ 
+				['callMe', [1, 3] ],
+				['callMe', [3, 4] ]
+		];
+
+		$this->dice->addRule('Y', $rule1);
+
+		$rule2 = [];
+		$rule2['instanceOf'] = 'Y';
+		$rule2['constructParams'] = ['Foo'];
+
+		$this->dice->addRule('$MyInstance', $rule2);
+
+		$this->assertEquals(array_merge_recursive($rule1, $rule2), $this->dice->getRule('$MyInstance'));
+
+	}
 	
+	public function testNamedInstanceCallWithoutInheritance() {
+		$rule1 = [];
+		$rule1['call'] = [ 
+				['callMe', [1, 3] ],
+				['callMe', [3, 4] ]
+		];
+
+		$this->dice->addRule('Y', $rule1);
+
+		$rule2 = [];
+		$rule2['instanceOf'] = 'Y';
+		$rule2['inherit'] = false;
+		$rule2['constructParams'] = ['Foo'];
+
+		$this->dice->addRule('$MyInstance', $rule2);
+
+		$this->assertEquals($rule2, $this->dice->getRule('$MyInstance'));
+	}
 	
 }

@@ -74,18 +74,6 @@ class BasicTest extends DiceTest {
 		$this->assertInstanceOf('F', $a->b->c->e->f);
 	} 
 
-
-	public function testAssignSharedNamed() {
-		$rule = [];
-		$rule['shared'] = true;
-		$rule['instanceOf'] = function() {
-			return Baz77::create();
-		};
-		$this->dice->addRule('$SharedBaz', $rule);
-	}
-
-
-
 	public function testSharedNamed() {
 		$rule = [];
 		$rule['shared'] = true;
