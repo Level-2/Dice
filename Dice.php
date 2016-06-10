@@ -37,17 +37,21 @@ class Dice {
 	 */
 	public function getRule($name) {
 		$lcName = strtolower(ltrim($name, '\\'));
-		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
+		if (isset($this->rules[$lcName])) $main_rule = $this->rules[$lcName];
+		else $main_rule = [];
 
 		foreach ($this->rules as $key => $rule) { 							// Find a rule which matches the class described in $name where:
 			if (empty($rule['instanceOf']) 		 							// It's not a named instance, the rule is applied to a class name
 				&& $key !== '*' 				 							// It's not the default rule
 				&& is_subclass_of($name, $key)								// The rule is applied to a parent class
-				&& (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) // And that rule should be inherited to subclasses
-			return $rule;
+				&& (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) { // And that rule should be inherited to subclasses
+			$second_rule = $rule;
+			break;
+			}
 		}
-		// No rule has matched, return the default rule if it's set
-		return isset($this->rules['*']) ? $this->rules['*'] : [];
+		// Merge in the default rule if it's set
+		$default = isset($this->rules['*']) ? $this->rules['*'] : [];
+		return array_merge_recursive($default, $second_rule, $main_rule);
 	}
 
 	/**
