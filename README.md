@@ -77,6 +77,55 @@ Originally developed by Tom Butler (@TomBZombie), with many thanks to daniel-mei
 Updates
 ------------
 
+10/06/2016
+
+** Backwards incompatible change **
+
+Based on [Issue 110](https://github.com/Level-2/Dice/pull/110) named instances using `instanceOf` will now inherit the rules applied to the class they are instances of:
+
+```php
+
+$rule = [];
+$rule['shared'] = true;
+
+$dice->addRule('MyClass', $rule);
+
+$rule = [];
+$rule['instanceOf'] = 'MyClass';
+$rule['constructParams'] = ['Foo', 'Bar'];
+
+$dice->addRule('$MyNamedInstance', $rule);
+
+
+```
+
+`$dice->create('$MyNamedInstance')` will now create a class following the rules applied to both `MyClass` and `$MyNamedInstance` so the instance will be shared. 
+
+Previously only the rules applied to the named instance would be used.
+
+To restore the old behaviour, set `inherit` to `false` on the named instance:
+
+```php
+$rule = [];
+$rule['shared'] = true;
+
+$dice->addRule('MyClass', $rule);
+
+$rule = [];
+$rule['instanceOf'] = 'MyClass';
+$rule['constructParams'] = ['Foo', 'Bar'];
+
+
+//Prevent the named instance inheriting rules from the class named in `instanceOf`:
+$rule['inherit'] = false;
+
+$dice->addRule('$MyNamedInstance', $rule);
+
+```
+
+
+
+
 29/10/2014
 * Based on [Issue #15](https://github.com/TomBZombie/Dice/issues/15), Dice will now only call closures if they are wrapped in \Dice\Instance. **PLEASE NOTE: THIS IS BACKWARDS INCOMPATIBLE **. 
 
