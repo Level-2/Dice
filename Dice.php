@@ -130,9 +130,10 @@ class Dice {
 		if (is_array($param) && isset($param['instance'])) {
 			// Call or return the value sored under the key 'instance'
 			// For ['instance' => ['className', 'methodName'] construct the instance before calling it
+			$args = isset($param['params']) ? $this->expand($param['params']) : [];
 			if (is_array($param['instance'])) $param['instance'][0] = $this->expand($param['instance'][0], $share, true);
-			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...(isset($param['params']) ? $this->expand($param['params']) : []));
-			else return $this->create($param['instance'], $share);
+			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...$args);
+			else return $this->create($param['instance'], array_merge($args, $share));
 		}
 		// Recursively search for 'instance' keys in $param
 		else if (is_array($param)) foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
