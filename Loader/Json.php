@@ -9,12 +9,8 @@ class Json {
 	public function load($json, \Dice\Dice $dice = null) {
 		if ($dice === null) $dice = new \Dice\Dice;
 		if (is_array($json)) {
-			$map = [];
-			foreach ($json as $file) {
-				$path = dirname(realpath($file));
-				$json = str_replace('__DIR__', $path, file_get_contents($file));
-				$map = array_merge_recursive($map, json_decode($json, true));
-			}
+			foreach ($json as $file) $dice = $this->load($file, $dice);
+			return $dice;
 		}
 		elseif (trim($json)[0] != '{') {
 			$path = dirname(realpath($json));
