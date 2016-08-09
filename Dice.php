@@ -175,10 +175,10 @@ class Dice {
 				}
 				// When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
 				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
-				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
-				else if ($args) $parameters[] = $this->expand(array_shift($args));
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
+				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
+				else if ($args) $parameters[] = $this->expand(array_shift($args));
 				// There's no type hint and nothing left in $args, provide the default value or null
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}
