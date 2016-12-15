@@ -33,4 +33,6 @@ class CallTest extends DiceTest {
 		$this->assertInstanceOf('a', $object->a);
 	
 	}
+
+
 }

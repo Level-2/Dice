@@ -6,10 +6,12 @@
 * @license            http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version            2.0
 */
+
+class TestCreate {}
 class BasicTest extends DiceTest {
 
 	public function testCreate() {
-		$this->getMock('stdClass', array(), array(), 'TestCreate');
+		$this->createMock('stdClass', array(), array(), 'TestCreate');
 		$myobj = $this->dice->create('TestCreate');
 		$this->assertInstanceOf('TestCreate', $myobj);
 	}

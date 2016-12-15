@@ -16,7 +16,7 @@ class XmlLoaderTest extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		parent::setUp ();
 		$dice = new \Dice\Dice;
-		$this->dice = $this->getMock('\\Dice\\Dice', array('getRule', 'addRule'));		
+		$this->dice = $this->createMock('\\Dice\\Dice', array('getRule', 'addRule'));		
 		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue($dice->getRule('*')));
 		$this->xmlLoader = new \Dice\Loader\XML;
 	}
