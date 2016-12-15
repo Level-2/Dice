@@ -34,5 +34,29 @@ class CallTest extends DiceTest {
 	
 	}
 
+	public function testCallAutoWireInstance() {
+		$rule = [];
+		$rule['call'][] = array('callMe', []);
+		$this->dice->addRule('TestCall3', $rule);
+		$object = $this->dice->create('TestCall3');
+		
+		$this->assertInstanceOf('a', $object->a);
+	}
 
+	public function testCallReturnValue() {
+		$rule = [];
+
+		$returnValue = null;
+
+		$rule['call'][] = array('callMe', [], function($return) use (&$returnValue) {
+			$returnValue = $return;
+		});
+
+
+		$this->dice->addRule('TestCall3', $rule);
+		$object = $this->dice->create('TestCall3');
+		
+		$this->assertInstanceOf('a', $object->a);
+		$this->assertEquals('callMe called', $returnValue);
+	}
 }
