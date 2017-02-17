@@ -144,4 +144,18 @@ class BasicTest extends DiceTest {
 		$obj2 = $this->dice->create('Child');
 		$this->assertNotSame($obj1, $obj2);
 	}
+
+	public function testSharedOverride() {
+
+		//Set everything to shared by default
+		$this->dice->addRule('*', ['shared' => true]);
+
+		$this->dice->addRule('A', ['shared' => false]);
+
+		$a1 = $this->dice->create('A');
+		$a2 = $this->dice->create('A');
+
+		$this->assertNotSame($a1, $a2);
+
+	}
 }
