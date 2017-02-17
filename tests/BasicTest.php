@@ -7,11 +7,10 @@
 * @version            2.0
 */
 
-class TestCreate {}
 class BasicTest extends DiceTest {
 
 	public function testCreate() {
-		$this->createMock('stdClass', array(), array(), 'TestCreate');
+		$this->getMock('stdClass', array(), array(), 'TestCreate');
 		$myobj = $this->dice->create('TestCreate');
 		$this->assertInstanceOf('TestCreate', $myobj);
 	}
