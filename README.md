@@ -153,19 +153,19 @@ This behaviour has changed as it makes it impossible to provide a closure as a c
 To overcome this, Dice will now only call a closures if they're wrapped in \Dice\Instance:
 
 ```php
-$rule->substitutions['A'] = new \Dice\Instance(function() {
+$rule->substitutions['A'] = ['instance' => function() {
 	return new A;
-});
+}];
 
-$rule->call[] = ['someMethod', new \Dice\Instance(function() {
+$rule->call[] = ['someMethod', ['instance' => function() {
 // '2' will be provided as the first argument when someMethod is called
 return 2;
-}]);
+}]]);
 
-$rule->constructParams[] = new \Dice\Instance(function() {
+$rule->constructParams[] =  ['instance' => function() { {
 	//'abc' will be providedas the first constructor parameter
 	return 'abc';
-});
+}]);
 ``` 
 
 
