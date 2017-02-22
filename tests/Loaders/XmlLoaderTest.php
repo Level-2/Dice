@@ -9,14 +9,14 @@ require_once 'Dice.php';
 require_once 'Loader/Xml.php';
 
 
-class XmlLoaderTest extends PHPUnit_Framework_TestCase {
+class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 	private $dice;
 	private $xmlLoader;
 
 	protected function setUp() {
 		parent::setUp ();
 		$dice = new \Dice\Dice;
-		$this->dice = $this->getMock('\\Dice\\Dice', array('getRule', 'addRule'));		
+		$this->dice = $this->createMock('\\Dice\\Dice', array('getRule', 'addRule'));		
 		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue($dice->getRule('*')));
 		$this->xmlLoader = new \Dice\Loader\XML;
 	}

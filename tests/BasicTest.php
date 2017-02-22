@@ -10,14 +10,17 @@
 class BasicTest extends DiceTest {
 
 	public function testCreate() {
-		$this->getMock('stdClass', array(), array(), 'TestCreate');
+		$this->getMockBuilder('TestCreate')->getMock();
 		$myobj = $this->dice->create('TestCreate');
 		$this->assertInstanceOf('TestCreate', $myobj);
 	}
 
+	  /**
+     * @expectedException ErrorException
+     */
 	public function testCreateInvalid() {
 		//"can't expect default exception". Not sure why.
-		$this->setExpectedException('ErrorException');
+		//$this->setExpectedException('ErrorException');
 		try {
 			$this->dice->create('SomeClassThatDoesNotExist');
 		}
