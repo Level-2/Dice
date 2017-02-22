@@ -7,6 +7,7 @@
 namespace Dice;
 class Dice {
 	const INSTANCE = '\Dice::INSTANCE';
+	const CONSTANT = '\Dice::CONSTANT';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -122,14 +123,15 @@ class Dice {
 	}
 
 	/**
-	 * Looks for self::INSTANCE array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
+	 * Looks for self::INSTANCE or self::CONSTANT array keys in $param and when found returns an object or looks up constant based on the value see {@link https:// r.je/dice.html#example3-1}
 	 * @param mixed $param Either a string or an array,
 	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
 	 * @param bool $createFromString
 	 * @return mixed
 	 */
 	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param[self::INSTANCE])) {
+		if (is_array($param) && isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
+		else if (is_array($param) && isset($param[self::INSTANCE])) {
 			// Call or return the value sored under the key self::INSTANCE
 			// For [self::INSTANCE => ['className', 'methodName'] construct the instance before calling it
 			$args = isset($param['params']) ? $this->expand($param['params']) : [];
