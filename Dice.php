@@ -26,7 +26,7 @@ class Dice {
 	 * @param string $name The name of the class to add the rule for
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
-    public function addRule($name, array $rule) {
+    public function addRule(string $name, array $rule): void {
         if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
         $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
     }
@@ -36,7 +36,7 @@ class Dice {
 	 * @param string name The name of the class to get the rules for
 	 * @return array The rules for the specified class
 	 */
-	public function getRule($name) {
+	public function getRule(string $name): array {
 		$lcName = strtolower(ltrim($name, '\\'));
 		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 
@@ -58,7 +58,7 @@ class Dice {
 	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
 	 * @return object A fully constructed object based on the specified input arguments
 	 */
-	public function create($name, array $args = [], array $share = []) {
+	public function create(string $name, array $args = [], array $share = []) {
 		// Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
 		if (!empty($this->instances[$name])) return $this->instances[$name];
 
@@ -75,7 +75,7 @@ class Dice {
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 * @return callable A closure
 	 */
-	private function getClosure($name, array $rule) {
+	private function getClosure(string $name, array $rule): \Closure {
 		// Reflect the class and constructor, this should only ever be done once per class and get cached
 		$class = new \ReflectionClass(isset($rule['instanceOf']) ? $rule['instanceOf'] : $name);
 		$constructor = $class->getConstructor();
@@ -148,7 +148,7 @@ class Dice {
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 * @return callable A closure that uses the cached information to generate the arguments for the method
 	 */
-	private function getParams(\ReflectionMethod $method, array $rule) {
+	private function getParams(\ReflectionMethod $method, array $rule): \Closure {
 		// Cache some information about the parameter in $paramInfo so (slow) reflection isn't needed every time
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
@@ -157,7 +157,7 @@ class Dice {
 		}
 
 		// Return a closure that uses the cached information to generate the arguments for the method
-		return function (array $args, array $share = []) use ($paramInfo, $rule) {
+		return function (array $args, array $share = []) use ($paramInfo, $rule): array {
 			// Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
 			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : [], $share);
 
