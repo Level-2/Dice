@@ -20,7 +20,7 @@ class NamespaceTest extends DiceTest {
 	
 	public function testNamespaceWithSlashrule() {
 		$rule = [];
-		$rule['substitutions']['Foo\\A'] = ['instance' => 'Foo\\ExtendedA'];
+		$rule['substitutions']['Foo\\A'] = [\Dice\Dice::INSTANCE => 'Foo\\ExtendedA'];
 		$this->dice->addRule('\\Foo\\B', $rule);
 		
 		$b = $this->dice->create('\\Foo\\B');
@@ -29,7 +29,7 @@ class NamespaceTest extends DiceTest {
 	
 	public function testNamespaceWithSlashruleInstance() {
 		$rule = [];
-		$rule['substitutions']['Foo\\A'] = ['instance' => 'Foo\\ExtendedA'];
+		$rule['substitutions']['Foo\\A'] = [\Dice\Dice::INSTANCE => 'Foo\\ExtendedA'];
 		$this->dice->addRule('\\Foo\\B', $rule);
 	
 		$b = $this->dice->create('\\Foo\\B');
@@ -60,7 +60,7 @@ class NamespaceTest extends DiceTest {
 	
 	public function testNamespaceRuleSubstitution() {
 		$rule = [];
-		$rule['substitutions']['Foo\\A'] = ['instance' => 'Foo\\ExtendedA'];
+		$rule['substitutions']['Foo\\A'] = [\Dice\Dice::INSTANCE => 'Foo\\ExtendedA'];
 		$this->dice->addRule('Foo\\B', $rule);
 		
 		$b = $this->dice->create('Foo\\B');

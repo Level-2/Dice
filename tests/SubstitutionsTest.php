@@ -9,7 +9,7 @@
 class SubstitutionsTest extends DiceTest {
 	public function testNoMoreAssign() {
 		$rule = [];
-		$rule['substitutions']['Bar77'] = ['instance' => function() {
+		$rule['substitutions']['Bar77'] = [\Dice\Dice::INSTANCE => function() {
 			return Baz77::create();
 		}];
 		
@@ -31,7 +31,7 @@ class SubstitutionsTest extends DiceTest {
 	
 	public function testSubstitutionText() {
 		$rule = [];
-		$rule['substitutions']['B'] = ['instance' => 'ExtendedB'];
+		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
 		$this->dice->addRule('A', $rule);
 		
 		$a = $this->dice->create('A');
@@ -41,7 +41,7 @@ class SubstitutionsTest extends DiceTest {
 
 	public function testSubstitutionTextMixedCase() {
 		$rule = [];
-		$rule['substitutions']['B'] = ['instance' => 'exTenDedb'];
+		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'exTenDedb'];
 		$this->dice->addRule('A', $rule);
 	
 		$a = $this->dice->create('A');
@@ -52,7 +52,7 @@ class SubstitutionsTest extends DiceTest {
 	public function testSubstitutionCallback() {
 		$rule = [];
 		$injection = $this->dice;
-		$rule['substitutions']['B'] = ['instance' => function() use ($injection) {
+		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => function() use ($injection) {
 			return $injection->create('ExtendedB');
 		}];
 		
@@ -78,7 +78,7 @@ class SubstitutionsTest extends DiceTest {
 	public function testSubstitutionString() {
 		$rule = [];
 	
-		$rule['substitutions']['B'] = ['instance' => 'ExtendedB'];
+		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
 	
 		$this->dice->addRule('A', $rule);
 	

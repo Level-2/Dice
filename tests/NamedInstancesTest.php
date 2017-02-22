@@ -23,7 +23,7 @@ class NamedInstancesTest extends DiceTest {
 		$this->dice->addRule('[Y2]', $rule);
 		
 		$rule = [];
-		$rule['constructParams'] = [ ['instance' => 'Y'], ['instance' => '[Y2]']];
+		$rule['constructParams'] = [ [\Dice\Dice::INSTANCE => 'Y'], [\Dice\Dice::INSTANCE => '[Y2]']];
 		
 		$this->dice->addRule('Z', $rule);
 		
@@ -38,7 +38,7 @@ class NamedInstancesTest extends DiceTest {
 		$this->dice->addRule('$B', $rule);
 		
 		$rule = [];
-		$rule['constructParams'][] = ['instance' => '$B'];
+		$rule['constructParams'][] = [\Dice\Dice::INSTANCE => '$B'];
 		$this->dice->addRule('A', $rule);
 		
 		$a = $this->dice->create('A');
@@ -61,7 +61,7 @@ class NamedInstancesTest extends DiceTest {
 		
 		$rule = [];
 
-		$rule['constructParams'][] = ['instance' => '$Y2'];
+		$rule['constructParams'][] = [\Dice\Dice::INSTANCE => '$Y2'];
 		$this->dice->addRule('Y1', $rule);
 		
 		$y1 = $this->dice->create('Y1');
@@ -74,7 +74,7 @@ class NamedInstancesTest extends DiceTest {
 		$this->dice->addRule('$B', $rule);
 		
 		$rule = [];
-		$rule['substitutions']['B'] = ['instance' => '$B'];
+		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => '$B'];
 				
 		$this->dice->addRule('A', $rule);		
 		$a = $this->dice->create('A');
@@ -94,7 +94,7 @@ class NamedInstancesTest extends DiceTest {
 		$this->dice->addRule('$Y2B', $rule);
 		
 		$rule = [];
-		$rule['constructParams'] = array(['instance' => '$Y2A'], ['instance' => '$Y2B']);
+		$rule['constructParams'] = array([\Dice\Dice::INSTANCE => '$Y2A'], [\Dice\Dice::INSTANCE => '$Y2B']);
 		$this->dice->addRule('HasTwoSameDependencies', $rule);
 		
 		$twodep = $this->dice->create('HasTwoSameDependencies');

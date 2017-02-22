@@ -6,6 +6,7 @@
  * @version 2.0 */
 namespace Dice;
 class Dice {
+	const INSTANCE = '\Dice::INSTANCE';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -93,7 +94,7 @@ class Dice {
 			return $this->instances[$name];
 		};
 		else if ($params) $closure = function (array $args, array $share) use ($class, $params) {
-			// This class has depenencies, call the $params closure to generate them based on $args and $share
+			// This class has dependencies, call the $params closure to generate them based on $args and $share
 			return new $class->name(...$params($args, $share));
 		};
 		else $closure = function () use ($class) {
@@ -121,24 +122,24 @@ class Dice {
 	}
 
 	/**
-	 * Looks for 'instance' array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
+	 * Looks for self::INSTANCE array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
 	 * @param mixed $param Either a string or an array,
 	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
 	 * @param bool $createFromString
 	 * @return mixed
 	 */
 	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param['instance'])) {
-			// Call or return the value sored under the key 'instance'
-			// For ['instance' => ['className', 'methodName'] construct the instance before calling it
+		if (is_array($param) && isset($param[self::INSTANCE])) {
+			// Call or return the value sored under the key self::INSTANCE
+			// For [self::INSTANCE => ['className', 'methodName'] construct the instance before calling it
 			$args = isset($param['params']) ? $this->expand($param['params']) : [];
-			if (is_array($param['instance'])) $param['instance'][0] = $this->expand($param['instance'][0], $share, true);
-			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...$args);
-			else return $this->create($param['instance'], array_merge($args, $share));
+			if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
+			if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
+			else return $this->create($param[self::INSTANCE], array_merge($args, $share));
 		}
-		// Recursively search for 'instance' keys in $param
+		// Recursively search for self::INSTANCE keys in $param
 		else if (is_array($param)) foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
-		// 'instance' wasn't found, return the value unchanged
+		// self::INSTANCE wasn't found, return the value unchanged
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
 
