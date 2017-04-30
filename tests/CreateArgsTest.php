@@ -17,7 +17,6 @@ class CreateArgsTest extends DiceTest {
 		$this->assertEquals('A', $foo->a->s);
 	}
 
-
     public function testConstructArgs() {
 		$obj = $this->dice->create('RequiresConstructorArgsA', array('foo', 'bar'));		
 		$this->assertEquals($obj->foo, 'foo');
