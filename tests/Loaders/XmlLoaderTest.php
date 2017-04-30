@@ -16,7 +16,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 	protected function setUp() {
 		parent::setUp ();
 		$dice = new \Dice\Dice;
-		$this->dice = $this->createMock('\\Dice\\Dice', array('getRule', 'addRule'));		
+		$this->dice = $this->createMock('\\Dice\\Dice', array('getRule', 'addRules'));		
 		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue($dice->getRule('*')));
 		$this->xmlLoader = new \Dice\Loader\XML;
 	}
@@ -41,7 +41,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = $this->dice->getRule('*');
 		$equivalentRule['shared'] = true;
 		
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('*'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['*' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 		
 	}
@@ -59,7 +59,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = $this->dice->getRule('*');
 		$equivalentRule['shared'] = true;
 		
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -82,7 +82,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule['constructParams'][] = 'A';
 		$equivalentRule['constructParams'][] = 'B';
 	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -103,7 +103,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = [];
 		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
 		
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -131,7 +131,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule['substitutions']['F'] = ['instance' => 'E'];
 	
 	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -147,7 +147,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = $this->dice->getRule('*');
 		$equivalentRule['instanceOf'] = 'C';
 	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('[C]'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['[C]' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -170,7 +170,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = $this->dice->getRule('*');
 		$equivalentRule['call'][] = ['setFoo', ['Foo', 'Bar']];
 	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -188,7 +188,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = $this->dice->getRule('*');
 		$equivalentRule['inherit'] = true;
 	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -205,7 +205,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = $this->dice->getRule('*');
 		$equivalentRule['inherit'] = false;
 	
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	
@@ -222,7 +222,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 		$equivalentRule = [];
 		$equivalentRule['shareInstances'] = ['C', 'D'];
 		
-		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
+		$this->dice->expects($this->once())->method('addRules')->with($this->equalTo(['A' => $equivalentRule]));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
 	}
 	

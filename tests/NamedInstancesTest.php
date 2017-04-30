@@ -12,7 +12,7 @@ class NamedInstancesTest extends DiceTest {
 		$rule['shared'] = true;
 		$rule['constructParams'][] = 'FirstY';
 		
-		$this->dice->addRule('Y', $rule);
+		$this->dice->addRules(['Y' =>  $rule]);
 		
 		$rule = [];
 		$rule['instanceOf'] = 'Y';
@@ -20,12 +20,12 @@ class NamedInstancesTest extends DiceTest {
 		$rule['inherit'] = false;
 		$rule['constructParams'][] = 'SecondY';
 		
-		$this->dice->addRule('[Y2]', $rule);
+		$this->dice->addRules(['[Y2]' =>  $rule]);
 		
 		$rule = [];
 		$rule['constructParams'] = [ [\Dice\Dice::INSTANCE => 'Y'], [\Dice\Dice::INSTANCE => '[Y2]']];
 		
-		$this->dice->addRule('Z', $rule);
+		$this->dice->addRules(['Z' =>  $rule]);
 		
 		$z = $this->dice->create('Z');
 		$this->assertEquals($z->y1->name, 'FirstY');
@@ -35,11 +35,11 @@ class NamedInstancesTest extends DiceTest {
 	public function testNonSharedComponentByNameA() {
 		$rule = [];
 		$rule['instanceOf'] = 'ExtendedB';
-		$this->dice->addRule('$B', $rule);
+		$this->dice->addRules(['$B' =>  $rule]);
 		
 		$rule = [];
 		$rule['constructParams'][] = [\Dice\Dice::INSTANCE => '$B'];
-		$this->dice->addRule('A', $rule);
+		$this->dice->addRules(['A' =>  $rule]);
 		
 		$a = $this->dice->create('A');
 		$this->assertInstanceOf('ExtendedB', $a->b);
@@ -52,7 +52,7 @@ class NamedInstancesTest extends DiceTest {
 		$rule['constructParams'][] = 'test';
 		
 		
-		$this->dice->addRule('$Y2', $rule);
+		$this->dice->addRules(['$Y2' =>  $rule]);
 		
 		
 		$y2 = $this->dice->create('$Y2');
@@ -62,7 +62,7 @@ class NamedInstancesTest extends DiceTest {
 		$rule = [];
 
 		$rule['constructParams'][] = [\Dice\Dice::INSTANCE => '$Y2'];
-		$this->dice->addRule('Y1', $rule);
+		$this->dice->addRules(['Y1' =>  $rule]);
 		
 		$y1 = $this->dice->create('Y1');
 		$this->assertInstanceOf('Y3', $y1->y2);
@@ -71,12 +71,12 @@ class NamedInstancesTest extends DiceTest {
 	public function testSubstitutionByName() {
 		$rule = [];
 		$rule['instanceOf'] = 'ExtendedB';
-		$this->dice->addRule('$B', $rule);
+		$this->dice->addRules(['$B' =>  $rule]);
 		
 		$rule = [];
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => '$B'];
 				
-		$this->dice->addRule('A', $rule);		
+		$this->dice->addRules(['A' =>  $rule]);		
 		$a = $this->dice->create('A');
 		
 		$this->assertInstanceOf('ExtendedB', $a->b);
@@ -86,16 +86,16 @@ class NamedInstancesTest extends DiceTest {
 		$rule = [];
 		$rule['instanceOf'] = 'Y2';
 		$rule['constructParams'][] = 'first';
-		$this->dice->addRule('$Y2A', $rule);
+		$this->dice->addRules(['$Y2A' =>  $rule]);
 		
 		$rule = [];
 		$rule['instanceOf'] = 'Y2';
 		$rule['constructParams'][] = 'second';
-		$this->dice->addRule('$Y2B', $rule);
+		$this->dice->addRules(['$Y2B' =>  $rule]);
 		
 		$rule = [];
 		$rule['constructParams'] = array([\Dice\Dice::INSTANCE => '$Y2A'], [\Dice\Dice::INSTANCE => '$Y2B']);
-		$this->dice->addRule('HasTwoSameDependencies', $rule);
+		$this->dice->addRules(['HasTwoSameDependencies' =>  $rule]);
 		
 		$twodep = $this->dice->create('HasTwoSameDependencies');
 		
@@ -110,13 +110,13 @@ class NamedInstancesTest extends DiceTest {
 				['callMe', [3, 4] ]
 		];
 
-		$this->dice->addRule('Y', $rule1);
+		$this->dice->addRules(['Y' =>  $rule1]);
 
 		$rule2 = [];
 		$rule2['instanceOf'] = 'Y';
 		$rule2['constructParams'] = ['Foo'];
 
-		$this->dice->addRule('$MyInstance', $rule2);
+		$this->dice->addRules(['$MyInstance' =>  $rule2]);
 
 		$this->assertEquals(array_merge_recursive($rule1, $rule2), $this->dice->getRule('$MyInstance'));
 
@@ -129,14 +129,14 @@ class NamedInstancesTest extends DiceTest {
 				['callMe', [3, 4] ]
 		];
 
-		$this->dice->addRule('Y', $rule1);
+		$this->dice->addRules(['Y' =>  $rule1]);
 
 		$rule2 = [];
 		$rule2['instanceOf'] = 'Y';
 		$rule2['inherit'] = false;
 		$rule2['constructParams'] = ['Foo'];
 
-		$this->dice->addRule('$MyInstance', $rule2);
+		$this->dice->addRules(['$MyInstance' =>  $rule2]);
 
 		$this->assertEquals($rule2, $this->dice->getRule('$MyInstance'));
 	}

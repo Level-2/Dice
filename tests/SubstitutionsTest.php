@@ -13,7 +13,7 @@ class SubstitutionsTest extends DiceTest {
 			return Baz77::create();
 		}];
 		
-		$this->dice->addRule('Foo77', $rule);
+		$this->dice->addRules(['Foo77' =>  $rule]);
 		
 		$foo = $this->dice->create('Foo77');
 		
@@ -24,7 +24,7 @@ class SubstitutionsTest extends DiceTest {
 	public function testNullSubstitution() {
 		$rule = [];
 		$rule['substitutions']['B'] = null;
-		$this->dice->addRule('MethodWithDefaultNull', $rule);
+		$this->dice->addRules(['MethodWithDefaultNull' =>  $rule]);
 		$obj = $this->dice->create('MethodWithDefaultNull');
 		$this->assertNull($obj->b);
 	}		
@@ -32,7 +32,7 @@ class SubstitutionsTest extends DiceTest {
 	public function testSubstitutionText() {
 		$rule = [];
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
-		$this->dice->addRule('A', $rule);
+		$this->dice->addRules(['A' =>  $rule]);
 		
 		$a = $this->dice->create('A');
 		
@@ -42,7 +42,7 @@ class SubstitutionsTest extends DiceTest {
 	public function testSubstitutionTextMixedCase() {
 		$rule = [];
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'exTenDedb'];
-		$this->dice->addRule('A', $rule);
+		$this->dice->addRules(['A' =>  $rule]);
 	
 		$a = $this->dice->create('A');
 	
@@ -56,7 +56,7 @@ class SubstitutionsTest extends DiceTest {
 			return $injection->create('ExtendedB');
 		}];
 		
-		$this->dice->addRule('A', $rule);
+		$this->dice->addRules(['A' =>  $rule]);
 		
 		$a = $this->dice->create('A');
 		
@@ -69,7 +69,7 @@ class SubstitutionsTest extends DiceTest {
 
 		$rule['substitutions']['B'] = $this->dice->create('ExtendedB');
 				
-		$this->dice->addRule('A', $rule);
+		$this->dice->addRules(['A' =>  $rule]);
 		
 		$a = $this->dice->create('A');
 		$this->assertInstanceOf('ExtendedB', $a->b);
@@ -80,7 +80,7 @@ class SubstitutionsTest extends DiceTest {
 	
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
 	
-		$this->dice->addRule('A', $rule);
+		$this->dice->addRules(['A' =>  $rule]);
 	
 		$a = $this->dice->create('A');
 		$this->assertInstanceOf('ExtendedB', $a->b);

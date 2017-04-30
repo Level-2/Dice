@@ -10,7 +10,7 @@ class CallTest extends DiceTest {
 	public function testCall() {
 		$rule = [];
 		$rule['call'][] = array('callMe', array());
-		$this->dice->addRule('TestCall', $rule);
+		$this->dice->addRules(['TestCall' =>  $rule]);
 		$object = $this->dice->create('TestCall');
 		$this->assertTrue($object->isCalled);
 	}
@@ -18,7 +18,7 @@ class CallTest extends DiceTest {
 	public function testCallWithParameters() {
 		$rule = [];
 		$rule['call'][] = array('callMe', array('one', 'two'));
-		$this->dice->addRule('TestCall2', $rule);
+		$this->dice->addRules(['TestCall2' =>  $rule]);
 		$object = $this->dice->create('TestCall2');
 		$this->assertEquals('one', $object->foo);
 		$this->assertEquals('two', $object->bar);
@@ -27,7 +27,7 @@ class CallTest extends DiceTest {
 	public function testCallWithInstance() {
 		$rule = [];
 		$rule['call'][] = array('callMe', array(['instance' => 'A']));
-		$this->dice->addRule('TestCall3', $rule);
+		$this->dice->addRules(['TestCall3' =>  $rule]);
 		$object = $this->dice->create('TestCall3');
 		
 		$this->assertInstanceOf('a', $object->a);
@@ -37,7 +37,7 @@ class CallTest extends DiceTest {
 	public function testCallAutoWireInstance() {
 		$rule = [];
 		$rule['call'][] = array('callMe', []);
-		$this->dice->addRule('TestCall3', $rule);
+		$this->dice->addRules(['TestCall3' =>  $rule]);
 		$object = $this->dice->create('TestCall3');
 		
 		$this->assertInstanceOf('a', $object->a);
@@ -53,7 +53,7 @@ class CallTest extends DiceTest {
 		});
 
 
-		$this->dice->addRule('TestCall3', $rule);
+		$this->dice->addRules(['TestCall3' =>  $rule]);
 		$object = $this->dice->create('TestCall3');
 		
 		$this->assertInstanceOf('a', $object->a);

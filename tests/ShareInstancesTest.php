@@ -10,7 +10,7 @@ class ShareInstancesTest extends DiceTest {
 	public function testShareInstances() {
 		$rule = [];
 		$rule['shareInstances'] = ['Shared'];
-		$this->dice->addRule('TestSharedInstancesTop', $rule);
+		$this->dice->addRules(['TestSharedInstancesTop' =>  $rule]);
 		
 		
 		$shareTest = $this->dice->create('TestSharedInstancesTop');
@@ -29,11 +29,11 @@ class ShareInstancesTest extends DiceTest {
 
 		$rule = [];
 		$rule['instanceOf'] = 'Shared';
-		$this->dice->addRule('$Shared', $rule);
+		$this->dice->addRules(['$Shared' =>  $rule]);
 
 		$rule = [];
 		$rule['shareInstances'] = ['$Shared'];
-		$this->dice->addRule('TestSharedInstancesTop', $rule);
+		$this->dice->addRules(['TestSharedInstancesTop' =>  $rule]);
 		
 		
 		$shareTest = $this->dice->create('TestSharedInstancesTop');
@@ -55,7 +55,7 @@ class ShareInstancesTest extends DiceTest {
 	public function testShareInstancesNested() {
 		$rule = [];
 		$rule['shareInstances'] = ['F'];
-		$this->dice->addRule('A4',$rule);
+		$this->dice->addRules(['A4' => $rule]);
 		$a = $this->dice->create('A4');
 		$this->assertTrue($a->m1->f === $a->m2->e->f);
 	}
@@ -64,7 +64,7 @@ class ShareInstancesTest extends DiceTest {
 	public function testShareInstancesMultiple() {
 		$rule = [];
 		$rule['shareInstances'] = ['Shared'];
-		$this->dice->addRule('TestSharedInstancesTop', $rule);
+		$this->dice->addRules(['TestSharedInstancesTop' =>  $rule]);
 	
 	
 		$shareTest = $this->dice->create('TestSharedInstancesTop');

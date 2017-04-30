@@ -33,7 +33,7 @@ class Xml {
 			if ($value->substitutions) foreach ($value->substitutions as $use) 	$rule['substitutions'][(string) $use->as] = $this->getComponent($use->use, true);
 			if ($value->constructParams) foreach ($value->constructParams->children() as $child) $rule['constructParams'][] = $this->getComponent($child);
 			if ($value->shareInstances) foreach ($value->shareInstances as $share) $rule['shareInstances'][] = $this->getComponent($share);
-			$dice->addRule((string) $value->name, $rule);
+			$dice->addRules([(string) $value->name => $rule]);
 		}
 	}
 
@@ -54,7 +54,7 @@ class Xml {
 			if ($value->constructParams) foreach ($value->constructParams->children() as $child) $rule['constructParams'][] = $this->getComponent($child);
 			if ($value->substitute) foreach ($value->substitute as $use) $rule['substitutions'][(string) $use['as']] = $this->getComponent($use['use'], true);
 			if ($value->shareInstances) foreach ($value->shareInstances->children() as $share) $rule['shareInstances'][] = $this->getComponent($share);
-			$dice->addRule((string) $value['name'], $rule);
+			$dice->addRules([(string) $value['name'] => $rule]);
 		}
 	}
 

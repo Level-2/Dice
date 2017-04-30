@@ -11,7 +11,7 @@ class CreateArgsTest extends DiceTest {
 	public function testConsumeArgs() {
 		$rule = [];
 		$rule['constructParams'] = ['A'];		
-		$this->dice->addRule('ConsumeArgsSub', $rule);
+		$this->dice->addRules(['ConsumeArgsSub' =>  $rule]);
 		$foo = $this->dice->create('ConsumeArgsTop',['B']);
 		
 		$this->assertEquals('A', $foo->a->s);

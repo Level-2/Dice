@@ -8,9 +8,9 @@
 */
 class ConstantTest extends DiceTest {
 	public function testConstructorConstant() {
-		$this->dice->addRule('HasConstructorArgs', ['constructParams' => [
+		$this->dice->addRules(['HasConstructorArgs' => ['constructParams' => [
 				[\Dice\Dice::CONSTANT => '\PDO::ATTR_EMULATE_PREPARES']
-		]]);
+		]]]);
 
 		$obj = $this->dice->create('HasConstructorArgs');
 

@@ -38,7 +38,7 @@ class BasicTest extends DiceTest {
 	public function testSetDefaultRule() {
 		$defaultBehaviour = [];
 		$defaultBehaviour['shared'] = true;
-		$this->dice->addRule('*', $defaultBehaviour);		
+		$this->dice->addRules(['*' =>  $defaultBehaviour]);		
 
 		$rule = $this->dice->getRule('*');
 		foreach ($defaultBehaviour as $name => $value) {
@@ -51,7 +51,7 @@ class BasicTest extends DiceTest {
 		$defaultBehaviour = [];
 		$defaultBehaviour['shared'] = true;
 		
-		$this->dice->addRule('*', $defaultBehaviour);
+		$this->dice->addRules(['*' =>  $defaultBehaviour]);
 		
 		$rule = $this->dice->getRule('A');
 		
@@ -83,7 +83,7 @@ class BasicTest extends DiceTest {
 		$rule['shared'] = true;
 		$rule['instanceOf'] = 'A';
 		
-		$this->dice->addRule('[A]', $rule);
+		$this->dice->addRules(['[A]' =>  $rule]);
 		
 		$a1 = $this->dice->create('[A]');
 		$a2 = $this->dice->create('[A]');
@@ -94,7 +94,7 @@ class BasicTest extends DiceTest {
 		$shared = [];
 		$shared['shared'] = true;
 	
-		$this->dice->addRule('MyObj', $shared);
+		$this->dice->addRules(['MyObj' =>  $shared]);
 	
 		$obj = $this->dice->create('MyObj');
 		$this->assertInstanceOf('MyObj', $obj);
@@ -117,7 +117,7 @@ class BasicTest extends DiceTest {
 		$rule = [];
 
 		$rule['shared'] = true;
-		$this->dice->addRule('interfaceTest', $rule);
+		$this->dice->addRules(['interfaceTest' =>  $rule]);
 		
 		$one = $this->dice->create('InterfaceTestClass');
 		$two = $this->dice->create('InterfaceTestClass');		
@@ -129,7 +129,7 @@ class BasicTest extends DiceTest {
 		$rule = [];
 		$rule['shared'] = true;
 		
-		$this->dice->addRule('CyclicB', $rule);
+		$this->dice->addRules(['CyclicB' =>  $rule]);
 		
 		$a = $this->dice->create('CyclicA');
 		
@@ -142,7 +142,7 @@ class BasicTest extends DiceTest {
 	public function testInherit() {
 		$rule = ['shared' => true, 'inherit' => false];
 		
-		$this->dice->addRule('ParentClass', $rule);
+		$this->dice->addRules(['ParentClass' =>  $rule]);
 		$obj1 = $this->dice->create('Child');
 		$obj2 = $this->dice->create('Child');
 		$this->assertNotSame($obj1, $obj2);
@@ -151,9 +151,9 @@ class BasicTest extends DiceTest {
 	public function testSharedOverride() {
 
 		//Set everything to shared by default
-		$this->dice->addRule('*', ['shared' => true]);
+		$this->dice->addRules(['*' =>  ['shared' => true]]);
 
-		$this->dice->addRule('A', ['shared' => false]);
+		$this->dice->addRules(['A' =>  ['shared' => false]]);
 
 		$a1 = $this->dice->create('A');
 		$a2 = $this->dice->create('A');

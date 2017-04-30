@@ -3,11 +3,12 @@
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2015 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
- * @version 2.0 */
+ * @version 3.0 */
 namespace Dice;
 class Dice {
 	const INSTANCE = '\Dice::INSTANCE';
 	const CONSTANT = '\Dice::CONSTANT';
+	const GLOBAL = '\Dice::GLOBAL';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -28,9 +29,11 @@ class Dice {
 	 * @param string $name The name of the class to add the rule for
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
-    public function addRule(string $name, array $rule): void {
-        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
-        $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
+    public function addRules(array $rules): void {
+    	foreach ($rules as $name => $rule) {
+        	if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
+        	$this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
+        }
     }
 
 	/**
@@ -130,17 +133,22 @@ class Dice {
 	 * @return mixed
 	 */
 	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
-		else if (is_array($param) && isset($param[self::INSTANCE])) {
-			// Call or return the value sored under the key self::INSTANCE
-			// For [self::INSTANCE => ['className', 'methodName'] construct the instance before calling it
-			$args = isset($param['params']) ? $this->expand($param['params']) : [];
-			if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
-			if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
-			else return $this->create($param[self::INSTANCE], array_merge($args, $share));
-		}
-		// Recursively search for self::INSTANCE keys in $param
-		else if (is_array($param)) foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
+		if (is_array($param)) {
+			if (isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
+			else if (isset($param[self::GLOBAL])) return $GLOBALS[$param[self::GLOBAL]];
+			else if (isset($param[self::INSTANCE])) {
+				// Call or return the value sored under the key self::INSTANCE
+				// For [self::INSTANCE => ['className', 'methodName'] construct the instance before calling it
+				$args = isset($param['params']) ? $this->expand($param['params']) : [];
+				if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
+				if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
+				else return $this->create($param[self::INSTANCE], array_merge($args, $share));
+			}
+			else {
+				foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
+			}
+		} 
+
 		// self::INSTANCE wasn't found, return the value unchanged
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
