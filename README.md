@@ -57,7 +57,7 @@ For complete documentation please see the [Dice PHP Dependency Injection contain
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP5.4 and up, there are archived versions of Dice which supports PHP5.3 however this is no longer maintanied.
+Dice 3.0 is compatible with 7.0 and up. Earlier versions of Dice support earlier versions of PHP. For PHP5.6 it is recommended that you use the 2.0 branch.
 
 
 Performance
@@ -76,6 +76,120 @@ Originally developed by Tom Butler (@TomBZombie), with many thanks to daniel-mei
 
 Updates
 ------------
+
+30/04/2016
+
+### 3.0 Release
+
+3.0 (development version) has been released. Please note there are several new features and backwards incompatible changes.
+
+#### 1) `addRule` has become `addRules` 
+
+What would have previously been expressed as:
+
+```php
+$dice->addRule('Foo', ['shared' => true]);
+```
+
+is now:
+
+```php
+$dice->addRules(['Foo' => ['shared' => true]]);
+```
+
+This allows for adding multiple rules in a single call:
+
+```php
+$dice->addRules([
+		'Foo' => ['shared' => true],
+		'Bar' => ['instanceOf' => 'Baz']
+]); 
+```
+
+#### 2) The `Jsonloader` class has been removed
+
+Dice now fully supports JSON style configuration without the need for an additional class. To load a JSON configuration file you can now use:#
+
+```php
+$json = json_decode(file_get_contents('rules.json'));
+$dice->addRules($json);
+```
+
+
+#### 3) `['instance' => '\Foo\Bar']` has been replaced
+
+Using the key `instance` meant that it was impossible to pass an array that contained the key `instance` to a class instantiated by Dice as Dice would always try to create the instance. You should now use:
+
+In native PHP
+
+```php
+[\Dice::INSTANCE => '\Foo\Bar']
+
+```
+
+Or in a JSON configuration file:
+
+```json
+	{"\\Dice::INSTANCE": "\\Foo\\Bar"}
+```
+
+#### 4) Support for reading constants from JSON
+
+A limitation of JSON configuration is that it cannot read any values from PHP code. A common problem encountered with the JSON format is that although the following works using native PHP, the same cannot be expressed in JSON
+
+```php
+
+$dice->addRules(['PDO' => [
+					'shared' => true,
+					'constructParams'  => ['mysql:host=127.0.0.1;dbname=mydb', 'username', 'password'],
+					'call' => [
+								['setAttribute', [PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ]]
+
+   					 ]
+				]
+		]);
+
+```
+
+This can't be expressed using JSON without providing the integers represented by `PDO::ATTR_DEFAULT_FETCH_MODE` and `PDO::FETCH_OBJ`.
+
+As of 3.0 Dice allows reading PHP constants in the JSON format:
+
+```json
+{
+	"PDO": {
+		"shared": "true",
+		"constructParams": ["mysql:host=127.0.0.1;dbname=mydb", "username", "password"],
+		"call": [ [
+					"setAttribute", [
+							{"\\Dice::CONSTANT": "PDO::ATTR_DEFAULT_FETCH_MODE"},
+							{"\\Dice::CONSTANT": "PDO::FETCH_OBJ"}
+				  ]
+				]
+		]
+	}
+}
+
+```
+
+Although slightly more verbose, it is considerably more readable than providing the integer values of the constants.
+
+#### 5) Read globals
+
+In the same way as reading constants. Dice 3.0 also supports reading from the `$GLOBALS` array. This can be useful when a class requires `$_GET` or `$_POST`.
+
+The below will pass `$_POST` and `$_GET` as constructor arguments:
+
+```json
+{
+	"\\Level2\\Core\\Request": {
+		"constructParams": [{"\\Dice::GLOBAL": "_POST"}, {"\\Dice::GLOBAL": "_GET"}]
+	}
+}
+
+```
+
+
 
 10/06/2016
 
