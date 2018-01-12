@@ -6,7 +6,7 @@
 * @license            http://www.opensource.org/licenses/bsd-license.php  BSD License
 * @version            2.0
 */
-abstract class DiceTest extends PHPUnit_Framework_TestCase {
+abstract class DiceTest extends \PHPUnit\Framework\TestCase {
 	protected $dice;
 
 	public function __construct() {

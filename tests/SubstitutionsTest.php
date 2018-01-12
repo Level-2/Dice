@@ -93,7 +93,9 @@ class SubstitutionsTest extends DiceTest {
 		];
 		$this->dice->addRule('*', $rule);
 
-		$this->dice->create('Foo');
+		$obj = $this->dice->create('Foo');
+
+		$this->assertInstanceOf('Baz', $obj->bar);
 
 	}
 

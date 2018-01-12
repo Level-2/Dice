@@ -9,14 +9,14 @@ require_once 'Dice.php';
 require_once 'Loader/Json.php';
 
 
-class JsonLoaderTest extends PHPUnit_Framework_TestCase {
+class JsonLoaderTest extends \PHPUnit\Framework\TestCase {
 	private $dice;
 	private $jsonLoader;
 
 	protected function setUp() {
 		parent::setUp ();
 		$dice = new \Dice\Dice;
-		$this->dice = $this->getMock('\\Dice\\Dice', array('getRule', 'addRule'));		
+		$this->dice = $this->createMock('\\Dice\\Dice', array('getRule', 'addRule'));		
 		$this->dice->expects($this->any())->method('getRule')->will($this->returnValue($dice->getRule('*')));
 		$this->jsonLoader = new \Dice\Loader\Json;
 	}
