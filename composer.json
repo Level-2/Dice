@@ -17,5 +17,11 @@
     	"psr-4": {
             "Dice\\": "./"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "scripts": {
+        "test": "phpunit"
     }
 }
