@@ -158,4 +158,11 @@ class BasicTest extends DiceTest {
 		$this->assertNotSame($a1, $a2);
 
 	}
+
+	public function testOptionalInterface() {
+
+		$optionalInterface = $this->dice->create('OptionalInterface');
+
+		$this->assertEquals(null, $optionalInterface->obj);
+	}
 }

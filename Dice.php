@@ -82,9 +82,12 @@ class Dice {
 
 		// Create parameter generating function in order to cache reflection on the parameters. This way $reflect->getParameters() only ever gets called once
 		$params = $constructor ? $this->getParams($constructor, $rule) : null;
-
+		//PHP throws a fatal error rather than an exception when trying to instantiate an interface, detect it and throw an exception instead
+		if ($class->isInterface()) $closure = function() {
+			throw new \InvalidArgumentException('Cannot instantiate interface');
+		};
 		// Get a closure based on the type of object being created: Shared, normal or constructorless
-		if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {
+		else if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {
 			// Shared instance: create the class without calling the constructor (and write to \$name and $name, see issue #68)
 			$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
 
@@ -175,7 +178,12 @@ class Dice {
 					}
 				}
 				// When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
-				if ($class) $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
+				if ($class)	try { 
+					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
+				}
+				catch (\InvalidArgumentException $e) {
+
+				}
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
 				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)

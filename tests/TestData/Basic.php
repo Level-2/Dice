@@ -114,7 +114,16 @@ class InterfaceTestClass implements interfaceTest {
 
 }
 
+
 class ParentClass {
 }
 class Child extends ParentClass {
+}
+
+class OptionalInterface {
+	public $obj;
+
+	public function __construct(InterfaceTest $obj = null) {
+		$this->obj = $obj;
+	}
 }
