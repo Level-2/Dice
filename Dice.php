@@ -117,7 +117,7 @@ class Dice {
 				// Generate the method arguments using getParams() and call the returned closure (in php7 will be ()() rather than __invoke)
 				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])->__invoke($this->expand(isset($call[1]) ? $call[1] : []));
 				$return = $object->{$call[0]}(...$params);
-				if (isset($call[2]) && is_callable($call[2])) call_user_func($call[2], $return);  
+				if (isset($call[2]) && is_callable($call[2])) call_user_func($call[2], $return);
 			}
 			return $object;
 		} : $closure;
@@ -178,7 +178,7 @@ class Dice {
 					}
 				}
 				// When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
-				if ($class)	try { 
+				if ($class)	try {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				}
 				catch (\InvalidArgumentException $e) {
@@ -187,7 +187,9 @@ class Dice {
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
 				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
-				else if ($args) $parameters[] = $this->expand(array_shift($args));
+				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this a
+				// is hacky AF workaround: call_user_func('is_' . $type, '')
+				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->getName(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
 				// There's no type hint and nothing left in $args, provide the default value or null
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}

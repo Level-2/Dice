@@ -6,7 +6,7 @@ class NoConstructor {
 
 class CyclicA {
 	public $b;
-	
+
 	public function __construct(CyclicB $b) {
 		$this->b = $b;
 	}
@@ -14,7 +14,7 @@ class CyclicA {
 
 class CyclicB {
 	public $a;
-	
+
 	public function __construct(CyclicA $a) {
 		$this->a = $a;
 	}
@@ -91,7 +91,7 @@ class MyObj {
 class MethodWithDefaultValue {
 	public $a;
 	public $foo;
-	
+
 	public function __construct(A $a, $foo = 'bar') {
 		$this->a = $a;
 		$this->foo = $foo;
@@ -125,5 +125,12 @@ class OptionalInterface {
 
 	public function __construct(InterfaceTest $obj = null) {
 		$this->obj = $obj;
+	}
+}
+
+
+class ScalarTypeHint {
+	public function __construct(string $a = null) {
+
 	}
 }
