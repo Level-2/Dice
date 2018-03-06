@@ -154,6 +154,7 @@ class Dice {
 				else return $this->create($param[self::INSTANCE], array_merge($args, $share));
 			}
 			else if (isset($param[self::GLOBAL])) return $GLOBALS[$param[self::GLOBAL]];
+			else if (isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
 			else foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
 		}
 

@@ -192,4 +192,18 @@ class BasicTest extends DiceTest {
 		$this->assertEquals($_GET, $obj->arg1);
 	}
 
+	public function testPassConstantString() {
+		//write to the global $_GET variable
+		$this->dice->addRule('CheckConstructorArgs',
+			[
+				'constructParams' => [
+					[\Dice\Dice::CONSTANT => '\PDO::FETCH_ASSOC']
+				]
+		]);
+
+		$obj = $this->dice->create('CheckConstructorArgs');
+
+		$this->assertEquals(\PDO::FETCH_ASSOC, $obj->arg1);
+	}
+
 }
