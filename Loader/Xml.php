@@ -7,8 +7,8 @@
 namespace Dice\Loader;
 class Xml {
 	private function getComponent(\SimpleXmlElement $element, $forceInstance = false) {
-		if ($forceInstance) return ['instance' => (string) $element];
-		else if ($element->instance) return ['instance' => (string) $element->instance];
+		if ($forceInstance) return [\Dice\Dice::INSTANCE => (string) $element];
+		else if ($element->instance) return [\Dice\Dice::INSTANCE => (string) $element->instance];
 		else return (string) $element;
 	}
 
