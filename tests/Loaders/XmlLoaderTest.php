@@ -100,7 +100,7 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 
 
 		$equivalentRule = [];
-		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
+		$equivalentRule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'C'];
 
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
 		$this->xmlLoader->load(simplexml_load_string($xml), $this->dice);
@@ -126,8 +126,8 @@ class XmlLoaderTest extends \PHPUnit\Framework\TestCase {
 
 
 		$equivalentRule = $this->dice->getRule('*');
-		$equivalentRule['substitutions']['B'] = ['instance' => 'C'];
-		$equivalentRule['substitutions']['F'] = ['instance' => 'E'];
+		$equivalentRule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'C'];
+		$equivalentRule['substitutions']['F'] = [\Dice\Dice::INSTANCE => 'E'];
 
 
 		$this->dice->expects($this->once())->method('addRule')->with($this->equalTo('A'), $this->equalTo($equivalentRule));
