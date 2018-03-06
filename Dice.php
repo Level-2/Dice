@@ -137,7 +137,7 @@ class Dice {
 	/**
 	 * Looks for Dice::INSTANCE, Dice::GLOBAL or Dice::CONSTANT array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
 	 * @param mixed $param Either a string or an array,
-	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
+	 * @param array $share Array of instances from 'shareInstances', required for calls to `create`
 	 * @param bool $createFromString
 	 * @return mixed
 	 */
