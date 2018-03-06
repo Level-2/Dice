@@ -96,7 +96,7 @@ $dice->addRules([
 ]);
 ```
 
-This change made the JSON loader redundant as loading of rules from a JSON file can easily be achieved with the code:
+The puropse of this addition is to make the JSON loader redundant. Loading of rules from a JSON file can easily be achieved with the code:
 
 ```php
 $dice->addRules(json_decode(file_get_contents('rules.json')));
@@ -141,7 +141,6 @@ _rules.json_
 $dice->addRules(json_decode(file_get_contents('rules.json')));
 ```
 
-
 **Backwards incompatible changes**
 
 1. Dice 3.0 requires PHP 7.0 or above, PHP 5.6 is no longer supported.
@@ -149,7 +148,7 @@ $dice->addRules(json_decode(file_get_contents('rules.json')));
 2. Dice no longer supports `'instance'` keys to signify instances. For example:
 
 ```php
-$dice->addRule('class', [
+$dice->addRule('ClassName', [
 	'constructParams' => ['instance' => '$NamedPDOInstance']
 ]);
 ```
@@ -161,7 +160,7 @@ $dice->addRule('ClassName', [
 	'constructParams' => [\Dice\Dice::INSTANCE => '$NamedPDOInstance']
 ]);
 ```
-
+_to make the constant shorter to type out, you can `use \Dice\Dice;` and reference `Dice::INSTANCE`_
 
 10/06/2016
 
