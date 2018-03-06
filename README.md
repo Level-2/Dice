@@ -27,7 +27,7 @@ Simple example:
 <?php
 class A {
 	public $b;
-	
+
 	public function __construct(B $b) {
 		$this->b = $b;
 	}
@@ -63,7 +63,7 @@ Dice is compatible with PHP5.4 and up, there are archived versions of Dice which
 Performance
 -----------
 
-Dice uses reflection which is often wrongly labelled "slow". Reflection is considerably faster than loading and parsing a configuration file. There are a set of benchmarks [here](https://rawgit.com/TomBZombie/php-dependency-injection-benchmarks/master/test1-5_results.html) and [here](https://rawgit.com/TomBZombie/php-dependency-injection-benchmarks/master/test6_results.html) (To download the benchmark tool yourself see [this repository](https://github.com/TomBZombie/php-dependency-injection-benchmarks)) and Dice is faster than the others in most cases. 
+Dice uses reflection which is often wrongly labelled "slow". Reflection is considerably faster than loading and parsing a configuration file. There are a set of benchmarks [here](https://rawgit.com/TomBZombie/php-dependency-injection-benchmarks/master/test1-5_results.html) and [here](https://rawgit.com/TomBZombie/php-dependency-injection-benchmarks/master/test6_results.html) (To download the benchmark tool yourself see [this repository](https://github.com/TomBZombie/php-dependency-injection-benchmarks)) and Dice is faster than the others in most cases.
 
 In the real world test ([test 6](https://rawgit.com/TomBZombie/php-dependency-injection-benchmarks/master/test6_results.html)) Dice is neck-and-neck with Pimple (which requires writing an awful lot of configuration code) and although Symfony\DependencyInjection is faster at creating objects, it has a larger overhead and you need to create over 500 objects on each page load until it becomes faster than Dice. The same is true of Phalcon, the overhead of loading the Phalcon extension means that unless you're creating well over a thousand objects per HTTP request, the overhead is not worthwhile.
 
@@ -76,6 +76,92 @@ Originally developed by Tom Butler (@TomBZombie), with many thanks to daniel-mei
 
 Updates
 ------------
+
+06/03/2018
+
+### 3.0 Release - Backwards incompatible
+
+**New Features**
+
+#### 1. The JSON loader has been removed in favour of a new `addRules` method.
+
+```php
+$dice->addRules([
+	'\PDO' => [
+		'shared' => true
+	],
+	'Framework\Router' => [
+		'constructParams' => ['Foo', 'Bar']
+	]
+]);
+```
+
+This change made the JSON loader redundant as loading of rules from a JSON file can easily be achieved with the code:
+
+```php
+$dice->addRules(json_decode(file_get_contents('rules.json')));
+```
+
+#### 2. Better JSON file support: constants and superglobals
+
+In order to improve support for rules being defined in external JSON files, constants and superglobals can now be passed into objects created by Dice.
+
+For example, passing the `$_SERVER` superglobal into a router instance and calling PDO's `setAttribute` with `PDO::ATTR_ERRMODE` and `PDO::ERRMODE_EXCEPTION` can be achieved like this in a JSON file:
+
+_rules.json_
+
+```json
+{
+	"Router": {
+		"constructParams": [
+			{"Dice::GLOBAL": "_SERVER"}
+		]
+	},
+	"PDO": {
+		"shared": true,
+		"constructParams": [
+			"mysql:dbname=testdb;host=127.0.0.1",
+			"dbuser",
+			"dbpass"
+		],
+		"call": [
+					[
+						"setAttribute",
+						[
+							{"Dice::CONSTANT": "PDO::ATTR_ERRMODE"},
+							{"Dice::CONSTANT": "PDO::ERRMODE_EXCEPTION"}
+						]
+					]
+		]
+	}
+}
+
+
+```php
+$dice->addRules(json_decode(file_get_contents('rules.json')));
+```
+
+
+**Backwards incompatible changes**
+
+1. Dice 3.0 requires PHP 7.0 or above, PHP 5.6 is no longer supported.
+
+2. Dice no longer supports `'instance'` keys to signify instances. For example:
+
+```php
+$dice->addRule('class', [
+	'constructParams' => ['instance' => '$NamedPDOInstance']
+]);
+```
+
+As noted in issue #125 this made it impossible to pass an array to a constructor if the array had a key `'instance'`. Instead, the new `\Dice\Dice::INSTANCE` constant should be used:
+
+```php
+$dice->addRule('ClassName', [
+	'constructParams' => [\Dice\Dice::INSTANCE => '$NamedPDOInstance']
+]);
+```
+
 
 10/06/2016
 
@@ -99,7 +185,7 @@ $dice->addRule('$MyNamedInstance', $rule);
 
 ```
 
-`$dice->create('$MyNamedInstance')` will now create a class following the rules applied to both `MyClass` and `$MyNamedInstance` so the instance will be shared. 
+`$dice->create('$MyNamedInstance')` will now create a class following the rules applied to both `MyClass` and `$MyNamedInstance` so the instance will be shared.
 
 Previously only the rules applied to the named instance would be used.
 
@@ -127,7 +213,7 @@ $dice->addRule('$MyNamedInstance', $rule);
 
 
 29/10/2014
-* Based on [Issue #15](https://github.com/TomBZombie/Dice/issues/15), Dice will now only call closures if they are wrapped in \Dice\Instance. **PLEASE NOTE: THIS IS BACKWARDS INCOMPATIBLE **. 
+* Based on [Issue #15](https://github.com/TomBZombie/Dice/issues/15), Dice will now only call closures if they are wrapped in \Dice\Instance. **PLEASE NOTE: THIS IS BACKWARDS INCOMPATIBLE **.
 
 Previously Dice ran closures that were passed as substitutions, constructParams and when calling methods:
 
@@ -146,9 +232,9 @@ $rule->constructParams[] = function() {
 	//'abc' will be providedas the first constructor parameter
 	return 'abc';
 };
-``` 
+```
 
-This behaviour has changed as it makes it impossible to provide a closure as a construct parameter or when calling a method because the closure was always called and executed. 
+This behaviour has changed as it makes it impossible to provide a closure as a construct parameter or when calling a method because the closure was always called and executed.
 
 To overcome this, Dice will now only call a closures if they're wrapped in \Dice\Instance:
 
@@ -166,7 +252,7 @@ $rule->constructParams[] =  ['instance' => function() { {
 	//'abc' will be providedas the first constructor parameter
 	return 'abc';
 }]);
-``` 
+```
 
 
 
@@ -197,7 +283,7 @@ $rule->constructParams[] =  ['instance' => function() { {
 * Added a JSON loader + test case
 * Added all test cases to a test suite
 * Moved to PHP5.4 array syntax. A PHP5.3 compatible version is now available in the PHP5.3 branch.
-* Fixed an issue where using named instances would trigger the autoloader with an invalid class name every time a class was created 
+* Fixed an issue where using named instances would trigger the autoloader with an invalid class name every time a class was created
 
 
 28/02/2014
