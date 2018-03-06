@@ -31,6 +31,14 @@ class Dice {
         $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
     }
 
+    /**
+    * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
+    * @param array Rules in a single array [name => $rule] format
+	*/
+    public function addRules(array $rules) {
+    	foreach ($rules as $name => $rule) $this->addRule($name, $rule);
+    }
+
 	/**
 	 * Returns the rule that will be applied to the class $name when calling create()
 	 * @param string name The name of the class to get the rules for
