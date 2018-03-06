@@ -14,7 +14,10 @@ abstract class DiceTest extends \PHPUnit\Framework\TestCase {
 		//Load the test classes for this test
 		$name = str_replace('Test', '', get_class($this));
 		require_once 'tests/TestData/Basic.php';
-		require_once 'tests/TestData/' . $name . '.php';
+
+		if (file_exists('tests/TestData/' . $name . '.php')) {
+			require_once 'tests/TestData/' . $name . '.php';
+		}
 	}
 
 	public function autoload($class) {
