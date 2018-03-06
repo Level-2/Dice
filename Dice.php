@@ -135,24 +135,28 @@ class Dice {
 	}
 
 	/**
-	 * Looks for 'instance' array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
+	 * Looks for Dice::INSTANCE, Dice::GLOBAL or Dice::CONSTANT array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
 	 * @param mixed $param Either a string or an array,
 	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
 	 * @param bool $createFromString
 	 * @return mixed
 	 */
 	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param[self::INSTANCE])) {
-			// Call or return the value sored under the key 'instance'
-			// For ['instance' => ['className', 'methodName'] construct the instance before calling it
-			$args = isset($param['params']) ? $this->expand($param['params']) : [];
-			if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
-			if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
-			else return $this->create($param[self::INSTANCE], array_merge($args, $share));
+		if (is_array($param)) {
+			//if a rule specifies Dice::INSTANCE, look up the relevant instance
+			if (isset($param[self::INSTANCE])) {
+				//Check for 'params' which allows parameters to be sent to the instance when it's created
+				//Either as a callback method or to the constructor of the instance
+				$args = isset($param['params']) ? $this->expand($param['params']) : [];
+
+				//Support Dice::INSTANCE by creating/fetching the specified instance
+				if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
+				else return $this->create($param[self::INSTANCE], array_merge($args, $share));
+			}
+			else if (isset($param[self::GLOBAL])) return $GLOBALS[$param[self::GLOBAL]];
+			else foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
 		}
-		// Recursively search for 'instance' keys in $param
-		else if (is_array($param)) foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
-		// 'instance' wasn't found, return the value unchanged
+
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
 

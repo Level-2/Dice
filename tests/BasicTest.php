@@ -175,4 +175,21 @@ class BasicTest extends DiceTest {
 
 		$this->assertInstanceOf('ScalarTypeHint', $obj);
 	}
+
+	public function testPassGlobals() {
+		//write to the global $_GET variable
+		$_GET['foo'] = 'bar';
+
+		$this->dice->addRule('CheckConstructorArgs',
+			[
+				'constructParams' => [
+					[\Dice\Dice::GLOBAL => '_GET']
+				]
+		]);
+
+		$obj = $this->dice->create('CheckConstructorArgs');
+
+		$this->assertEquals($_GET, $obj->arg1);
+	}
+
 }
