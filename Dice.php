@@ -30,9 +30,14 @@ class Dice {
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
     public function addRule(string $name, array $rule) {
-        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
+        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
+        	$rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
+     	}
+     	//Allow substitutions rules to be defined with a leading a slash
+     	if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule[ltrim($key,  '\\')] = $value;
+
         $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
-    }
+     }
 
     /**
     * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
@@ -198,7 +203,6 @@ class Dice {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				}
 				catch (\InvalidArgumentException $e) {
-
 				}
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
