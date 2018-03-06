@@ -86,7 +86,7 @@ class Dice {
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 * @return callable A closure
 	 */
-	private function getClosure($name, array $rule) {
+	private function getClosure(string $name, array $rule) {
 		// Reflect the class and constructor, this should only ever be done once per class and get cached
 		$class = new \ReflectionClass(isset($rule['instanceOf']) ? $rule['instanceOf'] : $name);
 		$constructor = $class->getConstructor();
@@ -141,7 +141,7 @@ class Dice {
 	 * @param bool $createFromString
 	 * @return mixed
 	 */
-	private function expand($param, array $share = [], $createFromString = false) {
+	private function expand($param, array $share = [], bool $createFromString = false) {
 		if (is_array($param)) {
 			//if a rule specifies Dice::INSTANCE, look up the relevant instance
 			if (isset($param[self::INSTANCE])) {
