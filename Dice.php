@@ -125,8 +125,8 @@ class Dice {
 			$object = $closure($args, $share);
 
 			foreach ($rule['call'] as $call) {
-				// Generate the method arguments using getParams() and call the returned closure (in php7 will be ()() rather than __invoke)
-				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])->__invoke($this->expand(isset($call[1]) ? $call[1] : []));
+				// Generate the method arguments using getParams() and call the returned closure
+				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])(($this->expand(isset($call[1]) ? $call[1] : [])));
 				$return = $object->{$call[0]}(...$params);
 				if (isset($call[2]) && is_callable($call[2])) call_user_func($call[2], $return);
 			}
