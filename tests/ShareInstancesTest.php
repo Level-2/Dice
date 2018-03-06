@@ -11,20 +11,20 @@ class ShareInstancesTest extends DiceTest {
 		$rule = [];
 		$rule['shareInstances'] = ['Shared'];
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
-		
-		
+
+
 		$shareTest = $this->dice->create('TestSharedInstancesTop');
-		
+
 		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
-		
+
 		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
 		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
-		
+
 		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
 		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
-		
+
 	}
-	
+
 	public function testNamedShareInstances() {
 
 		$rule = [];
@@ -34,15 +34,15 @@ class ShareInstancesTest extends DiceTest {
 		$rule = [];
 		$rule['shareInstances'] = ['$Shared'];
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
-		
-		
+
+
 		$shareTest = $this->dice->create('TestSharedInstancesTop');
-		
+
 		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
-		
+
 		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
 		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
-		
+
 		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
 		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
 
@@ -59,31 +59,31 @@ class ShareInstancesTest extends DiceTest {
 		$a = $this->dice->create('A4');
 		$this->assertTrue($a->m1->f === $a->m2->e->f);
 	}
-	
-	
+
+
 	public function testShareInstancesMultiple() {
 		$rule = [];
 		$rule['shareInstances'] = ['Shared'];
 		$this->dice->addRule('TestSharedInstancesTop', $rule);
-	
-	
+
+
 		$shareTest = $this->dice->create('TestSharedInstancesTop');
-	
+
 		$this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
-	
+
 		$this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
 		$this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
-	
+
 		$this->assertSame($shareTest->share1->shared, $shareTest->share2->shared);
 		$this->assertEquals($shareTest->share1->shared->uniq, $shareTest->share2->shared->uniq);
-		
-		
+
+
 		$shareTest2 = $this->dice->create('TestSharedInstancesTop');
 		$this->assertSame($shareTest2->share1->shared, $shareTest2->share2->shared);
 		$this->assertEquals($shareTest2->share1->shared->uniq, $shareTest2->share2->shared->uniq);
-		
+
 		$this->assertNotSame($shareTest->share1->shared, $shareTest2->share2->shared);
 		$this->assertNotEquals($shareTest->share1->shared->uniq, $shareTest2->share2->shared->uniq);
-	
+
 	}
 }

@@ -6,6 +6,9 @@
  * @version 2.0 */
 namespace Dice;
 class Dice {
+	const CONSTANT = 'Dice::CONSTANT';
+	const GLOBAL = 'Dice::GLOBAL';
+	const INSTANCE = 'Dice::INSTANCE';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -26,7 +29,7 @@ class Dice {
 	 * @param string $name The name of the class to add the rule for
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
-    public function addRule($name, array $rule) {
+    public function addRule(string $name, array $rule) {
         if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
         $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
     }
@@ -44,7 +47,7 @@ class Dice {
 	 * @param string name The name of the class to get the rules for
 	 * @return array The rules for the specified class
 	 */
-	public function getRule($name) {
+	public function getRule(string $name): array {
 		$lcName = strtolower(ltrim($name, '\\'));
 		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 
@@ -66,7 +69,7 @@ class Dice {
 	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
 	 * @return object A fully constructed object based on the specified input arguments
 	 */
-	public function create($name, array $args = [], array $share = []) {
+	public function create(string $name, array $args = [], array $share = []) {
 		// Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
 		if (!empty($this->instances[$name])) return $this->instances[$name];
 
@@ -139,13 +142,13 @@ class Dice {
 	 * @return mixed
 	 */
 	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param['instance'])) {
+		if (is_array($param) && isset($param[self::INSTANCE])) {
 			// Call or return the value sored under the key 'instance'
 			// For ['instance' => ['className', 'methodName'] construct the instance before calling it
 			$args = isset($param['params']) ? $this->expand($param['params']) : [];
-			if (is_array($param['instance'])) $param['instance'][0] = $this->expand($param['instance'][0], $share, true);
-			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...$args);
-			else return $this->create($param['instance'], array_merge($args, $share));
+			if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
+			if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
+			else return $this->create($param[self::INSTANCE], array_merge($args, $share));
 		}
 		// Recursively search for 'instance' keys in $param
 		else if (is_array($param)) foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
