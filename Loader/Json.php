@@ -8,12 +8,16 @@ namespace Dice\Loader;
 class Json {
 	public function load($json, \Dice\Dice $dice = null) {
 		if ($dice === null) $dice = new \Dice\Dice;
-		if (trim($json)[0] != '{') {
+		if (is_array($json)) {
+			foreach ($json as $file) $dice = $this->load($file, $dice);
+			return $dice;
+		}
+		elseif (trim($json)[0] != '{') {
 			$path = dirname(realpath($json));
 			$json = str_replace('__DIR__', $path, file_get_contents($json));
+			$map = json_decode($json, true);
 		}
-
-		$map = json_decode($json, true);
+		else $map = json_decode($json, true);
 
 		if (!is_array($map)) throw new \Exception('Could not decode json: ' . json_last_error_msg());
 
@@ -27,7 +31,7 @@ class Json {
 		else {
 			foreach ($map as $name => $rule) $dice->addRule($name, $rule);
 		}
-		
+
 		return $dice;
 	}
 }
