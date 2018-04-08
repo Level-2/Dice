@@ -1,5 +1,9 @@
 <?php
-
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 
 class ConsumeArgsTop {
     public $s;
@@ -58,19 +62,19 @@ class BestMatch {
 	public $a;
 	public $string;
 	public $b;
-	
+
 	public function __construct($string, A $a, B $b) {
 		$this->a = $a;
 		$this->string = $string;
 		$this->b = $b;
-	}	
+	}
 }
 
 //From: https://github.com/TomBZombie/Dice/issues/62#issuecomment-112370319
 class ScalarConstructors {
 	public $string;
 	public $null;
-	
+
   public function __construct($string, $null) {
     $this->string = $string;
     $this->null = $null;

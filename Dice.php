@@ -1,11 +1,14 @@
 <?php
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
- * @copyright 2012-2015 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
- * @version 2.0 */
+ * @version 3.0 */
 namespace Dice;
 class Dice {
+	const CONSTANT = 'Dice::CONSTANT';
+	const GLOBAL = 'Dice::GLOBAL';
+	const INSTANCE = 'Dice::INSTANCE';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -26,9 +29,22 @@ class Dice {
 	 * @param string $name The name of the class to add the rule for
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
-    public function addRule($name, array $rule) {
-        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
+    public function addRule(string $name, array $rule) {
+        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
+        	$rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
+     	}
+     	//Allow substitutions rules to be defined with a leading a slash
+     	if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule[ltrim($key,  '\\')] = $value;
+
         $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
+     }
+
+    /**
+    * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
+    * @param array Rules in a single array [name => $rule] format
+	*/
+    public function addRules(array $rules) {
+    	foreach ($rules as $name => $rule) $this->addRule($name, $rule);
     }
 
 	/**
@@ -36,7 +52,7 @@ class Dice {
 	 * @param string name The name of the class to get the rules for
 	 * @return array The rules for the specified class
 	 */
-	public function getRule($name) {
+	public function getRule(string $name): array {
 		$lcName = strtolower(ltrim($name, '\\'));
 		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 
@@ -58,7 +74,7 @@ class Dice {
 	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
 	 * @return object A fully constructed object based on the specified input arguments
 	 */
-	public function create($name, array $args = [], array $share = []) {
+	public function create(string $name, array $args = [], array $share = []) {
 		// Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
 		if (!empty($this->instances[$name])) return $this->instances[$name];
 
@@ -75,7 +91,7 @@ class Dice {
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 * @return callable A closure
 	 */
-	private function getClosure($name, array $rule) {
+	private function getClosure(string $name, array $rule) {
 		// Reflect the class and constructor, this should only ever be done once per class and get cached
 		$class = new \ReflectionClass(isset($rule['instanceOf']) ? $rule['instanceOf'] : $name);
 		$constructor = $class->getConstructor();
@@ -114,8 +130,8 @@ class Dice {
 			$object = $closure($args, $share);
 
 			foreach ($rule['call'] as $call) {
-				// Generate the method arguments using getParams() and call the returned closure (in php7 will be ()() rather than __invoke)
-				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])->__invoke($this->expand(isset($call[1]) ? $call[1] : []));
+				// Generate the method arguments using getParams() and call the returned closure
+				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])(($this->expand(isset($call[1]) ? $call[1] : [])));
 				$return = $object->{$call[0]}(...$params);
 				if (isset($call[2]) && is_callable($call[2])) call_user_func($call[2], $return);
 			}
@@ -124,24 +140,29 @@ class Dice {
 	}
 
 	/**
-	 * Looks for 'instance' array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
+	 * Looks for Dice::INSTANCE, Dice::GLOBAL or Dice::CONSTANT array keys in $param and when found returns an object based on the value see {@link https:// r.je/dice.html#example3-1}
 	 * @param mixed $param Either a string or an array,
-	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
+	 * @param array $share Array of instances from 'shareInstances', required for calls to `create`
 	 * @param bool $createFromString
 	 * @return mixed
 	 */
-	private function expand($param, array $share = [], $createFromString = false) {
-		if (is_array($param) && isset($param['instance'])) {
-			// Call or return the value sored under the key 'instance'
-			// For ['instance' => ['className', 'methodName'] construct the instance before calling it
-			$args = isset($param['params']) ? $this->expand($param['params']) : [];
-			if (is_array($param['instance'])) $param['instance'][0] = $this->expand($param['instance'][0], $share, true);
-			if (is_callable($param['instance'])) return call_user_func($param['instance'], ...$args);
-			else return $this->create($param['instance'], array_merge($args, $share));
+	private function expand($param, array $share = [], bool $createFromString = false) {
+		if (is_array($param)) {
+			//if a rule specifies Dice::INSTANCE, look up the relevant instance
+			if (isset($param[self::INSTANCE])) {
+				//Check for 'params' which allows parameters to be sent to the instance when it's created
+				//Either as a callback method or to the constructor of the instance
+				$args = isset($param['params']) ? $this->expand($param['params']) : [];
+
+				//Support Dice::INSTANCE by creating/fetching the specified instance
+				if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
+				else return $this->create($param[self::INSTANCE], array_merge($args, $share));
+			}
+			else if (isset($param[self::GLOBAL])) return $GLOBALS[$param[self::GLOBAL]];
+			else if (isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
+			else foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
 		}
-		// Recursively search for 'instance' keys in $param
-		else if (is_array($param)) foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
-		// 'instance' wasn't found, return the value unchanged
+
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
 
@@ -182,7 +203,6 @@ class Dice {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				}
 				catch (\InvalidArgumentException $e) {
-
 				}
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);

@@ -1,5 +1,9 @@
 <?php
-
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 class NoConstructor {
 	public $a = 'b';
 }
@@ -132,5 +136,13 @@ class OptionalInterface {
 class ScalarTypeHint {
 	public function __construct(string $a = null) {
 
+	}
+}
+
+class CheckConstructorArgs {
+	public $arg1;
+
+	public function __construct($arg1) {
+		$this->arg1 = $arg1;
 	}
 }

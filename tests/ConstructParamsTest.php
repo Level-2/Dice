@@ -1,20 +1,18 @@
 <?php
-/*@description        Dice - A minimal Dependency Injection Container for PHP
-* @author             Tom Butler tom@r.je
-* @copyright          2012-2015 Tom Butler <tom@r.je>
-* @link               http://r.je/dice.html
-* @license            http://www.opensource.org/licenses/bsd-license.php  BSD License
-* @version            2.0
-*/
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 class ConstructParamsTest extends DiceTest {
 
 	public function testConstructParams() {
 		$rule = [];
 		$rule['constructParams'] = array('foo', 'bar');
 		$this->dice->addRule('RequiresConstructorArgsA', $rule);
-		
+
 		$obj = $this->dice->create('RequiresConstructorArgsA');
-		
+
 		$this->assertEquals($obj->foo, 'foo');
 		$this->assertEquals($obj->bar, 'bar');
 	}
@@ -23,40 +21,40 @@ class ConstructParamsTest extends DiceTest {
 	public function testInternalClass() {
 		$rule = [];
 		$rule['constructParams'][] = '.';
-		
+
 		$this->dice->addRule('DirectoryIterator', $rule);
-		
+
 		$dir = $this->dice->create('DirectoryIterator');
-		
+
 		$this->assertInstanceOf('DirectoryIterator', $dir);
 	}
-	
+
 	public function testInternalClassExtended() {
 		$rule = [];
 		$rule['constructParams'][] = '.';
-	
+
 		$this->dice->addRule('MyDirectoryIterator', $rule);
-	
+
 		$dir = $this->dice->create('MyDirectoryIterator');
-	
+
 		$this->assertInstanceOf('MyDirectoryIterator', $dir);
 	}
-	
-	
+
+
 	public function testInternalClassExtendedConstructor() {
 		$rule = [];
 		$rule['constructParams'][] = '.';
-	
+
 		$this->dice->addRule('MyDirectoryIterator2', $rule);
-	
+
 		$dir = $this->dice->create('MyDirectoryIterator2');
-	
+
 		$this->assertInstanceOf('MyDirectoryIterator2', $dir);
 	}
 
 	public function testDefaultNullAssigned() {
 		$rule = [];
-		$rule['constructParams'] = [ ['instance' => 'A'], null];
+		$rule['constructParams'] = [ [\Dice\Dice::INSTANCE => 'A'], null];
 		$this->dice->addRule('MethodWithDefaultNull', $rule);
 		$obj = $this->dice->create('MethodWithDefaultNull');
 		$this->assertNull($obj->b);
@@ -70,21 +68,21 @@ class ConstructParamsTest extends DiceTest {
 		$rule = [];
 		$rule['shareInstances'] = array('D');
 		$this->dice->addRule('ParamRequiresArgs', $rule);
-		
+
 		$obj = $this->dice->create('ParamRequiresArgs');
-		
+
 		$this->assertEquals($obj->a->foo, 'foo');
 		$this->assertEquals($obj->a->bar, 'bar');
 	}
 
-	
+
 	public function testConstructParamsMixed() {
 		$rule = [];
 		$rule['constructParams'] = array('foo', 'bar');
 		$this->dice->addRule('RequiresConstructorArgsB', $rule);
-		
+
 		$obj = $this->dice->create('RequiresConstructorArgsB');
-		
+
 		$this->assertEquals($obj->foo, 'foo');
 		$this->assertEquals($obj->bar, 'bar');
 		$this->assertInstanceOf('A', $obj->a);

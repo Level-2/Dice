@@ -1,12 +1,17 @@
 <?php
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 class TestSharedInstancesTop {
 	public $share1;
 	public $share2;
-	
+
 	public function __construct(SharedInstanceTest1 $share1, SharedInstanceTest2 $share2) {
 		$this->share1 = $share1;
 		$this->share2 = $share2;
-	}	
+	}
 }
 
 
@@ -14,9 +19,9 @@ class TestSharedInstancesTop {
 
 class SharedInstanceTest1 {
 	public $shared;
-	
+
 	public function __construct(Shared $shared) {
-		$this->shared = $shared;		
+		$this->shared = $shared;
 	}
 }
 
@@ -70,7 +75,7 @@ class Baz77 {
 
 class Shared {
 	public $uniq;
-	
+
 	public function __construct() {
 		$this->uniq = uniqid();
 	}

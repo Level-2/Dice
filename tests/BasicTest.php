@@ -1,11 +1,9 @@
 <?php
-/*@description        Dice - A minimal Dependency Injection Container for PHP
-* @author             Tom Butler tom@r.je
-* @copyright          2012-2015 Tom Butler <tom@r.je>
-* @link               http://r.je/dice.html
-* @license            http://www.opensource.org/licenses/bsd-license.php  BSD License
-* @version            2.0
-*/
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 
 class BasicTest extends DiceTest {
 
@@ -174,5 +172,34 @@ class BasicTest extends DiceTest {
 		$obj = $this->dice->create('ScalarTypeHint');
 
 		$this->assertInstanceOf('ScalarTypeHint', $obj);
+	}
+
+	public function testPassGlobals() {
+		//write to the global $_GET variable
+		$_GET['foo'] = 'bar';
+
+		$this->dice->addRule('CheckConstructorArgs',
+			[
+				'constructParams' => [
+					[\Dice\Dice::GLOBAL => '_GET']
+				]
+		]);
+
+		$obj = $this->dice->create('CheckConstructorArgs');
+
+		$this->assertEquals($_GET, $obj->arg1);
+	}
+
+	public function testPassConstantString() {
+		$this->dice->addRule('CheckConstructorArgs',
+			[
+				'constructParams' => [
+					[\Dice\Dice::CONSTANT => '\PDO::FETCH_ASSOC']
+				]
+		]);
+
+		$obj = $this->dice->create('CheckConstructorArgs');
+
+		$this->assertEquals(\PDO::FETCH_ASSOC, $obj->arg1);
 	}
 }

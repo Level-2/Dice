@@ -1,7 +1,11 @@
 <?php
-
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 class MyDirectoryIterator extends DirectoryIterator {
-	
+
 }
 
 
@@ -13,7 +17,7 @@ class MyDirectoryIterator2 extends DirectoryIterator {
 
 class ParamRequiresArgs {
     public $a;
-    
+
     public function __construct(D $d, RequiresConstructorArgsA $a) {
         $this->a = $a;
     }
