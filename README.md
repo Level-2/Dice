@@ -96,7 +96,7 @@ $dice->addRules([
 ]);
 ```
 
-The puropse of this addition is to make the JSON loader redundant. Loading of rules from a JSON file can easily be achieved with the code:
+The purpose of this addition is to make the JSON loader redundant. Loading of rules from a JSON file can easily be achieved with the code:
 
 ```php
 $dice->addRules(json_decode(file_get_contents('rules.json')));
