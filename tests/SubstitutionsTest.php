@@ -97,6 +97,16 @@ class SubstitutionsTest extends DiceTest {
 
 	}
 
+	public function testSubstitutionWithFuncCall() {
+		$rule = [];
+
+		$rule['substitutions']['Bar'] = [\Dice\Dice::INSTANCE => ['Foo2', 'bar']];
+
+		$this->dice->addRule('Foo', $rule);
+
+		$a = $this->dice->create('Foo');
+		$this->assertInstanceOf('Baz', $a->bar);
+	}
 }
 
 
@@ -104,6 +114,12 @@ class Foo {
 	public $bar;
 	public function __construct(Bar $bar) {
 		$this->bar = $bar;
+	}
+}
+
+class Foo2 {
+	public function bar() {
+		return new Baz;
 	}
 }
 

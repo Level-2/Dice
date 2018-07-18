@@ -156,6 +156,7 @@ class Dice {
 				$args = isset($param['params']) ? $this->expand($param['params']) : [];
 
 				//Support Dice::INSTANCE by creating/fetching the specified instance
+				if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
 				if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
 				else return $this->create($param[self::INSTANCE], array_merge($args, $share));
 			}
