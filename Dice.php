@@ -24,6 +24,11 @@ class Dice {
 	 */
 	private $instances = [];
 
+    /**
+     * @var Stores any instances marked as 'sharedConstructor' so create() can return the same instance
+     */
+	private $sharedConstructor = [];
+
 	/**
 	 * Add a rule $rule to the class $name
 	 * @param string $name The name of the class to add the rule for
@@ -79,6 +84,12 @@ class Dice {
 		// Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
 		if (!empty($this->instances[$name])) return $this->instances[$name];
 
+        $rules = $this->getRule($name);
+        if (!empty($rules['sharedConstructor']) && isset($this->sharedConstructor[$name])) {
+            $snapshot = $this->snapshotArray($args);
+            if (!empty($this->sharedConstructor[$name][$snapshot])) return $this->sharedConstructor[$name][$snapshot]; 
+        }
+
 		// Create a closure for creating the object if there isn't one already
 		if (empty($this->cache[$name])) $this->cache[$name] = $this->getClosure($name, $this->getRule($name));
 
@@ -111,6 +122,18 @@ class Dice {
 			// Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
 			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
 			return $this->instances[$name];
+		};
+        else if (!empty($rule['sharedConstructor'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {
+			//Shared instance: create the class without calling the constructor (and write to \$name and $name, see issue #68)
+            $snapshot = $this->snapshotArray($args);
+            if (!isset($this->sharedConstructor[$name])) {
+                $this->sharedConstructor[$name] = [];
+            }
+            $this->sharedConstructor[$name][$snapshot] = $this->sharedConstructor[ltrim($name, '\\')][$snapshot] = $class->newInstanceWithoutConstructor();
+
+			//Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
+			if ($constructor) $constructor->invokeArgs($this->sharedConstructor[$name][$snapshot], $params($args, $share));
+			return $this->sharedConstructor[$name][$snapshot];
 		};
 		else if ($params) $closure = function (array $args, array $share) use ($class, $params) {
 			// This class has depenencies, call the $params closure to generate them based on $args and $share
@@ -219,4 +242,26 @@ class Dice {
 			return $parameters;
 		};
 	}
+
+    /**
+     * Creates an unique hash for an array
+     * @param array $args
+     * @return string unique hash for an array
+     */
+    private function snapshotArray(array $args = [])
+    {
+        $res = "";
+        foreach ($args as $key => $arg) {
+            if (is_object($arg)) {
+                $res .= spl_object_hash($arg);
+            } elseif (is_array($arg)) {
+                $res .= $this->snapshotArray($arg);
+            } else {
+                $res .= $arg;
+            }
+            $res = $key . $res;
+        }
+        return $res;
+        #return md5($res);
+    }
 }
