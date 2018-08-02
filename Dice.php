@@ -137,8 +137,6 @@ class Dice {
 				if (isset($call[2])) {
 					if ($call[2] === true) $object = $return;
 					else if (is_callable($call[2])) call_user_func($call[2], $return);
-
-					//else
 				}
 			}
 			return $object;
