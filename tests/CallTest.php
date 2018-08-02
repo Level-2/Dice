@@ -63,8 +63,8 @@ class CallTest extends DiceTest {
 		$rules = [
 			'TestCallImmutable' => [
 				'call' => [
-					['call1', ['foo'], true],
-					['call2', ['bar'], true]
+					['call1', ['foo'], \Dice\Dice::CHAIN_CALL],
+					['call2', ['bar'], \Dice\Dice::CHAIN_CALL]
 				]
 			]
 		];
