@@ -104,21 +104,24 @@ class Dice {
 			throw new \InvalidArgumentException('Cannot instantiate interface');
 		};
 		// Get a closure based on the type of object being created: Shared, normal or constructorless
-		else if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {
-			// Shared instance: create the class without calling the constructor (and write to \$name and $name, see issue #68)
-			$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
-
-			// Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
-			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
-			return $this->instances[$name];
-		};
 		else if ($params) $closure = function (array $args, array $share) use ($class, $params) {
 			// This class has depenencies, call the $params closure to generate them based on $args and $share
 			return new $class->name(...$params($args, $share));
 		};
-		else $closure = function () use ($class) {
-			// No constructor arguments, just instantiate the class
+		else $closure = function () use ($class) { // No constructor arguments, just instantiate the class
 			return new $class->name;
+		};
+
+		if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
+			//Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
+			if ($class->isInternal()) $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
+			else {
+				//Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
+				$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
+				// Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
+				if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
+			}
+			return $this->instances[$name];
 		};
 		// If there are shared instances, create them and merge them with shared instances higher up the object graph
 		if (isset($rule['shareInstances'])) $closure = function(array $args, array $share) use ($closure, $rule) {
