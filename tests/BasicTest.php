@@ -202,4 +202,12 @@ class BasicTest extends DiceTest {
 
 		$this->assertEquals(\PDO::FETCH_ASSOC, $obj->arg1);
 	}
+
+	public function testImmutability() {
+		$this->assertEquals([], $this->dice->getRule('Foo'));
+
+		$dice = $this->dice->addRule('Foo', ['shared' => true]);
+
+		$this->assertEquals([], $this->dice->getRule('Foo'));
+	}
 }
