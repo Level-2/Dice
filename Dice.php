@@ -209,8 +209,7 @@ class Dice {
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
 				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
-				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this a
-				// is hacky AF workaround: call_user_func('is_' . $type, '')
+				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
 				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->getName(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
 				// There's no type hint and nothing left in $args, provide the default value or null
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
