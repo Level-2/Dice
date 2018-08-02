@@ -32,3 +32,21 @@ class TestCall3 {
 		return 'callMe called';
 	}
 }
+
+
+class TestCallImmutable {
+	public $a;
+	public $b;
+
+	public function call1($a) {
+		$new = clone $this;
+		$new->a = $a;
+		return $new;
+	}
+
+	public function call2($b) {
+		$new = clone $this;
+		$new->b = $b;
+		return $new;
+	}
+}
