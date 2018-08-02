@@ -29,24 +29,31 @@ class Dice {
 	 * @param string $name The name of the class to add the rule for
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
-    public function addRule(string $name, array $rule) {
-        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
-        	$rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
-     	}
-     	//Allow substitutions rules to be defined with a leading a slash
-     	if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule[ltrim($key,  '\\')] = $value;
+	public function addRule(string $name, array $rule): self {
+		//Clear any existing instance or cache for this class
+		unset($this->instances[$name], $this->cache[$name]);
 
-        $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
-     }
+		if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
+			$rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
+		}
+		//Allow substitutions rules to be defined with a leading a slash
+		if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule[ltrim($key,  '\\')] = $value;
 
-    /**
-    * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
-    * @param array Rules in a single array [name => $rule] format
+		$dice = clone $this;
+		$dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
+
+		return $dice;
+	 }
+
+	/**
+	* Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
+	* @param array Rules in a single array [name => $rule] format
 	*/
-    public function addRules($rules) {
-    	if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
-    	foreach ($rules as $name => $rule) $this->addRule($name, $rule);
-    }
+	public function addRules($rules): self {
+		if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
+		foreach ($rules as $name => $rule) $dice = $this->addRule($name, $rule);
+		return $dice ?? $this;
+	}
 
 	/**
 	 * Returns the rule that will be applied to the class $name when calling create()

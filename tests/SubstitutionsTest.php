@@ -11,9 +11,9 @@ class SubstitutionsTest extends DiceTest {
 			return Baz77::create();
 		}];
 
-		$this->dice->addRule('Foo77', $rule);
+		$dice = $this->dice->addRule('Foo77', $rule);
 
-		$foo = $this->dice->create('Foo77');
+		$foo = $dice->create('Foo77');
 
 		$this->assertInstanceOf('Bar77', $foo->bar);
 		$this->assertEquals('Z', $foo->bar->a);
@@ -22,17 +22,17 @@ class SubstitutionsTest extends DiceTest {
 	public function testNullSubstitution() {
 		$rule = [];
 		$rule['substitutions']['B'] = null;
-		$this->dice->addRule('MethodWithDefaultNull', $rule);
-		$obj = $this->dice->create('MethodWithDefaultNull');
+		$dice = $this->dice->addRule('MethodWithDefaultNull', $rule);
+		$obj = $dice->create('MethodWithDefaultNull');
 		$this->assertNull($obj->b);
 	}
 
 	public function testSubstitutionText() {
 		$rule = [];
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
-		$this->dice->addRule('A', $rule);
+		$dice = $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+		$a = $dice->create('A');
 
 		$this->assertInstanceOf('ExtendedB', $a->b);
 	}
@@ -40,9 +40,9 @@ class SubstitutionsTest extends DiceTest {
 	public function testSubstitutionTextMixedCase() {
 		$rule = [];
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'exTenDedb'];
-		$this->dice->addRule('A', $rule);
+		$dice = $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+		$a = $dice->create('A');
 
 		$this->assertInstanceOf('ExtendedB', $a->b);
 	}
@@ -54,9 +54,9 @@ class SubstitutionsTest extends DiceTest {
 			return $injection->create('ExtendedB');
 		}];
 
-		$this->dice->addRule('A', $rule);
+		$dice = $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+		$a = $dice->create('A');
 
 		$this->assertInstanceOf('ExtendedB', $a->b);
 	}
@@ -67,9 +67,9 @@ class SubstitutionsTest extends DiceTest {
 
 		$rule['substitutions']['B'] = $this->dice->create('ExtendedB');
 
-		$this->dice->addRule('A', $rule);
+		$dice = $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+		$a = $dice->create('A');
 		$this->assertInstanceOf('ExtendedB', $a->b);
 	}
 
@@ -78,9 +78,9 @@ class SubstitutionsTest extends DiceTest {
 
 		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
 
-		$this->dice->addRule('A', $rule);
+		$dice = $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+		$a = $dice->create('A');
 		$this->assertInstanceOf('ExtendedB', $a->b);
 	}
 
@@ -89,9 +89,9 @@ class SubstitutionsTest extends DiceTest {
 		$rule = [
 			'substitutions' => ['Bar' => 'Baz']
 		];
-		$this->dice->addRule('*', $rule);
+		$dice = $this->dice->addRule('*', $rule);
 
-		$obj = $this->dice->create('Foo');
+		$obj = $dice->create('Foo');
 
 		$this->assertInstanceOf('Baz', $obj->bar);
 
@@ -102,9 +102,9 @@ class SubstitutionsTest extends DiceTest {
 
 		$rule['substitutions']['Bar'] = [\Dice\Dice::INSTANCE => ['Foo2', 'bar']];
 
-		$this->dice->addRule('Foo', $rule);
+		$dice = $this->dice->addRule('Foo', $rule);
 
-		$a = $this->dice->create('Foo');
+		$a = $dice->create('Foo');
 		$this->assertInstanceOf('Baz', $a->bar);
 	}
 }
