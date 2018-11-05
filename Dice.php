@@ -57,9 +57,10 @@ class Dice
      }
 
     /**
-    * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
-    * @param array Rules in a single array [name => $rule] format
-    */
+     * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
+     * @param array Rules in a single array [name => $rule] format
+     * @return void
+     */
     public function addRules($rules)
     {
         if (is_string($rules)) {
