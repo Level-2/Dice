@@ -5,6 +5,15 @@
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  * @version 3.0 */
 namespace Dice;
+
+/**
+ * Class Dice
+ * @package Dice
+ *
+ * Dice is a minimalist Dependency Injection Container for PHP with a focus on
+ * being lightweight and fast as well as requiring as little configuration
+ * as possible.
+ */
 class Dice {
     const CONSTANT = 'Dice::CONSTANT';
     const GLOBAL = 'Dice::GLOBAL';
