@@ -41,7 +41,7 @@ class Dice
      * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
      */
     public function addRule(string $name, array $rule) {
-        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
+        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true)) {
             $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
         }
         //Allow substitutions rules to be defined with a leading a slash
