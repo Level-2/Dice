@@ -146,13 +146,17 @@ class Dice
                 throw new \InvalidArgumentException('Cannot instantiate interface');
             };
         // Get a closure based on the type of object being created: Shared, normal or constructor-less
-        } elseif ($params) $closure = function (array $args, array $share) use ($class, $params) {
-            // This class has dependencies, call the $params closure to generate them based on $args and $share
-            return new $class->name(...$params($args, $share));
-        };
-        else $closure = function () use ($class) { // No constructor arguments, just instantiate the class
-            return new $class->name;
-        };
+        } elseif ($params) {
+            $closure = function (array $args, array $share) use ($class, $params) {
+                // This class has dependencies, call the $params closure to generate them based on $args and $share
+                return new $class->name(...$params($args, $share));
+            };
+        } else {
+            $closure = function () use ($class) {
+                // No constructor arguments, just instantiate the class
+                return new $class->name;
+            };
+        }
 
         if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
             //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
