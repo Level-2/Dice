@@ -46,7 +46,11 @@ class Dice
             $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
         }
         //Allow substitutions rules to be defined with a leading a slash
-        if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule[ltrim($key,  '\\')] = $value;
+        if (isset($rule['substitutions'])) {
+            foreach ($rule['substitutions'] as $key => $value) {
+                $rule[ltrim($key, '\\')] = $value;
+            }
+        }
 
         $this->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($this->getRule($name), $rule);
      }
