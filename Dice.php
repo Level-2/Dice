@@ -158,17 +158,22 @@ class Dice
             };
         }
 
-        if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
-            //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
-            if ($class->isInternal()) $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
-            else {
-                //Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
-                $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
-                // Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
-                if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
-            }
-            return $this->instances[$name];
-        };
+        if (!empty($rule['shared'])) {
+            $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
+                //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
+                if ($class->isInternal()) {
+                    $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
+                } else {
+                    //Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
+                    $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
+                    // Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
+                    if ($constructor) {
+                        $constructor->invokeArgs($this->instances[$name], $params($args, $share));
+                    }
+                }
+                return $this->instances[$name];
+            };
+        }
         // If there are shared instances, create them and merge them with shared instances higher up the object graph
         if (isset($rule['shareInstances'])) $closure = function(array $args, array $share) use ($closure, $rule) {
              foreach($rule['shareInstances'] as $instance) $share[] = $this->create($instance, [], $share);
