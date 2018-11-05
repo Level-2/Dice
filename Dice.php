@@ -113,10 +113,14 @@ class Dice
     public function create(string $name, array $args = [], array $share = [])
     {
         // Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
-        if (!empty($this->instances[$name])) return $this->instances[$name];
+        if (!empty($this->instances[$name])) {
+            return $this->instances[$name];
+        }
 
         // Create a closure for creating the object if there isn't one already
-        if (empty($this->cache[$name])) $this->cache[$name] = $this->getClosure($name, $this->getRule($name));
+        if (empty($this->cache[$name])) {
+            $this->cache[$name] = $this->getClosure($name, $this->getRule($name));
+        }
 
         // Call the cached closure which will return a fully constructed object of type $name
         return $this->cache[$name]($args, $share);
