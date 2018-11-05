@@ -221,13 +221,13 @@ class Dice
     private function expand($param, array $share = [], bool $createFromString = false)
     {
         if (is_array($param)) {
-            //if a rule specifies Dice::INSTANCE, look up the relevant instance
+            // if a rule specifies Dice::INSTANCE, look up the relevant instance
             if (isset($param[self::INSTANCE])) {
-                //Check for 'params' which allows parameters to be sent to the instance when it's created
-                //Either as a callback method or to the constructor of the instance
+                // Check for 'params' which allows parameters to be sent to the instance when it's created
+                // Either as a callback method or to the constructor of the instance
                 $args = isset($param['params']) ? $this->expand($param['params']) : [];
 
-                //Support Dice::INSTANCE by creating/fetching the specified instance
+                // Support Dice::INSTANCE by creating/fetching the specified instance
                 if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
                 if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
                 else return $this->create($param[self::INSTANCE], array_merge($args, $share));
