@@ -81,12 +81,20 @@ class Dice
         $lcName = strtolower(ltrim($name, '\\'));
         if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 
-        foreach ($this->rules as $key => $rule) { 							// Find a rule which matches the class described in $name where:
-            if (empty($rule['instanceOf']) 		 							// It's not a named instance, the rule is applied to a class name
-                && $key !== '*' 				 							// It's not the default rule
-                && is_subclass_of($name, $key)								// The rule is applied to a parent class
-                && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) // And that rule should be inherited to subclasses
-            return $rule;
+        foreach ($this->rules as $key => $rule) {
+            // Find a rule which matches the class described in $name where:
+            if (
+                // It's not a named instance, the rule is applied to a class name
+                empty($rule['instanceOf'])
+                // It's not the default rule
+                && $key !== '*'
+                // The rule is applied to a parent class
+                && is_subclass_of($name, $key)
+                // And that rule should be inherited to subclasses
+                && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true)
+            ) {
+                return $rule;
+            }
         }
         // No rule has matched, return the default rule if it's set
         return isset($this->rules['*']) ? $this->rules['*'] : [];
