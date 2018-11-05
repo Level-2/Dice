@@ -260,7 +260,11 @@ class Dice
         $paramInfo = [];
         foreach ($method->getParameters() as $param) {
             $class = $param->getClass() ? $param->getClass()->name : null;
-            $paramInfo[] = [$class, $param, isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions'])];
+            $paramInfo[] = [
+                $class,
+                $param,
+                isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions'])
+            ];
         }
 
         // Return a closure that uses the cached information to generate the arguments for the method
