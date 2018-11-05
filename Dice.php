@@ -40,7 +40,8 @@ class Dice
      * @param string $name The name of the class to add the rule for
      * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
      */
-    public function addRule(string $name, array $rule) {
+    public function addRule(string $name, array $rule)
+    {
         if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true)) {
             $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
         }
@@ -54,7 +55,8 @@ class Dice
     * Add rules as array. Useful for JSON loading $dice->addRules(json_decode(file_get_contents('foo.json'));
     * @param array Rules in a single array [name => $rule] format
     */
-    public function addRules($rules) {
+    public function addRules($rules)
+    {
         if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
         foreach ($rules as $name => $rule) $this->addRule($name, $rule);
     }
@@ -64,7 +66,8 @@ class Dice
      * @param string name The name of the class to get the rules for
      * @return array The rules for the specified class
      */
-    public function getRule(string $name): array {
+    public function getRule(string $name): array
+    {
         $lcName = strtolower(ltrim($name, '\\'));
         if (isset($this->rules[$lcName])) return $this->rules[$lcName];
 
@@ -86,7 +89,8 @@ class Dice
      * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
      * @return object A fully constructed object based on the specified input arguments
      */
-    public function create(string $name, array $args = [], array $share = []) {
+    public function create(string $name, array $args = [], array $share = [])
+    {
         // Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
         if (!empty($this->instances[$name])) return $this->instances[$name];
 
@@ -103,7 +107,8 @@ class Dice
      * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
      * @return callable A closure
      */
-    private function getClosure(string $name, array $rule) {
+    private function getClosure(string $name, array $rule)
+    {
         // Reflect the class and constructor, this should only ever be done once per class and get cached
         $class = new \ReflectionClass(isset($rule['instanceOf']) ? $rule['instanceOf'] : $name);
         $constructor = $class->getConstructor();
@@ -162,7 +167,8 @@ class Dice
      * @param bool $createFromString
      * @return mixed
      */
-    private function expand($param, array $share = [], bool $createFromString = false) {
+    private function expand($param, array $share = [], bool $createFromString = false)
+    {
         if (is_array($param)) {
             //if a rule specifies Dice::INSTANCE, look up the relevant instance
             if (isset($param[self::INSTANCE])) {
@@ -189,7 +195,8 @@ class Dice
      * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
      * @return callable A closure that uses the cached information to generate the arguments for the method
      */
-    private function getParams(\ReflectionMethod $method, array $rule) {
+    private function getParams(\ReflectionMethod $method, array $rule)
+    {
         // Cache some information about the parameter in $paramInfo so (slow) reflection isn't needed every time
         $paramInfo = [];
         foreach ($method->getParameters() as $param) {
