@@ -184,6 +184,7 @@ class Dice
                 foreach ($rule['shareInstances'] as $instance) {
                     $share[] = $this->create($instance, [], $share);
                 }
+
                 return $closure($args, $share);
             };
         }
