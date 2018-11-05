@@ -299,19 +299,26 @@ class Dice
                     }
                 }
                 // When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
-                if ($class)	try {
-                    $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
+                if ($class) {
+                    try {
+                        $parameters[] = $sub ?
+                            $this->expand($rule['substitutions'][$class], $share, true) :
+                            $this->create($class, [], $share);
+                    } catch (\InvalidArgumentException $e) {
+                    }
+                } elseif ($param->isVariadic()) {
+                    // For variadic parameters, provide remaining $args
+                    $parameters = array_merge($parameters, $args);
+                } elseif ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) {
+                    // There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
+                    // Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
+                    $parameters[] = $this->expand(array_shift($args));
+                } else {
+                    // There's no type hint and nothing left in $args, provide the default value or null
+                    $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
                 }
-                catch (\InvalidArgumentException $e) {
-                }
-                // For variadic parameters, provide remaining $args
-                else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
-                // There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
-                // Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
-                else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
-                // There's no type hint and nothing left in $args, provide the default value or null
-                else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
             }
+
             return $parameters;
         };
     }
