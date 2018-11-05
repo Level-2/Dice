@@ -39,6 +39,7 @@ class Dice
      * Add a rule $rule to the class $name
      * @param string $name The name of the class to add the rule for
      * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
+     * @return void
      */
     public function addRule(string $name, array $rule)
     {
