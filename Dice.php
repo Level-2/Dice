@@ -62,8 +62,12 @@ class Dice
     */
     public function addRules($rules)
     {
-        if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
-        foreach ($rules as $name => $rule) $this->addRule($name, $rule);
+        if (is_string($rules)) {
+            $rules = json_decode(file_get_contents($rules), true);
+        }
+        foreach ($rules as $name => $rule) {
+            $this->addRule($name, $rule);
+        }
     }
 
     /**
