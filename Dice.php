@@ -250,7 +250,7 @@ class Dice
 
     /**
      * Returns a closure that generates arguments for $method based on $rule and any $args passed into the closure
-     * @param object $method An instance of ReflectionMethod (see: {@link http:// php.net/manual/en/class.reflectionmethod.php})
+     * @param \ReflectionMethod $method An instance of ReflectionMethod (see: {@link http:// php.net/manual/en/class.reflectionmethod.php})
      * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
      * @return callable A closure that uses the cached information to generate the arguments for the method
      */
