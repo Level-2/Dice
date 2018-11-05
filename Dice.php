@@ -177,12 +177,16 @@ class Dice
                 return $this->instances[$name];
             };
         }
-        
+
         // If there are shared instances, create them and merge them with shared instances higher up the object graph
-        if (isset($rule['shareInstances'])) $closure = function(array $args, array $share) use ($closure, $rule) {
-             foreach($rule['shareInstances'] as $instance) $share[] = $this->create($instance, [], $share);
-             return $closure($args, $share);
-        };
+        if (isset($rule['shareInstances'])) {
+            $closure = function (array $args, array $share) use ($closure, $rule) {
+                foreach ($rule['shareInstances'] as $instance) {
+                    $share[] = $this->create($instance, [], $share);
+                }
+                return $closure($args, $share);
+            };
+        }
         // When $rule['call'] is set, wrap the closure in another closure which will call the required methods after constructing the object
         // By putting this in a closure, the loop is never executed unless call is actually set
         return isset($rule['call']) ? function (array $args, array $share) use ($closure, $class, $rule) {
