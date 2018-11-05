@@ -19,7 +19,7 @@ class Dice
     const CONSTANT = 'Dice::CONSTANT';
     const GLOBAL = 'Dice::GLOBAL';
     const INSTANCE = 'Dice::INSTANCE';
-    
+
     /**
      * @var array $rules Rules which have been set using addRule()
      */
