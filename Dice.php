@@ -177,6 +177,7 @@ class Dice
                 return $this->instances[$name];
             };
         }
+        
         // If there are shared instances, create them and merge them with shared instances higher up the object graph
         if (isset($rule['shareInstances'])) $closure = function(array $args, array $share) use ($closure, $rule) {
              foreach($rule['shareInstances'] as $instance) $share[] = $this->create($instance, [], $share);
