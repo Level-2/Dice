@@ -228,13 +228,21 @@ class Dice
                 $args = isset($param['params']) ? $this->expand($param['params']) : [];
 
                 // Support Dice::INSTANCE by creating/fetching the specified instance
-                if (is_array($param[self::INSTANCE])) $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
-                if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
-                else return $this->create($param[self::INSTANCE], array_merge($args, $share));
+                if (is_array($param[self::INSTANCE])) {
+                    $param[self::INSTANCE][0] = $this->expand($param[self::INSTANCE][0], $share, true);
+                }
+                if (is_callable($param[self::INSTANCE])) {
+                    return call_user_func($param[self::INSTANCE], ...$args);
+                } else {
+                    return $this->create($param[self::INSTANCE], array_merge($args, $share));
+                }
+            } elseif (isset($param[self::GLOBAL])) {
+                return $GLOBALS[$param[self::GLOBAL]];
+            } elseif (isset($param[self::CONSTANT])) {
+                return constant($param[self::CONSTANT]);
+            } else {
+                foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
             }
-            else if (isset($param[self::GLOBAL])) return $GLOBALS[$param[self::GLOBAL]];
-            else if (isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
-            else foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
         }
 
         return is_string($param) && $createFromString ? $this->create($param) : $param;
