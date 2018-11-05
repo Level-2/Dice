@@ -281,6 +281,10 @@ class Dice
             $parameters = [];
 
             // Now find a value for each method parameter
+            /**
+             * @var \ReflectionClass $class
+             * @var \ReflectionParameter $param
+             */
             foreach ($paramInfo as list($class, $param, $sub)) {
                 // First loop through $args and see whether or not each value can match the current parameter based on type hint
                 if ($args) {
