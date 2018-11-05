@@ -5,122 +5,122 @@
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  * @version 3.0 */
 class SubstitutionsTest extends DiceTest {
-	public function testNoMoreAssign() {
-		$rule = [];
-		$rule['substitutions']['Bar77'] = [\Dice\Dice::INSTANCE => function() {
-			return Baz77::create();
-		}];
+    public function testNoMoreAssign() {
+        $rule = [];
+        $rule['substitutions']['Bar77'] = [\Dice\Dice::INSTANCE => function() {
+            return Baz77::create();
+        }];
 
-		$this->dice->addRule('Foo77', $rule);
+        $this->dice->addRule('Foo77', $rule);
 
-		$foo = $this->dice->create('Foo77');
+        $foo = $this->dice->create('Foo77');
 
-		$this->assertInstanceOf('Bar77', $foo->bar);
-		$this->assertEquals('Z', $foo->bar->a);
-	}
+        $this->assertInstanceOf('Bar77', $foo->bar);
+        $this->assertEquals('Z', $foo->bar->a);
+    }
 
-	public function testNullSubstitution() {
-		$rule = [];
-		$rule['substitutions']['B'] = null;
-		$this->dice->addRule('MethodWithDefaultNull', $rule);
-		$obj = $this->dice->create('MethodWithDefaultNull');
-		$this->assertNull($obj->b);
-	}
+    public function testNullSubstitution() {
+        $rule = [];
+        $rule['substitutions']['B'] = null;
+        $this->dice->addRule('MethodWithDefaultNull', $rule);
+        $obj = $this->dice->create('MethodWithDefaultNull');
+        $this->assertNull($obj->b);
+    }
 
-	public function testSubstitutionText() {
-		$rule = [];
-		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
-		$this->dice->addRule('A', $rule);
+    public function testSubstitutionText() {
+        $rule = [];
+        $rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
+        $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+        $a = $this->dice->create('A');
 
-		$this->assertInstanceOf('ExtendedB', $a->b);
-	}
+        $this->assertInstanceOf('ExtendedB', $a->b);
+    }
 
-	public function testSubstitutionTextMixedCase() {
-		$rule = [];
-		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'exTenDedb'];
-		$this->dice->addRule('A', $rule);
+    public function testSubstitutionTextMixedCase() {
+        $rule = [];
+        $rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'exTenDedb'];
+        $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+        $a = $this->dice->create('A');
 
-		$this->assertInstanceOf('ExtendedB', $a->b);
-	}
+        $this->assertInstanceOf('ExtendedB', $a->b);
+    }
 
-	public function testSubstitutionCallback() {
-		$rule = [];
-		$injection = $this->dice;
-		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => function() use ($injection) {
-			return $injection->create('ExtendedB');
-		}];
+    public function testSubstitutionCallback() {
+        $rule = [];
+        $injection = $this->dice;
+        $rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => function() use ($injection) {
+            return $injection->create('ExtendedB');
+        }];
 
-		$this->dice->addRule('A', $rule);
+        $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('A');
+        $a = $this->dice->create('A');
 
-		$this->assertInstanceOf('ExtendedB', $a->b);
-	}
-
-
-	public function testSubstitutionObject() {
-		$rule = [];
-
-		$rule['substitutions']['B'] = $this->dice->create('ExtendedB');
-
-		$this->dice->addRule('A', $rule);
-
-		$a = $this->dice->create('A');
-		$this->assertInstanceOf('ExtendedB', $a->b);
-	}
-
-	public function testSubstitutionString() {
-		$rule = [];
-
-		$rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
-
-		$this->dice->addRule('A', $rule);
-
-		$a = $this->dice->create('A');
-		$this->assertInstanceOf('ExtendedB', $a->b);
-	}
+        $this->assertInstanceOf('ExtendedB', $a->b);
+    }
 
 
-	public function testSubFromString() {
-		$rule = [
-			'substitutions' => ['Bar' => 'Baz']
-		];
-		$this->dice->addRule('*', $rule);
+    public function testSubstitutionObject() {
+        $rule = [];
 
-		$obj = $this->dice->create('Foo');
+        $rule['substitutions']['B'] = $this->dice->create('ExtendedB');
 
-		$this->assertInstanceOf('Baz', $obj->bar);
+        $this->dice->addRule('A', $rule);
 
-	}
+        $a = $this->dice->create('A');
+        $this->assertInstanceOf('ExtendedB', $a->b);
+    }
 
-	public function testSubstitutionWithFuncCall() {
-		$rule = [];
+    public function testSubstitutionString() {
+        $rule = [];
 
-		$rule['substitutions']['Bar'] = [\Dice\Dice::INSTANCE => ['Foo2', 'bar']];
+        $rule['substitutions']['B'] = [\Dice\Dice::INSTANCE => 'ExtendedB'];
 
-		$this->dice->addRule('Foo', $rule);
+        $this->dice->addRule('A', $rule);
 
-		$a = $this->dice->create('Foo');
-		$this->assertInstanceOf('Baz', $a->bar);
-	}
+        $a = $this->dice->create('A');
+        $this->assertInstanceOf('ExtendedB', $a->b);
+    }
+
+
+    public function testSubFromString() {
+        $rule = [
+            'substitutions' => ['Bar' => 'Baz']
+        ];
+        $this->dice->addRule('*', $rule);
+
+        $obj = $this->dice->create('Foo');
+
+        $this->assertInstanceOf('Baz', $obj->bar);
+
+    }
+
+    public function testSubstitutionWithFuncCall() {
+        $rule = [];
+
+        $rule['substitutions']['Bar'] = [\Dice\Dice::INSTANCE => ['Foo2', 'bar']];
+
+        $this->dice->addRule('Foo', $rule);
+
+        $a = $this->dice->create('Foo');
+        $this->assertInstanceOf('Baz', $a->bar);
+    }
 }
 
 
 class Foo {
-	public $bar;
-	public function __construct(Bar $bar) {
-		$this->bar = $bar;
-	}
+    public $bar;
+    public function __construct(Bar $bar) {
+        $this->bar = $bar;
+    }
 }
 
 class Foo2 {
-	public function bar() {
-		return new Baz;
-	}
+    public function bar() {
+        return new Baz;
+    }
 }
 
 interface Bar {

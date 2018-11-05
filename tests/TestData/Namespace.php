@@ -11,11 +11,11 @@ class A {
 }
 
 class B {
-	public $a;
+    public $a;
 
-	public function __construct(A $a) {
-		$this->a = $a;
-	}
+    public function __construct(A $a) {
+        $this->a = $a;
+    }
 }
 
 class ExtendedA extends A {
@@ -24,21 +24,21 @@ class ExtendedA extends A {
 
 
 class C {
-	public $a;
+    public $a;
 
-	public function __construct(\Bar\A $a) {
-		$this->a = $a;
-	}
+    public function __construct(\Bar\A $a) {
+        $this->a = $a;
+    }
 }
 
 }
 
 namespace Bar {
-	class A {
+    class A {
 
-	}
+    }
 
-	class B {
+    class B {
 
-	}
+    }
 }

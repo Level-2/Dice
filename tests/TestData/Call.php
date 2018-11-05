@@ -5,30 +5,30 @@
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  * @version 3.0 */
 class TestCall {
-	public $isCalled = false;
+    public $isCalled = false;
 
-	public function callMe() {
-		$this->isCalled = true;
-	}
+    public function callMe() {
+        $this->isCalled = true;
+    }
 }
 
 class TestCall2 {
-	public $foo;
-	public $bar;
+    public $foo;
+    public $bar;
 
-	public function callMe($foo, $bar) {
-		$this->foo = $foo;
-		$this->bar = $bar;
-	}
+    public function callMe($foo, $bar) {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
 }
 
 
 class TestCall3 {
-	public $a;
+    public $a;
 
-	public function callMe(A $a) {
-		$this->a = $a;
+    public function callMe(A $a) {
+        $this->a = $a;
 
-		return 'callMe called';
-	}
+        return 'callMe called';
+    }
 }

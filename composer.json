@@ -5,16 +5,16 @@
     "homepage": "http://r.je/dice.html",
     "keywords": ["Dependency injection", "ioc", "Dependency injection container", "DI"],
     "authors": [
-    	{
-    		"name": "Tom Butler",
-    		"email": "tom@r.je"
-    	}
+        {
+            "name": "Tom Butler",
+            "email": "tom@r.je"
+        }
     ],
     "require": {
         "php": ">=7.0.0"
     },
     "autoload": {
-    	"psr-4": {
+        "psr-4": {
             "Dice\\": "./"
         }
     },
