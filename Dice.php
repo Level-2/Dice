@@ -46,7 +46,7 @@ class Dice
         if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true)) {
             $rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
         }
-        //Allow substitutions rules to be defined with a leading a slash
+        // Allow substitutions rules to be defined with a leading a slash
         if (isset($rule['substitutions'])) {
             foreach ($rule['substitutions'] as $key => $value) {
                 $rule[ltrim($key, '\\')] = $value;
@@ -140,7 +140,7 @@ class Dice
 
         // Create parameter generating function in order to cache reflection on the parameters. This way $reflect->getParameters() only ever gets called once
         $params = $constructor ? $this->getParams($constructor, $rule) : null;
-        //PHP throws a fatal error rather than an exception when trying to instantiate an interface, detect it and throw an exception instead
+        // PHP throws a fatal error rather than an exception when trying to instantiate an interface, detect it and throw an exception instead
         if ($class->isInterface()) {
             $closure = function () {
                 throw new \InvalidArgumentException('Cannot instantiate interface');
@@ -160,18 +160,18 @@ class Dice
 
         if (!empty($rule['shared'])) {
             $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
-                //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
+                // Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
                 if ($class->isInternal()) {
                     $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
                 } else {
-                    //Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
+                    // Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
                     $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
                     // Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
                     if ($constructor) {
                         $constructor->invokeArgs($this->instances[$name], $params($args, $share));
                     }
                 }
-                
+
                 return $this->instances[$name];
             };
         }
