@@ -145,8 +145,9 @@ class Dice
             $closure = function () {
                 throw new \InvalidArgumentException('Cannot instantiate interface');
             };
-        // Get a closure based on the type of object being created: Shared, normal or constructorless
+        // Get a closure based on the type of object being created: Shared, normal or constructor-less
         } elseif ($params) $closure = function (array $args, array $share) use ($class, $params) {
+            // This class has dependencies, call the $params closure to generate them based on $args and $share
             return new $class->name(...$params($args, $share));
         };
         else $closure = function () use ($class) { // No constructor arguments, just instantiate the class
