@@ -283,12 +283,14 @@ class Dice
             // Now find a value for each method parameter
             foreach ($paramInfo as list($class, $param, $sub)) {
                 // First loop through $args and see whether or not each value can match the current parameter based on type hint
-                if ($args) foreach ($args as $i => $arg) { // This if statement actually gives a ~10% speed increase when $args isn't set
-                    if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
-                        // The argument matched, store it and remove it from $args so it won't wrongly match another parameter
-                        $parameters[] = array_splice($args, $i, 1)[0];
-                        // Move on to the next parameter
-                        continue 2;
+                if ($args) {
+                    foreach ($args as $i => $arg) { // This if statement actually gives a ~10% speed increase when $args isn't set
+                        if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
+                            // The argument matched, store it and remove it from $args so it won't wrongly match another parameter
+                            $parameters[] = array_splice($args, $i, 1)[0];
+                            // Move on to the next parameter
+                            continue 2;
+                        }
                     }
                 }
                 // When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
