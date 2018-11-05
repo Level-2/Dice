@@ -171,6 +171,7 @@ class Dice
                         $constructor->invokeArgs($this->instances[$name], $params($args, $share));
                     }
                 }
+                
                 return $this->instances[$name];
             };
         }
