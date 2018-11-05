@@ -79,7 +79,9 @@ class Dice
     public function getRule(string $name): array
     {
         $lcName = strtolower(ltrim($name, '\\'));
-        if (isset($this->rules[$lcName])) return $this->rules[$lcName];
+        if (isset($this->rules[$lcName])) {
+            return $this->rules[$lcName];
+        }
 
         foreach ($this->rules as $key => $rule) {
             // Find a rule which matches the class described in $name where:
