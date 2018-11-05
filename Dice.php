@@ -270,7 +270,13 @@ class Dice
         // Return a closure that uses the cached information to generate the arguments for the method
         return function (array $args, array $share = []) use ($paramInfo, $rule) {
             // Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
-            if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : [], $share);
+            if ($share || isset($rule['constructParams'])) {
+                $args = array_merge(
+                    $args,
+                    isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : [],
+                    $share
+                );
+            }
 
             $parameters = [];
 
