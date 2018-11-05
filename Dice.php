@@ -162,10 +162,12 @@ class Dice
             $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
                 // Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
                 if ($class->isInternal()) {
-                    $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
+                    $this->instances[$name] =
+                    $this->instances[ltrim($name, '\\')] = $closure($args, $share);
                 } else {
                     // Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
-                    $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
+                    $this->instances[$name] =
+                    $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
                     // Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
                     if ($constructor) {
                         $constructor->invokeArgs($this->instances[$name], $params($args, $share));
