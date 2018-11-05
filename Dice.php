@@ -98,6 +98,7 @@ class Dice
                 return $rule;
             }
         }
+
         // No rule has matched, return the default rule if it's set
         return isset($this->rules['*']) ? $this->rules['*'] : [];
     }
