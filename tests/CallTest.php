@@ -57,4 +57,23 @@ class CallTest extends DiceTest {
 		$this->assertInstanceOf('a', $object->a);
 		$this->assertEquals('callMe called', $returnValue);
 	}
+
+
+	public function testCallChain() {
+		$rules = [
+			'TestCallImmutable' => [
+				'call' => [
+					['call1', ['foo'], \Dice\Dice::CHAIN_CALL],
+					['call2', ['bar'], \Dice\Dice::CHAIN_CALL]
+				]
+			]
+		];
+
+		$this->dice->addRules($rules);
+
+		$object = $this->dice->create('TestCallImmutable');
+
+		$this->assertEquals('foo', $object->a);
+		$this->assertEquals('bar', $object->b);
+	}
 }

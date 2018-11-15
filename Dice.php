@@ -9,6 +9,7 @@ class Dice {
 	const CONSTANT = 'Dice::CONSTANT';
 	const GLOBAL = 'Dice::GLOBAL';
 	const INSTANCE = 'Dice::INSTANCE';
+	const CHAIN_CALL = 'Dice::CHAIN_CALL';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -140,7 +141,10 @@ class Dice {
 				// Generate the method arguments using getParams() and call the returned closure
 				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])(($this->expand(isset($call[1]) ? $call[1] : [])));
 				$return = $object->{$call[0]}(...$params);
-				if (isset($call[2]) && is_callable($call[2])) call_user_func($call[2], $return);
+				if (isset($call[2])) {
+					if ($call[2] === self::CHAIN_CALL) $object = $return;
+					else if (is_callable($call[2])) call_user_func($call[2], $return);
+				}
 			}
 			return $object;
 		} : $closure;
