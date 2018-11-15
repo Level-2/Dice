@@ -74,7 +74,7 @@ class Dice {
 	 * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied
 	 * @param string name The name of the class to instantiate
 	 * @param array $args An array with any additional arguments to be passed into the constructor upon instantiation
-	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
+	 * @param array $share a list of defined in shareInstances for objects higher up the object graph, should only be used internally
 	 * @return object A fully constructed object based on the specified input arguments
 	 */
 	public function create(string $name, array $args = [], array $share = []) {
