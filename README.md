@@ -77,9 +77,78 @@ Originally developed by Tom Butler (@TomBZombie), with many thanks to daniel-mei
 Updates
 ------------
 
-06/03/2018
+### 15/11/2018 4.0 Release - Backwards incompatible
 
-### 3.0 Release - Backwards incompatible
+Dice is now immutable and has better support for other immutable objects.
+
+**New Features**
+
+#### 1. Dice is Immutable
+
+This avoids [issues surrounding mutability](https://www.yegor256.com/2014/06/09/objects-should-be-immutable.html) where a Dice instance is passed around the application and reconfigured. The only difference is that `addRules` and `addRule` return a new Dice instance with the updated rules rather than changing the state of the existing instance.
+
+```php
+
+// Pre-4.0 code:
+$dice->addRule('PDO', ['shared' => true]);
+
+$db = $dice->create('PDO');
+
+// 4.0 code:
+$dice = $dice->addRule('PDO', ['shared' => true]);
+
+$db = $dice->create('PDO');
+```
+
+From a practical perspective in most cases just put `$dice = ` in front of any `$dice->addRule()` call and it will work as before.
+
+#### 2. Support for Object Method Chaining
+
+One feature some immutable objects have is they offer object chaining.
+
+Consider the following Object:
+
+```php
+
+$httpRequest = new HTTPRequest();
+$httpRequest = $httpRequest->url('http://example.org')->method('POST')->postdata('foo=bar');
+```
+
+It was not possible for Dice to consturuct the configured object in previous versions. As of 4.0 Dice supports chaining method call using the `call` rule and the `Dice::CHAIN_CALL` constant:
+
+```php
+$dice = $dice->addRule('HTTPRequest',
+                ['call' => [
+                    ['url', ['http://example.org'], Dice::CHAIN_CALL],
+                    ['method', ['POST'], Dice::CHAIN_CALL ],
+                    ['postdata', ['foo=bar'], Dice::CHAIN_CALL]
+                 ]
+                ]
+);
+```
+
+Dice will replace the HTTPRequest object with the result of the chained call. This is also useful for factories:
+
+
+```php
+$dice = $dice->addRule('MyDatabase',
+                [
+                	'instanceOf' => 'DatabaseFactory',
+                	'call' => [
+                		['get', ['Database'], Dice::CHAIN_CALL]
+                 ]
+                ]
+);
+
+$database = $dice->create('MyDatabase');
+//Equivalent of:
+
+$factory = new DatabaseFactory();
+$database = $factory->get('Database');
+```
+
+
+### 06/03/2018 3.0 Release - Backwards incompatible
 
 **New Features**
 
@@ -135,7 +204,7 @@ _rules.json_
 		]
 	}
 }
-
+```
 
 ```php
 $dice->addRules(json_decode(file_get_contents('rules.json')));
