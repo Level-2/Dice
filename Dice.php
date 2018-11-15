@@ -29,6 +29,7 @@ class Dice {
 	 * @param string $name The name of the class to add the rule for
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
+
 	public function addRule(string $name, array $rule): self {
 		//Clear any existing instance or cache for this class
 		unset($this->instances[$name], $this->cache[$name]);
@@ -37,7 +38,7 @@ class Dice {
 			$rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
 		}
 		//Allow substitutions rules to be defined with a leading a slash
-		if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule[ltrim($key,  '\\')] = $value;
+		if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule['substitutions'][ltrim($key,  '\\')] = $value;
 
 		$dice = clone $this;
 		$dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
@@ -51,8 +52,9 @@ class Dice {
 	*/
 	public function addRules($rules): self {
 		if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
+		$dice = $this;
 		foreach ($rules as $name => $rule) $dice = $this->addRule($name, $rule);
-		return $dice ?? $this;
+		return $dice;
 	}
 
 	/**
@@ -79,7 +81,7 @@ class Dice {
 	 * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied
 	 * @param string name The name of the class to instantiate
 	 * @param array $args An array with any additional arguments to be passed into the constructor upon instantiation
-	 * @param array $share Whether or not this class instance be shared, so that the same instance is passed around each time
+	 * @param array $share a list of defined in shareInstances for objects higher up the object graph, should only be used internally
 	 * @return object A fully constructed object based on the specified input arguments
 	 */
 	public function create(string $name, array $args = [], array $share = []) {
@@ -111,25 +113,29 @@ class Dice {
 			throw new \InvalidArgumentException('Cannot instantiate interface');
 		};
 		// Get a closure based on the type of object being created: Shared, normal or constructorless
-		else if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params) {
-			// Shared instance: create the class without calling the constructor (and write to \$name and $name, see issue #68)
-			$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
-
-			// Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
-			if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
-			return $this->instances[$name];
-		};
 		else if ($params) $closure = function (array $args, array $share) use ($class, $params) {
 			// This class has depenencies, call the $params closure to generate them based on $args and $share
 			return new $class->name(...$params($args, $share));
 		};
-		else $closure = function () use ($class) {
-			// No constructor arguments, just instantiate the class
+		else $closure = function () use ($class) { // No constructor arguments, just instantiate the class
 			return new $class->name;
+		};
+
+		if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
+			//Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
+			if ($class->isInternal()) $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
+			else {
+				//Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
+				$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
+				// Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
+				if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
+			}
+			return $this->instances[$name];
 		};
 		// If there are shared instances, create them and merge them with shared instances higher up the object graph
 		if (isset($rule['shareInstances'])) $closure = function(array $args, array $share) use ($closure, $rule) {
-			return $closure($args, array_merge($args, $share, array_map([$this, 'create'], $rule['shareInstances'])));
+			 foreach($rule['shareInstances'] as $instance) $share[] = $this->create($instance, [], $share);
+             return $closure($args, $share);
 		};
 		// When $rule['call'] is set, wrap the closure in another closure which will call the required methods after constructing the object
 		// By putting this in a closure, the loop is never executed unless call is actually set
@@ -216,13 +222,11 @@ class Dice {
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
 				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
-				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this a
-				// is hacky AF workaround: call_user_func('is_' . $type, '')
-				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->getName(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
+				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
+				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
 				// There's no type hint and nothing left in $args, provide the default value or null
 				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 			}
-			// variadic functions will only have one argument. To account for those, append any remaining arguments to the list
 			return $parameters;
 		};
 	}

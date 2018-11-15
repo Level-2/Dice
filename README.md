@@ -57,7 +57,7 @@ For complete documentation please see the [Dice PHP Dependency Injection contain
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP5.4 and up, there are archived versions of Dice which supports PHP5.3 however this is no longer maintanied.
+Dice is compatible with PHP 7.0 and up, there are archived versions of Dice which support PHP 5.6 however this is no longer maintanied.
 
 
 Performance
@@ -96,7 +96,7 @@ $dice->addRules([
 ]);
 ```
 
-The puropse of this addition is to make the JSON loader redundant. Loading of rules from a JSON file can easily be achieved with the code:
+The purpose of this addition is to make the JSON loader redundant. Loading of rules from a JSON file can easily be achieved with the code:
 
 ```php
 $dice->addRules(json_decode(file_get_contents('rules.json')));
