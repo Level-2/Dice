@@ -9,9 +9,9 @@ class ConstructParamsTest extends DiceTest {
 	public function testConstructParams() {
 		$rule = [];
 		$rule['constructParams'] = array('foo', 'bar');
-		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+		$dice = $this->dice->addRule('RequiresConstructorArgsA', $rule);
 
-		$obj = $this->dice->create('RequiresConstructorArgsA');
+		$obj = $dice->create('RequiresConstructorArgsA');
 
 		$this->assertEquals($obj->foo, 'foo');
 		$this->assertEquals($obj->bar, 'bar');
@@ -22,9 +22,9 @@ class ConstructParamsTest extends DiceTest {
 		$rule = [];
 		$rule['constructParams'][] = '.';
 
-		$this->dice->addRule('DirectoryIterator', $rule);
+		$dice = $this->dice->addRule('DirectoryIterator', $rule);
 
-		$dir = $this->dice->create('DirectoryIterator');
+		$dir = $dice->create('DirectoryIterator');
 
 		$this->assertInstanceOf('DirectoryIterator', $dir);
 	}
@@ -33,9 +33,9 @@ class ConstructParamsTest extends DiceTest {
 		$rule = [];
 		$rule['constructParams'][] = '.';
 
-		$this->dice->addRule('MyDirectoryIterator', $rule);
+		$dice = $this->dice->addRule('MyDirectoryIterator', $rule);
 
-		$dir = $this->dice->create('MyDirectoryIterator');
+		$dir = $dice->create('MyDirectoryIterator');
 
 		$this->assertInstanceOf('MyDirectoryIterator', $dir);
 	}
@@ -45,9 +45,9 @@ class ConstructParamsTest extends DiceTest {
 		$rule = [];
 		$rule['constructParams'][] = '.';
 
-		$this->dice->addRule('MyDirectoryIterator2', $rule);
+		$dice = $this->dice->addRule('MyDirectoryIterator2', $rule);
 
-		$dir = $this->dice->create('MyDirectoryIterator2');
+		$dir = $dice->create('MyDirectoryIterator2');
 
 		$this->assertInstanceOf('MyDirectoryIterator2', $dir);
 	}
@@ -55,21 +55,21 @@ class ConstructParamsTest extends DiceTest {
 	public function testDefaultNullAssigned() {
 		$rule = [];
 		$rule['constructParams'] = [ [\Dice\Dice::INSTANCE => 'A'], null];
-		$this->dice->addRule('MethodWithDefaultNull', $rule);
-		$obj = $this->dice->create('MethodWithDefaultNull');
+		$dice = $this->dice->addRule('MethodWithDefaultNull', $rule);
+		$obj = $dice->create('MethodWithDefaultNull');
 		$this->assertNull($obj->b);
 	}
 
 	public function testConstructParamsNested() {
 		$rule = [];
 		$rule['constructParams'] = array('foo', 'bar');
-		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+		$dice = $this->dice->addRule('RequiresConstructorArgsA', $rule);
 
 		$rule = [];
 		$rule['shareInstances'] = array('D');
-		$this->dice->addRule('ParamRequiresArgs', $rule);
+		$dice = $dice->addRule('ParamRequiresArgs', $rule);
 
-		$obj = $this->dice->create('ParamRequiresArgs');
+		$obj = $dice->create('ParamRequiresArgs');
 
 		$this->assertEquals($obj->a->foo, 'foo');
 		$this->assertEquals($obj->a->bar, 'bar');
@@ -79,9 +79,9 @@ class ConstructParamsTest extends DiceTest {
 	public function testConstructParamsMixed() {
 		$rule = [];
 		$rule['constructParams'] = array('foo', 'bar');
-		$this->dice->addRule('RequiresConstructorArgsB', $rule);
+		$dice = $this->dice->addRule('RequiresConstructorArgsB', $rule);
 
-		$obj = $this->dice->create('RequiresConstructorArgsB');
+		$obj = $dice->create('RequiresConstructorArgsB');
 
 		$this->assertEquals($obj->foo, 'foo');
 		$this->assertEquals($obj->bar, 'bar');
@@ -93,9 +93,9 @@ class ConstructParamsTest extends DiceTest {
 		$rule = [];
 		$rule['constructParams'] = ['.'];
 
-		$this->dice->addRule('MyDirectoryIteratorWithTrait', $rule);
+		$dice = $this->dice->addRule('MyDirectoryIteratorWithTrait', $rule);
 
-		$dir = $this->dice->create('MyDirectoryIteratorWithTrait');
+		$dir = $dice->create('MyDirectoryIteratorWithTrait');
 
 		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
 	}
@@ -103,13 +103,13 @@ class ConstructParamsTest extends DiceTest {
 	public function testConstructParamsPrecedence() {
 		$rule = [];
 		$rule['constructParams'] = ['A', 'B'];
-		$this->dice->addRule('RequiresConstructorArgsA', $rule);
+		$dice = $this->dice->addRule('RequiresConstructorArgsA', $rule);
 
-		$a1 = $this->dice->create('RequiresConstructorArgsA');
+		$a1 = $dice->create('RequiresConstructorArgsA');
 		$this->assertEquals('A', $a1->foo);
 		$this->assertEquals('B', $a1->bar);
 
-		$a2 = $this->dice->create('RequiresConstructorArgsA', ['C', 'D']);
+		$a2 = $dice->create('RequiresConstructorArgsA', ['C', 'D']);
 		$this->assertEquals('C', $a2->foo);
 		$this->assertEquals('D', $a2->bar);
 	}
@@ -117,18 +117,18 @@ class ConstructParamsTest extends DiceTest {
 	public function testNullScalar() {
 		$rule = [];
 		$rule['constructParams'] = [null];
-		$this->dice->addRule('NullScalar', $rule);
+		$dice = $this->dice->addRule('NullScalar', $rule);
 
-		$obj = $this->dice->create('NullScalar');
+		$obj = $dice->create('NullScalar');
 		$this->assertEquals(null, $obj->string);
 	}
 
 	public function testNullScalarNested() {
 		$rule = [];
 		$rule['constructParams'] = [null];
-		$this->dice->addRule('NullScalar', $rule);
+		$dice = $this->dice->addRule('NullScalar', $rule);
 
-		$obj = $this->dice->create('NullScalarNested');
+		$obj = $dice->create('NullScalarNested');
 		$this->assertEquals(null, $obj->nullScalar->string);
 	}
 

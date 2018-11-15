@@ -33,9 +33,9 @@ class BasicTest extends DiceTest {
 	public function testSetDefaultRule() {
 		$defaultBehaviour = [];
 		$defaultBehaviour['shared'] = true;
-		$this->dice->addRule('*', $defaultBehaviour);
+		$dice = $this->dice->addRule('*', $defaultBehaviour);
 
-		$rule = $this->dice->getRule('*');
+		$rule = $dice->getRule('*');
 		foreach ($defaultBehaviour as $name => $value) {
 			$this->assertEquals($rule[$name], $defaultBehaviour[$name]);
 		}
@@ -46,14 +46,14 @@ class BasicTest extends DiceTest {
 		$defaultBehaviour = [];
 		$defaultBehaviour['shared'] = true;
 
-		$this->dice->addRule('*', $defaultBehaviour);
+		$dice = $this->dice->addRule('*', $defaultBehaviour);
 
-		$rule = $this->dice->getRule('A');
+		$rule = $dice->getRule('A');
 
 		$this->assertTrue($rule['shared']);
 
-		$a1 = $this->dice->create('A');
-		$a2 = $this->dice->create('A');
+		$a1 = $dice->create('A');
+		$a2 = $dice->create('A');
 
 		$this->assertSame($a1, $a2);
 	}
@@ -78,10 +78,10 @@ class BasicTest extends DiceTest {
 		$rule['shared'] = true;
 		$rule['instanceOf'] = 'A';
 
-		$this->dice->addRule('[A]', $rule);
+		$dice = $this->dice->addRule('[A]', $rule);
 
-		$a1 = $this->dice->create('[A]');
-		$a2 = $this->dice->create('[A]');
+		$a1 = $dice->create('[A]');
+		$a2 = $dice->create('[A]');
 		$this->assertSame($a1, $a2);
 	}
 
@@ -89,12 +89,12 @@ class BasicTest extends DiceTest {
 		$shared = [];
 		$shared['shared'] = true;
 
-		$this->dice->addRule('MyObj', $shared);
+		$dice = $this->dice->addRule('MyObj', $shared);
 
-		$obj = $this->dice->create('MyObj');
+		$obj = $dice->create('MyObj');
 		$this->assertInstanceOf('MyObj', $obj);
 
-		$obj2 = $this->dice->create('MyObj');
+		$obj2 = $dice->create('MyObj');
 		$this->assertInstanceOf('MyObj', $obj2);
 
 		$this->assertSame($obj, $obj2);
@@ -112,10 +112,10 @@ class BasicTest extends DiceTest {
 		$rule = [];
 
 		$rule['shared'] = true;
-		$this->dice->addRule('interfaceTest', $rule);
+		$dice =  $this->dice->addRule('interfaceTest', $rule);
 
-		$one = $this->dice->create('InterfaceTestClass');
-		$two = $this->dice->create('InterfaceTestClass');
+		$one = $dice->create('InterfaceTestClass');
+		$two = $dice->create('InterfaceTestClass');
 
 		$this->assertSame($one, $two);
 	}
@@ -124,9 +124,9 @@ class BasicTest extends DiceTest {
 		$rule = [];
 		$rule['shared'] = true;
 
-		$this->dice->addRule('CyclicB', $rule);
+		$dice =  $this->dice->addRule('CyclicB', $rule);
 
-		$a = $this->dice->create('CyclicA');
+		$a = $dice->create('CyclicA');
 
 		$this->assertInstanceOf('CyclicB', $a->b);
 		$this->assertInstanceOf('CyclicA', $a->b->a);
@@ -137,21 +137,21 @@ class BasicTest extends DiceTest {
 	public function testInherit() {
 		$rule = ['shared' => true, 'inherit' => false];
 
-		$this->dice->addRule('ParentClass', $rule);
-		$obj1 = $this->dice->create('Child');
-		$obj2 = $this->dice->create('Child');
+		$dice = $this->dice->addRule('ParentClass', $rule);
+		$obj1 = $dice->create('Child');
+		$obj2 = $dice->create('Child');
 		$this->assertNotSame($obj1, $obj2);
 	}
 
 	public function testSharedOverride() {
 
 		//Set everything to shared by default
-		$this->dice->addRule('*', ['shared' => true]);
+		$dice = $this->dice->addRule('*', ['shared' => true]);
 
-		$this->dice->addRule('A', ['shared' => false]);
+		$dice =  $dice->addRule('A', ['shared' => false]);
 
-		$a1 = $this->dice->create('A');
-		$a2 = $this->dice->create('A');
+		$a1 = $dice->create('A');
+		$a2 = $dice->create('A');
 
 		$this->assertNotSame($a1, $a2);
 
@@ -167,9 +167,9 @@ class BasicTest extends DiceTest {
 
 	public function testScalarTypeHintWithShareInstances() {
 
-		$this->dice->addRule('ScalarTypeHint', ['shareInstances' => ['A']]);
+		$dice = $this->dice->addRule('ScalarTypeHint', ['shareInstances' => ['A']]);
 
-		$obj = $this->dice->create('ScalarTypeHint');
+		$obj = $dice->create('ScalarTypeHint');
 
 		$this->assertInstanceOf('ScalarTypeHint', $obj);
 	}
@@ -178,28 +178,36 @@ class BasicTest extends DiceTest {
 		//write to the global $_GET variable
 		$_GET['foo'] = 'bar';
 
-		$this->dice->addRule('CheckConstructorArgs',
+		$dice = $this->dice->addRule('CheckConstructorArgs',
 			[
 				'constructParams' => [
 					[\Dice\Dice::GLOBAL => '_GET']
 				]
 		]);
 
-		$obj = $this->dice->create('CheckConstructorArgs');
+		$obj = $dice->create('CheckConstructorArgs');
 
 		$this->assertEquals($_GET, $obj->arg1);
 	}
 
 	public function testPassConstantString() {
-		$this->dice->addRule('CheckConstructorArgs',
+		$dice = $this->dice->addRule('CheckConstructorArgs',
 			[
 				'constructParams' => [
 					[\Dice\Dice::CONSTANT => '\PDO::FETCH_ASSOC']
 				]
 		]);
 
-		$obj = $this->dice->create('CheckConstructorArgs');
+		$obj = $dice->create('CheckConstructorArgs');
 
 		$this->assertEquals(\PDO::FETCH_ASSOC, $obj->arg1);
+	}
+
+	public function testImmutability() {
+		$this->assertEquals([], $this->dice->getRule('Foo'));
+
+		$dice = $this->dice->addRule('Foo', ['shared' => true]);
+
+		$this->assertEquals([], $this->dice->getRule('Foo'));
 	}
 }

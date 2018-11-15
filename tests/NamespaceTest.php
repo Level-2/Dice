@@ -19,30 +19,30 @@ class NamespaceTest extends DiceTest {
 	public function testNamespaceWithSlashrule() {
 		$rule = [];
 		$rule['substitutions']['Foo\\A'] = [\Dice\Dice::INSTANCE => 'Foo\\ExtendedA'];
-		$this->dice->addRule('\\Foo\\B', $rule);
+		$dice = $this->dice->addRule('\\Foo\\B', $rule);
 
-		$b = $this->dice->create('\\Foo\\B');
+		$b = $dice->create('\\Foo\\B');
 		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
 	}
 
 	public function testNamespaceWithSlashruleInstance() {
 		$rule = [];
 		$rule['substitutions']['Foo\\A'] = [\Dice\Dice::INSTANCE => 'Foo\\ExtendedA'];
-		$this->dice->addRule('\\Foo\\B', $rule);
+		$dice = $this->dice->addRule('\\Foo\\B', $rule);
 
-		$b = $this->dice->create('\\Foo\\B');
+		$b = $dice->create('\\Foo\\B');
 		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
 	}
 
 	public function testNamespaceTypeHint() {
 		$rule = [];
 		$rule['shared'] = true;
-		$this->dice->addRule('Bar\\A', $rule);
+		$dice = $this->dice->addRule('Bar\\A', $rule);
 
-		$c = $this->dice->create('Foo\\C');
+		$c = $dice->create('Foo\\C');
 		$this->assertInstanceOf('Bar\\A', $c->a);
 
-		$c2 = $this->dice->create('Foo\\C');
+		$c2 = $dice->create('Foo\\C');
 		$this->assertNotSame($c, $c2);
 
 		//Check the rule has been correctly recognised for type hinted classes in a different namespace
@@ -59,9 +59,9 @@ class NamespaceTest extends DiceTest {
 	public function testNamespaceRuleSubstitution() {
 		$rule = [];
 		$rule['substitutions']['Foo\\A'] = [\Dice\Dice::INSTANCE => 'Foo\\ExtendedA'];
-		$this->dice->addRule('Foo\\B', $rule);
+		$dice = $this->dice->addRule('Foo\\B', $rule);
 
-		$b = $this->dice->create('Foo\\B');
+		$b = $dice->create('Foo\\B');
 		$this->assertInstanceOf('Foo\\ExtendedA', $b->a);
 	}
 
