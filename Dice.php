@@ -53,7 +53,7 @@ class Dice {
 	public function addRules($rules): self {
 		if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
 		$dice = $this;
-		foreach ($rules as $name => $rule) $dice = $this->addRule($name, $rule);
+		foreach ($rules as $name => $rule) $dice = $dice->addRule($name, $rule);
 		return $dice;
 	}
 
