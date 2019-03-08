@@ -14,7 +14,6 @@ class RuleValidator {
 		$this->checkNumericArray($rule, 'constructParams');
 		$this->checkNumericArray($rule, 'shareInstances');
 		$this->checkNumericArray($rule, 'call');
-		$this->checkAssocArray($rule, 'call');
 		$this->dice->addRule($name, $rule);
 	}
 
@@ -46,6 +45,7 @@ class RuleValidator {
 		if (!isset($rule[$key])) return;
 
 		if (count(array_filter(array_keys($rule[$key]), 'is_string')) === 0) throw new \InvalidArgumentException('Rule option ' . $key . ' must be a an associative array');
-		
+
 	}
+
 }

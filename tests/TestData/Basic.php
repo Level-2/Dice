@@ -1,12 +1,16 @@
 <?php
-
+/* @description Dice - A minimal Dependency Injection Container for PHP *
+ * @author Tom Butler tom@r.je *
+ * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
+ * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
+ * @version 3.0 */
 class NoConstructor {
 	public $a = 'b';
 }
 
 class CyclicA {
 	public $b;
-	
+
 	public function __construct(CyclicB $b) {
 		$this->b = $b;
 	}
@@ -14,7 +18,7 @@ class CyclicA {
 
 class CyclicB {
 	public $a;
-	
+
 	public function __construct(CyclicA $a) {
 		$this->a = $a;
 	}
@@ -91,7 +95,7 @@ class MyObj {
 class MethodWithDefaultValue {
 	public $a;
 	public $foo;
-	
+
 	public function __construct(A $a, $foo = 'bar') {
 		$this->a = $a;
 		$this->foo = $foo;
@@ -114,7 +118,31 @@ class InterfaceTestClass implements interfaceTest {
 
 }
 
+
 class ParentClass {
 }
 class Child extends ParentClass {
+}
+
+class OptionalInterface {
+	public $obj;
+
+	public function __construct(InterfaceTest $obj = null) {
+		$this->obj = $obj;
+	}
+}
+
+
+class ScalarTypeHint {
+	public function __construct(string $a = null) {
+
+	}
+}
+
+class CheckConstructorArgs {
+	public $arg1;
+
+	public function __construct($arg1) {
+		$this->arg1 = $arg1;
+	}
 }
