@@ -206,30 +206,30 @@ class Dice {
 			$parameters = [];
 
 			// Now find a value for each method parameter
-			foreach ($paramInfo as list($class, $param, $sub)) {
-				// First loop through $args and see whether or not each value can match the current parameter based on type hint
-				if ($args) foreach ($args as $i => $arg) { // This if statement actually gives a ~10% speed increase when $args isn't set
-					if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
-						// The argument matched, store it and remove it from $args so it won't wrongly match another parameter
-						$parameters[] = array_splice($args, $i, 1)[0];
-						// Move on to the next parameter
-						continue 2;
-					}
-				}
-				// When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
-				if ($class)	try {
-					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
-				}
-				catch (\InvalidArgumentException $e) {
-				}
-				// For variadic parameters, provide remaining $args
-				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
-				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
-				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
-				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
-				// There's no type hint and nothing left in $args, provide the default value or null
-				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
-			}
+            foreach ($paramInfo as list($class, $param, $sub)) {
+                // First loop through $args and see whether or not each value can match the current parameter based on type hint
+                if ($args) foreach ($args as $i => $arg) { // This if statement actually gives a ~10% speed increase when $args isn't set
+                    // For variadic parameters, provide remaining $args
+                    if ($param->isVariadic()) { $parameters = array_merge($parameters, $args); continue 2; }
+                    if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
+                        // The argument matched, store it and remove it from $args so it won't wrongly match another parameter
+                        $parameters[] = array_splice($args, $i, 1)[0];
+                        // Move on to the next parameter
+                        continue 2;
+                    }
+                }
+                // When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
+                if ($class)	try {
+                    $parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
+                }
+                catch (\InvalidArgumentException $e) {
+                }
+                // There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
+                // Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
+                else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
+                // There's no type hint and nothing left in $args, provide the default value or null
+                else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+            }
 			return $parameters;
 		};
 	}
