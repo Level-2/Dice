@@ -31,17 +31,10 @@ class Dice {
 	 * @param array $rule The container can be fully configured using rules provided by associative arrays. See {@link https://r.je/dice.html#example3} for a description of the rules.
 	 */
 	public function addRule(string $name, array $rule): self {
-		if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
-			$rule = array_replace_recursive($this->getRule($rule['instanceOf']), $rule);
-		}
-		//Allow substitutions rules to be defined with a leading a slash
-		if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule['substitutions'][ltrim($key,  '\\')] = $value;
 
 		$dice = clone $this;
-        //Clear any existing instance or cache for this class
-        unset($dice->instances[$name], $dice->cache[$name]);
 
-        $dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
+		self::addRuleTo($dice, $name, $rule);
 
 		return $dice;
 	 }
@@ -53,9 +46,22 @@ class Dice {
 	public function addRules($rules): self {
 		if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
 		$dice = $this;
-		foreach ($rules as $name => $rule) $dice = $dice->addRule($name, $rule);
+		foreach ($rules as $name => $rule) self::addRuleTo($dice,$name, $rule);
 		return $dice;
 	}
+
+	protected static function addRuleTo(Dice $dice, string $name, array $rule) {
+        if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
+            $rule = array_replace_recursive($dice->getRule($rule['instanceOf']), $rule);
+        }
+        //Allow substitutions rules to be defined with a leading a slash
+        if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule['substitutions'][ltrim($key,  '\\')] = $value;
+
+        //Clear any existing instance or cache for this class
+        unset($dice->instances[$name], $dice->cache[$name]);
+
+        $dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
+    }
 
 	/**
 	 * Returns the rule that will be applied to the class $name when calling create()
