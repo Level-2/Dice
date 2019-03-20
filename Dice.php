@@ -45,12 +45,12 @@ class Dice {
 	*/
 	public function addRules($rules): self {
 		if (is_string($rules)) $rules = json_decode(file_get_contents($rules), true);
-		$dice = $this;
+		$dice = clone $this;
 		foreach ($rules as $name => $rule) self::addRuleTo($dice,$name, $rule);
 		return $dice;
 	}
 
-	protected static function addRuleTo(Dice $dice, string $name, array $rule) {
+	private function addRuleTo(Dice $dice, string $name, array $rule) {
         if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true )) {
             $rule = array_replace_recursive($dice->getRule($rule['instanceOf']), $rule);
         }
