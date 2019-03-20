@@ -1,5 +1,7 @@
 <?php
 
+use Dice\Dice;
+
 class TagTest extends DiceTest {
 
     public function testNonexistentTag() {
@@ -39,6 +41,26 @@ class TagTest extends DiceTest {
 		$this->assertCount(2, $objects );
 		$this->assertInstanceOf(A::class, $objects[0]);
 		$this->assertInstanceOf(B::class, $objects[1]);
+	}
+
+	public function testTagParameter(){
+		$dice = $this->dice->addRules(
+			[
+				TestDispatcher::class => [
+					'constructParams' => [
+						Dice::TAG => 'Test Listeners'
+					]
+				],
+				EventListenerA::class => [ 'tag' => 'Test Listeners' ],
+				EventListenerB::class => [ 'tag' => 'Test Listeners' ]
+			]
+		);
+
+		$testListener = $dice->create(TestDispatcher::class);
+
+		$this->assertCount(2, $testListener->listeners);
+		$this->assertInstanceOf(EventListenerA::class, $testListener->listeners[0]);
+		$this->assertInstanceOf(EventListenerB::class, $testListener->listeners[1]);
 	}
 
 
