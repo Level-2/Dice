@@ -16,6 +16,11 @@ class Dice {
 	private $rules = [];
 
 	/**
+	 * @var array $tags Tagged classes
+	 */
+	private $tags = [];
+
+	/**
 	 * @var array $cache A cache of closures based on class name so each class is only reflected once
 	 */
 	private $cache = [];
@@ -48,6 +53,13 @@ class Dice {
 	}
 
 	private function addRuleTo(Dice $dice, string $name, array $rule) {
+		if ($name !== '*' && isset($rule['tag'])) {
+			// Add a class only once under a tag
+			if ( !array_key_exists($rule['tag'], $dice->tags) ||
+			     !in_array($name, $dice->tags[$rule['tag']], true)) {
+				$dice->tags[$rule['tag']][] = $name;
+			}
+		}
         if (isset($rule['instanceOf']) && (!array_key_exists('inherit', $rule) || $rule['inherit'] === true ))
             $rule = array_replace_recursive($dice->getRule($rule['instanceOf']), $rule);
         //Allow substitutions rules to be defined with a leading a slash
@@ -77,6 +89,18 @@ class Dice {
 		return isset($this->rules['*']) ? $this->rules['*'] : [];
 	}
 
+	/**
+	 * Returns a collection of fully constructed objects tagged with $tag
+	 *
+	 * @param string $tag
+	 *
+	 * @return \Generator
+	 */
+	public function getAll(string $tag): \Generator{
+		foreach ($this->tags[$tag] ?? [] as $name) {
+			yield $this->create($name);
+		}
+	}
 	/**
 	 * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied
 	 * @param string name The name of the class to instantiate
