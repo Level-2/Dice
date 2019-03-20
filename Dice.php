@@ -10,6 +10,8 @@ class Dice {
 	const GLOBAL = 'Dice::GLOBAL';
 	const INSTANCE = 'Dice::INSTANCE';
 	const CHAIN_CALL = 'Dice::CHAIN_CALL';
+	const TAG = 'Dice::TAG';
+
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -200,6 +202,7 @@ class Dice {
 				if (is_callable($param[self::INSTANCE])) return call_user_func($param[self::INSTANCE], ...$args);
 				else return $this->create($param[self::INSTANCE], array_merge($args, $share));
 			}
+			else if (isset($param[self::TAG])) return [iterator_to_array($this->getAll($param[self::TAG]))];
 			else if (isset($param[self::GLOBAL])) return $GLOBALS[$param[self::GLOBAL]];
 			else if (isset($param[self::CONSTANT])) return constant($param[self::CONSTANT]);
 			else foreach ($param as $name => $value) $param[$name] = $this->expand($value, $share);
