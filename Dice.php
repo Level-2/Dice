@@ -209,6 +209,8 @@ class Dice {
 			foreach ($paramInfo as list($class, $param, $sub)) {
 				// First loop through $args and see whether or not each value can match the current parameter based on type hint
 				if ($args) foreach ($args as $i => $arg) { // This if statement actually gives a ~10% speed increase when $args isn't set
+                    // For variadic parameters, provide remaining $args
+                    if ($param->isVariadic()) { $parameters = array_merge($parameters, $args); continue 2; }
 					if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
 						// The argument matched, store it and remove it from $args so it won't wrongly match another parameter
 						$parameters[] = array_splice($args, $i, 1)[0];
@@ -222,8 +224,6 @@ class Dice {
 				}
 				catch (\InvalidArgumentException $e) {
 				}
-				// For variadic parameters, provide remaining $args
-				else if ($param->isVariadic()) $parameters = array_merge($parameters, $args);
 				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
 				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
 				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
