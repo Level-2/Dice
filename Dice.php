@@ -139,7 +139,7 @@ class Dice {
 		};
 		// When $rule['call'] is set, wrap the closure in another closure which will call the required methods after constructing the object
 		// By putting this in a closure, the loop is never executed unless call is actually set
-		return isset($rule['call']) ? function (array $args, array $share) use ($closure, $class, $rule) {
+		return isset($rule['call']) ? function (array $args, array $share) use ($closure, $class, $rule, $name) {
 			// Construct the object using the original closure
 			$object = $closure($args, $share);
 
@@ -148,7 +148,10 @@ class Dice {
 				$params = $this->getParams($class->getMethod($call[0]), ['shareInstances' => isset($rule['shareInstances']) ? $rule['shareInstances'] : [] ])(($this->expand(isset($call[1]) ? $call[1] : [])));
 				$return = $object->{$call[0]}(...$params);
 				if (isset($call[2])) {
-					if ($call[2] === self::CHAIN_CALL) $object = $return;
+					if ($call[2] === self::CHAIN_CALL) {
+						if (!empty($rule['shared'])) $this->instances[$name] = $return;
+						$object = $return;
+					}
 					else if (is_callable($call[2])) call_user_func($call[2], $return);
 				}
 			}

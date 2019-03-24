@@ -64,11 +64,15 @@ class ChainTest extends DiceTest {
 				]
 		]);
 
+
+		$dice->create('FactoryDependency');
+
 		$obj = $dice->create('RequiresFactoryDependecy');
 
 		$this->assertInstanceOf('FactoryDependency', $obj->dep);
 
 		$obj2 = $dice->create('RequiresFactoryDependecy');
+
 
 		$this->assertNotSame($obj, $obj2);
 		$this->assertSame($obj->dep, $obj2->dep);
