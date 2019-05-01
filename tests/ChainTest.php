@@ -21,6 +21,23 @@ class ChainTest extends DiceTest {
 
 	}
 
+    public function testMultipleChainCall() {
+        $dice = $this->dice->addRules([
+            '$someClass' => [
+                'instanceOf' => 'Factory',
+                'call' => [
+                    ['get', [], \Dice\Dice::CHAIN_CALL],
+                    ['getBar', [], \Dice\Dice::CHAIN_CALL]
+                ]
+            ]
+        ]);
+
+        $obj = $dice->create('$someClass');
+
+        $this->assertEquals('bar', $obj);
+
+    }
+
 	public function testChainCallShared() {
 		$dice = $this->dice->addRules([
 				'$someClass' => [
@@ -88,7 +105,9 @@ class Factory {
 }
 
 class FactoryDependency {
-
+    public function getBar() {
+        return 'bar';
+    }
 }
 
 class RequiresFactoryDependecy {
