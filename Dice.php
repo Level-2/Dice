@@ -150,6 +150,7 @@ class Dice {
 				if (isset($call[2])) {
 					if ($call[2] === self::CHAIN_CALL) {
 						if (!empty($rule['shared'])) $this->instances[$name] = $return;
+                        if (is_object($return)) $class = new \ReflectionClass(get_class($return));
 						$object = $return;
 					}
 					else if (is_callable($call[2])) call_user_func($call[2], $return);
