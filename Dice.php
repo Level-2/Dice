@@ -227,23 +227,18 @@ class Dice {
 				// For variadic parameters, provide remaining $args
 				if ($param->isVariadic()) {
 					$parameters = array_merge($parameters, $args);
-					continue;
 				}
-
 				// Now loop through $args and see whether or not each value can match the current parameter based on type hint
-				if ($args && ($match = $this->matchParam($param, $class, $args)) !== false)  {
+				else if ($args && ($match = $this->matchParam($param, $class, $args)) !== false)  {
 					$parameters[] = $match;
-					continue;
 				}
-
 				//And do the same with $share
-				if ($share && ($match = $this->matchParam($param, $class, $share)) !== false)  {
+				else if ($share && ($match = $this->matchParam($param, $class, $share)) !== false)  {
 					$parameters[] = $match;
-					continue;
 				}
 
 				// When nothing from $args or $share matches but a class is type hinted, create an instance to use, using a substitution if set
-				if ($class)	try {
+				else if ($class)	try {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				}
 				catch (\InvalidArgumentException $e) {
