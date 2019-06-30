@@ -187,7 +187,20 @@ class Dice {
 
 		return is_string($param) && $createFromString ? $this->create($param) : $param;
 	}
+	/**
+	* Looks through the array $search for any object which can be used to fulfil $param
+	The original array $search is modifed so must be passed by reference.
 
+	*/
+	private function matchParam(\ReflectionParameter $param, $class, array &$search) {
+		foreach ($search as $i => $arg) {
+			if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
+				// The argument matched, return it and remove it from $search so it won't wrongly match another parameter
+				return array_splice($search, $i, 1)[0];
+			}
+		}
+		return false;
+	}
 	/**
 	 * Returns a closure that generates arguments for $method based on $rule and any $args passed into the closure
 	 * @param object $method An instance of ReflectionMethod (see: {@link http:// php.net/manual/en/class.reflectionmethod.php})
@@ -205,32 +218,31 @@ class Dice {
 		// Return a closure that uses the cached information to generate the arguments for the method
 		return function (array $args, array $share = []) use ($paramInfo, $rule) {
 			// Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
-			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : []);
+			if (isset($rule['constructParams'])) $args = array_merge($args, $this->expand($rule['constructParams'], $share));
 
 			$parameters = [];
 
 			// Now find a value for each method parameter
 			foreach ($paramInfo as list($class, $param, $sub)) {
-				// First loop through $args and see whether or not each value can match the current parameter based on type hint
-				if ($args) foreach ($args as $i => $arg) { // This if statement actually gives a ~10% speed increase when $args isn't set
-                    // For variadic parameters, provide remaining $args
-                    if ($param->isVariadic()) { $parameters = array_merge($parameters, $args); continue 2; }
-					if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
-						// The argument matched, store it and remove it from $args so it won't wrongly match another parameter
-						$parameters[] = array_splice($args, $i, 1)[0];
-						// Move on to the next parameter
-						continue 2;
-					}
+				// For variadic parameters, provide remaining $args
+				if ($param->isVariadic()) {
+					$parameters = array_merge($parameters, $args);
+					continue;
 				}
-                if ($share) foreach ($share as $i => $arg) {
-                    if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
-                        // The argument matched, store it and remove it from $args so it won't wrongly match another parameter
-                        $parameters[] = array_splice($share, $i, 1)[0];
-                        // Move on to the next parameter
-                        continue 2;
-                    }
-                }
-				// When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
+
+				// Now loop through $args and see whether or not each value can match the current parameter based on type hint
+				if ($args && ($match = $this->matchParam($param, $class, $args)) !== false)  {
+					$parameters[] = $match;
+					continue;
+				}
+
+				//And do the same with $share
+				if ($share && ($match = $this->matchParam($param, $class, $share)) !== false)  {
+					$parameters[] = $match;
+					continue;
+				}
+
+				// When nothing from $args or $share matches but a class is type hinted, create an instance to use, using a substitution if set
 				if ($class)	try {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
 				}
