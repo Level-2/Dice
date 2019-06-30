@@ -76,4 +76,21 @@ class CallTest extends DiceTest {
 		$this->assertEquals('foo', $object->a);
 		$this->assertEquals('bar', $object->b);
 	}
+
+	public function testCallShareVariadic() {
+	    // Shared params should not be passed to variadic call
+
+        $rules = [
+            'TestCallVariadic' => [
+                'call' => [
+                    ['callMe', ['test1']]
+                ]
+            ]
+        ];
+
+        $dice = $this->dice->addRules($rules);
+        $object = $dice->create('TestCallVariadic', [], [new F()]);
+
+        $this->assertEquals(['test1'], $object->data);
+    }
 }

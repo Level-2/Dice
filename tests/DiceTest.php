@@ -28,12 +28,12 @@ abstract class DiceTest extends \PHPUnit\Framework\TestCase {
 		$this->fail('Autoload triggered: ' . $class);
 	}
 
-	protected function setUp() {
+	protected function setUp(): void {
 		parent::setUp ();
 		$this->dice = new \Dice\Dice();
 	}
 
-	protected function tearDown() {
+	protected function tearDown(): void {
 		$this->dice = null;
 		parent::tearDown ();
 	}

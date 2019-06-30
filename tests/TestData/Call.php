@@ -50,3 +50,11 @@ class TestCallImmutable {
 		return $new;
 	}
 }
+
+class TestCallVariadic {
+    public $data;
+
+    public function callMe(...$data) {
+        $this->data = $data;
+    }
+}

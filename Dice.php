@@ -205,7 +205,7 @@ class Dice {
 		// Return a closure that uses the cached information to generate the arguments for the method
 		return function (array $args, array $share = []) use ($paramInfo, $rule) {
 			// Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
-			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : [], $share);
+			if ($share || isset($rule['constructParams'])) $args = array_merge($args, isset($rule['constructParams']) ? $this->expand($rule['constructParams'], $share) : []);
 
 			$parameters = [];
 
@@ -222,6 +222,14 @@ class Dice {
 						continue 2;
 					}
 				}
+                if ($share) foreach ($share as $i => $arg) {
+                    if ($class && ($arg instanceof $class || ($arg === null && $param->allowsNull()))) {
+                        // The argument matched, store it and remove it from $args so it won't wrongly match another parameter
+                        $parameters[] = array_splice($share, $i, 1)[0];
+                        // Move on to the next parameter
+                        continue 2;
+                    }
+                }
 				// When nothing from $args matches but a class is type hinted, create an instance to use, using a substitution if set
 				if ($class)	try {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
