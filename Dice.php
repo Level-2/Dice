@@ -225,18 +225,15 @@ class Dice {
 			// Now find a value for each method parameter
 			foreach ($paramInfo as list($class, $param, $sub)) {
 				// For variadic parameters, provide remaining $args
-				if ($param->isVariadic()) {
-					$parameters = array_merge($parameters, $args);
-				}
+
 				// Now loop through $args and see whether or not each value can match the current parameter based on type hint
-				else if ($args && ($match = $this->matchParam($param, $class, $args)) !== false)  {
+				if ($args && ($match = $this->matchParam($param, $class, $args)) !== false)  {
 					$parameters[] = $match;
 				}
 				//And do the same with $share
 				else if ($share && ($match = $this->matchParam($param, $class, $share)) !== false)  {
 					$parameters[] = $match;
 				}
-
 				// When nothing from $args or $share matches but a class is type hinted, create an instance to use, using a substitution if set
 				else if ($class)	try {
 					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
@@ -247,7 +244,12 @@ class Dice {
 				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
 				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
 				// There's no type hint and nothing left in $args, provide the default value or null
-				else $parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+				else if ($param->isVariadic()) {
+					$parameters = array_merge($parameters, $args);
+				}
+				else {
+					$parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+				}
 			}
 			return $parameters;
 		};
