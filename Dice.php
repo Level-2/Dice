@@ -217,20 +217,19 @@ class Dice {
 
 		// Return a closure that uses the cached information to generate the arguments for the method
 		return function (array $args, array $share = []) use ($paramInfo, $rule) {
-			// Now merge all the possible parameters: user-defined in the rule via constructParams, shared instances and the $args argument from $dice->create();
+			// If the rule has construtParams set, construct any classes reference and use them as $args
 			if (isset($rule['constructParams'])) $args = array_merge($args, $this->expand($rule['constructParams'], $share));
 
+			// Array of matched parameters
 			$parameters = [];
 
-			// Now find a value for each method parameter
+			// Fnd a value for each method argument
 			foreach ($paramInfo as list($class, $param, $sub)) {
-				// For variadic parameters, provide remaining $args
-
-				// Now loop through $args and see whether or not each value can match the current parameter based on type hint
+				// Loop through $args and see whether or not each value can match the current parameter based on type hint
 				if ($args && ($match = $this->matchParam($param, $class, $args)) !== false)  {
 					$parameters[] = $match;
 				}
-				//And do the same with $share
+				// Do the same with $share
 				else if ($share && ($match = $this->matchParam($param, $class, $share)) !== false)  {
 					$parameters[] = $match;
 				}
@@ -240,13 +239,13 @@ class Dice {
 				}
 				catch (\InvalidArgumentException $e) {
 				}
-				// There is no type hint, take the next available value from $args (and remove it from $args to stop it being reused)
 				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
 				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
-				// There's no type hint and nothing left in $args, provide the default value or null
+				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) {
 					$parameters = array_merge($parameters, $args);
 				}
+				// There's no type hint and nothing left in $args, provide the default value or null
 				else {
 					$parameters[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
 				}
