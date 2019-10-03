@@ -210,4 +210,17 @@ class BasicTest extends DiceTest {
 
 		$this->assertEquals([], $this->dice->getRule('Foo'));
 	}
+
+	public function testPassSelf() {
+        $dice = $this->dice->addRule('CheckConstructorArgs',
+            [
+                'constructParams' => [
+                    [\Dice\Dice::INSTANCE => \Dice\Dice::SELF]
+                ]
+            ]);
+
+        $obj = $dice->create('CheckConstructorArgs');
+
+        $this->assertEquals($dice, $obj->arg1);
+    }
 }

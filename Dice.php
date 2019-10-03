@@ -10,6 +10,7 @@ class Dice {
 	const GLOBAL = 'Dice::GLOBAL';
 	const INSTANCE = 'Dice::INSTANCE';
 	const CHAIN_CALL = 'Dice::CHAIN_CALL';
+	const SELF = 'Dice::SELF';
 	/**
 	 * @var array $rules Rules which have been set using addRule()
 	 */
@@ -171,6 +172,7 @@ class Dice {
 		if (is_array($param)) {
 			//if a rule specifies Dice::INSTANCE, look up the relevant instance
 			if (isset($param[self::INSTANCE])) {
+			    if ($param[self::INSTANCE] === self::SELF) return $this;
 				//Check for 'params' which allows parameters to be sent to the instance when it's created
 				//Either as a callback method or to the constructor of the instance
 				$args = isset($param['params']) ? $this->expand($param['params']) : [];
