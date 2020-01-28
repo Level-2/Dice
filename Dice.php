@@ -242,7 +242,18 @@ class Dice {
 				catch (\InvalidArgumentException $e) {
 				}
 				// Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
-				else if ($args && (!$param->getType() || call_user_func('is_' . $param->getType()->__toString(), $args[0]))) $parameters[] = $this->expand(array_shift($args));
+
+				//Find a match in $args for scalar types
+				else if ($args && $param->getType()) {
+					for ($i = 0; $i < count($args); $i++) {
+						if (call_user_func('is_' . $param->getType()->getName(), $args[$i])) {
+							$parameters[] = array_splice($args, $i, 1)[0];
+						}
+					}
+				}
+				else if ($args) {
+					$parameters[] = $this->expand(array_shift($args));
+				}
 				// For variadic parameters, provide remaining $args
 				else if ($param->isVariadic()) {
 					$parameters = array_merge($parameters, $args);
