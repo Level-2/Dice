@@ -90,7 +90,7 @@ class Dice {
 		if (!empty($this->instances[$name])) return $this->instances[$name];
 
 		// Create a closure for creating the object if there isn't one already
-		if (empty($this->cache[$name])) $this->cache[$name] = $this->getClosure($name, $this->getRule($name));
+		if (empty($this->cache[$name])) $this->cache[$name] = $this->getClosure(ltrim($name, '\\'), $this->getRule($name));
 
 		// Call the cached closure which will return a fully constructed object of type $name
 		return $this->cache[$name]($args, $share);
@@ -124,10 +124,10 @@ class Dice {
 
 		if (!empty($rule['shared'])) $closure = function (array $args, array $share) use ($class, $name, $constructor, $params, $closure) {
 			//Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
-			if ($class->isInternal()) $this->instances[$name] = $this->instances[ltrim($name, '\\')] = $closure($args, $share);
+			if ($class->isInternal()) $this->instances[$class->name] = $this->instances['\\' . $class->name] = $closure($args, $share);
 			else {
 				//Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
-				$this->instances[$name] = $this->instances[ltrim($name, '\\')] = $class->newInstanceWithoutConstructor();
+				$this->instances[$name] = $this->instances['\\' . $name] = $class->newInstanceWithoutConstructor();
 				// Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
 				if ($constructor) $constructor->invokeArgs($this->instances[$name], $params($args, $share));
 			}

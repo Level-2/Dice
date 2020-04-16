@@ -146,3 +146,13 @@ class CheckConstructorArgs {
 		$this->arg1 = $arg1;
 	}
 }
+
+
+class someclass {}
+
+class someotherclass {
+	public $obj;
+	public function __construct(someclass $obj){
+	    $this->obj = $obj;
+	}
+}

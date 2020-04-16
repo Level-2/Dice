@@ -5,6 +5,9 @@
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  * @version 3.0 */
 
+
+
+
 class BasicTest extends DiceTest {
 
 	public function testCreate() {
@@ -12,6 +15,8 @@ class BasicTest extends DiceTest {
 		$myobj = $this->dice->create('TestCreate');
 		$this->assertInstanceOf('TestCreate', $myobj);
 	}
+
+
 
 	public function testCreateInvalid() {
 		//"can't expect default exception". Not sure why.
@@ -223,4 +228,15 @@ class BasicTest extends DiceTest {
 
         $this->assertEquals($dice, $obj->arg1);
     }
+
+
+    // Issue 180
+	public function testSlashNoSlash() {
+		$dice = $this->dice->addRule('\someclass', ['shared' => true]);
+
+		$b = $dice->create('\someotherclass');
+		$a = $dice->create('\someclass');
+
+		$this->assertSame($a, $b->obj);
+	}
 }
