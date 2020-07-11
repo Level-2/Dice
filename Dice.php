@@ -85,7 +85,8 @@ class Dice {
 		$globalRules = isset($this->rules['*']) ? $this->rules['*'] : [];
 		if (!isset($globalRules['substitutions'])) return $rules;
 
-		$rules['substitutions'] = array_merge($globalRules['substitutions'], $rules['substitutions']);
+		$subs = isset($rules['substitutions']) ? $rules['substitutions'] : [];
+		$rules['substitutions'] = array_merge($globalRules['substitutions'], $subs);
 		return $rules;
 	}
 

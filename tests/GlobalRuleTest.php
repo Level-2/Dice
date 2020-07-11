@@ -148,4 +148,17 @@ class GlobalRuleTest extends DiceTest
         $this->assertInstanceOf('AnotherGlobalImplementation', $obj->glb);
         $this->assertInstanceOf('GlobalRuleImplementation', $obj->glbr);
     }
+
+    public function testNoSubstitutionKey()
+    {
+		$rule = [
+			'substitutions' => ['GlobalInterface' => 'GlobalImplementation']
+        ];
+        $dice = $this->dice->addRule('Global3', ['shared'=> true]);
+		$dice = $dice->addRule('*', $rule);
+
+		$obj = $dice->create('Global3');
+
+		$this->assertInstanceOf('GlobalImplementation', $obj->obj);
+    }
 }
