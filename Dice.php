@@ -55,8 +55,23 @@ class Dice {
         if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule['substitutions'][ltrim($key,  '\\')] = $value;
         //Clear any existing instance or cache for this class
         unset($dice->instances[$name], $dice->cache[$name]);
-        $dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
-    }
+		$rules = array_replace_recursive($dice->getRule($name), $rule);
+
+		if ($name !== '*') {
+			$rules = $this->appendGlobalRule($rules);
+		}
+
+		$dice->rules[ltrim(strtolower($name), '\\')] = $rules;
+	}
+
+	private function appendGlobalRule(array $rules) : array
+	{
+		$globalRules = isset($this->rules['*']) ? $this->rules['*'] : [];
+		if (!isset($globalRules['substitutions'])) return $rules;
+
+		$rules['substitutions'] = array_merge($globalRules['substitutions'], $rules['substitutions']);
+		return $rules;
+	}
 
 	/**
 	 * Returns the rule that will be applied to the class $name when calling create()
@@ -191,8 +206,7 @@ class Dice {
 	}
 	/**
 	* Looks through the array $search for any object which can be used to fulfil $param
-	The original array $search is modifed so must be passed by reference.
-
+	* The original array $search is modifed so must be passed by reference.
 	*/
 	private function matchParam(\ReflectionParameter $param, $class, array &$search) {
 		foreach ($search as $i => $arg) {
