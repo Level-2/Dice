@@ -111,4 +111,41 @@ class GlobalRuleTest extends DiceTest
         $this->assertInstanceOf('AnotherGlobalImplementation', $obj->glb);
         $this->assertInstanceOf('GlobalRuleImplementation', $obj->glbr);
     }
+
+    public function testGlobal4_4()
+    {
+		$glbRule = [
+            'substitutions' => ['GlobalRuleInterface' => 'GlobalRuleImplementation']
+        ];
+        $glb4Rule = [
+            'substitutions' => ['GlobalInterface' => 'GlobalImplementation']
+		];
+        $dice = $this->dice->addRule('Global4', $glb4Rule);
+		$dice = $dice->addRule('*', $glbRule);
+
+		$obj = $dice->create('Global4');
+
+        $this->assertInstanceOf('GlobalImplementation', $obj->glb);
+        $this->assertInstanceOf('GlobalRuleImplementation', $obj->glbr);
+    }
+
+    public function testGlobal4_5()
+    {
+		$glbRule = [
+            'substitutions' => ['GlobalInterface' => 'GlobalImplementation']
+        ];
+        $glb4Rule = [
+            'substitutions' => [
+                'GlobalInterface' => 'AnotherGlobalImplementation',
+                'GlobalRuleInterface' => 'GlobalRuleImplementation'
+            ]
+		];
+        $dice = $this->dice->addRule('Global4', $glb4Rule);
+		$dice = $dice->addRule('*', $glbRule);
+
+		$obj = $dice->create('Global4');
+
+        $this->assertInstanceOf('AnotherGlobalImplementation', $obj->glb);
+        $this->assertInstanceOf('GlobalRuleImplementation', $obj->glbr);
+    }
 }
