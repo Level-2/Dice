@@ -103,15 +103,14 @@ class Dice {
 	 * @return callable A closure
 	 */
 	private function getClosure(string $name, array $rule) {
-	    if(isset($rule['instanceOf'])) {
-            $class = new \ReflectionClass($rule['instanceOf']);
-            $closure = function() use ($class) {
-                return $this->create($class->getName());
-            };
+	    if(($rule['instanceOf'] ?? false) && !empty($rule['call']) &&($this->getRule($rule['instanceOf'])['shared'] ?? false)) {
+	        $className = $rule['instanceOf'];
+            $class = new \ReflectionClass($className);
+            $closure = $this->getClosure($className, $this->getRule($className));
         } else {
 
             // Reflect the class and constructor, this should only ever be done once per class and get cached
-            $class = new \ReflectionClass($name);
+            $class = new \ReflectionClass($rule['instanceOf'] ?? $name);
             $constructor = $class->getConstructor();
 
             // Create parameter generating function in order to cache reflection on the parameters. This way $reflect->getParameters() only ever gets called once
