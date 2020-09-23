@@ -1,4 +1,8 @@
 <?php
+
+use Dice\tests\TestData\SharedInstanceFactory;
+use Dice\tests\TestData\SharedInstanceInterface;
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -84,4 +88,19 @@ class ShareInstancesTest extends DiceTest {
 		$this->assertNotEquals($shareTest->share1->shared->uniq, $shareTest2->share2->shared->uniq);
 
 	}
+
+	public function testSharedInstanceFactory() {
+	    $dice = new Dice\Dice();
+	    $dice = $dice->addRule(SharedInstanceFactory::class,[
+	        'shared' => true,
+        ]);
+        $dice = $dice->addRule(SharedInstanceInterface::class,[
+            'shared' => true,
+            'instanceOf' => SharedInstanceFactory::class,
+            'call' => [['factory', [], Dice\Dice::CHAIN_CALL]]
+        ]);
+        $in1 = $dice->create(SharedInstanceInterface::class);
+        $in2 = $dice->create(SharedInstanceFactory::class)->factory();
+        $this->assertSame($in1, $in2);
+    }
 }
