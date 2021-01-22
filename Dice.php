@@ -220,7 +220,8 @@ class Dice {
 		// Cache some information about the parameter in $paramInfo so (slow) reflection isn't needed every time
 		$paramInfo = [];
 		foreach ($method->getParameters() as $param) {
-			$class = $param->getClass() ? $param->getClass()->name : null;
+		    $pType = $param->getType();
+            $class = $pType && !$pType->isBuiltin() && $pType instanceof \ReflectionNamedType ? $pType->getName() : null;
 			$paramInfo[] = [$class, $param, isset($rule['substitutions']) && array_key_exists($class, $rule['substitutions'])];
 		}
 
