@@ -1,13 +1,15 @@
 [Dice PHP Dependency Injection Container](https://r.je/dice.html)
 ======================================
 
+_Please note: This version is a fork that provides a few fixes that have not yet been merged into the Original Repo mantained by Tom Butler._
+
 Dice is a minimalist Dependency Injection Container for PHP with a focus on being lightweight and fast as well as requiring as little configuration as possible.
 
 
 Project Goals
 -------------
 
-1) To be lightweight and not a huge library with dozens of files (Dice is a single 100 line class) yet support all features (and more) offered by much more complex containers
+1) To be lightweight and not a huge library with dozens of files (Dice is a single class) yet support all features (and more) offered by much more complex containers
 
 2) To "just work". Basic functionality should work with zero configuration
 
@@ -57,7 +59,7 @@ For complete documentation please see the [Dice PHP Dependency Injection contain
 PHP version compatibility
 -------------------------
 
-Dice is compatible with PHP 7.0 and up, there are archived versions of Dice which support PHP 5.6 however this is no longer maintanied.
+Dice is compatible with PHP 7.1+ and PHP 8.0+.
 
 
 Performance
@@ -76,6 +78,10 @@ Originally developed by Tom Butler (@TomBZombie), with many thanks to daniel-mei
 
 Updates
 ------------
+### 25/01/2021 4.1 Release - PHP 8 Support
+
+Dice now offers basic PHP8 support, however it does not currently resolve union types.
+
 
 ### 15/11/2018 4.0 Release - Backwards incompatible
 
