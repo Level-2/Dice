@@ -1,0 +1,17 @@
+# Configuration file for unit test runner.
+language: php
+env:
+  global:
+    - XDEBUG_MODE=coverage
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
+  - 8.0
+before_script:
+  - composer install
+script: composer test
+notifications:
+  email: true
+sudo: false
