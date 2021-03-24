@@ -1,5 +1,6 @@
 [Dice PHP Dependency Injection Container](https://r.je/dice.html)
 ======================================
+[![Build Status](https://travis-ci.com/moddengine/Dice.svg?branch=master)](https://travis-ci.com/moddengine/Dice)
 
 _Please note: This version is a fork that provides a few fixes that have not yet been merged into the Original Repo mantained by Tom Butler._
 
