@@ -70,7 +70,7 @@ class Dice
         if (isset($rule['substitutions'])) {
             foreach ($rule['substitutions'] as $key => $value) {
                 $rule['substitutions'][ltrim($key, '\\')] = $value;
-            };
+            }
         }
         //Clear any existing instance or cache for this class
         unset($dice->instances[$name], $dice->cache[$name]);
@@ -197,8 +197,8 @@ class Dice
                 ) {
                     //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
                     if ($class->isInternal()) {
-                        $this->instances[$class->name] = $this->instances[
-                            '\\' . $class->name
+                        $this->instances[$name] = $this->instances[
+                            '\\' . $name
                         ] = $closure($args, $share);
                     } else {
                         //Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
@@ -317,7 +317,7 @@ class Dice
             } else {
                 foreach ($param as $name => $value) {
                     $param[$name] = $this->expand($value, $share);
-                };
+                }
             }
         }
 
@@ -418,7 +418,7 @@ class Dice
                             )
                             : $this->create($class, [], $share);
                     } catch (\InvalidArgumentException $e) {
-                    };
+                    }
                 }
                 // Support PHP 7 scalar type hinting,  is_a('string', 'foo') doesn't work so this is a hacky AF workaround: call_user_func('is_' . $type, '')
                 //Find a match in $args for scalar types
