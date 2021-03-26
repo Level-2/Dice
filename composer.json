@@ -23,6 +23,7 @@
         "php-coveralls/php-coveralls": "^2.4"
     },
     "scripts": {
-        "test": "phpunit -c phpunit.xml"
+        "test": "phpunit -c phpunit.xml",
+        "test-coverage": "phpunit -c phpunit.xml --coverage-clover clover.xml"
     }
 }
