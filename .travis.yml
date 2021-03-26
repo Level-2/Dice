@@ -11,6 +11,7 @@ php:
   - 8.0
 before_script:
   - composer install
+  - mkdir -p build/logs
 script: composer test-coverage
 notifications:
   email: true
