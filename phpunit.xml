@@ -1,7 +1,17 @@
-<phpunit bootstrap="tests/bootstrap.php">
-  <testsuites>
-    <testsuite name="tests">
-      <directory>tests</directory>
-    </testsuite>
-  </testsuites>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         verbose="true">
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+
+    <testsuites>
+        <testsuite name="default">
+            <directory suffix="Test.php">tests</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>

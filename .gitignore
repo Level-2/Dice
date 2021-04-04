@@ -1,2 +1,4 @@
 vendor/
 composer.lock
+clover.xml
+node_modules
