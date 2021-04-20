@@ -90,3 +90,11 @@ class MethodWithTwoDefaultNullCC {
 	}
 }
 
+
+class NullableClassTypeHint {
+	public $obj;
+
+	public function __construct(?D $obj) {
+		$this->obj = $obj;
+	}
+}
