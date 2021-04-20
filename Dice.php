@@ -240,7 +240,12 @@ class Dice {
 				}
 				// When nothing from $args or $share matches but a class is type hinted, create an instance to use, using a substitution if set
 				else if ($class)	try {
-					$parameters[] = $sub ? $this->expand($rule['substitutions'][$class], $share, true) : $this->create($class, [], $share);
+					if ($sub) {
+						$parameters[] = $this->expand($rule['substitutions'][$class], $share, true);
+					}
+					else {
+						$parameters[] = !$param->allowsNull() ? $this->create($class, [], $share) : null;
+					}
 				}
 				catch (\InvalidArgumentException $e) {
 				}

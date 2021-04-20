@@ -132,4 +132,10 @@ class ConstructParamsTest extends DiceTest {
 		$this->assertEquals(null, $obj->nullScalar->string);
 	}
 
+	public function testNullableClassTypeHint() {
+		$nullableClassTypeHint = $this->dice->create('NullableClassTypeHint');
+
+		$this->assertEquals(null, $nullableClassTypeHint->obj);
+	}
+
 }
