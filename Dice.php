@@ -256,6 +256,7 @@ class Dice {
 					for ($i = 0; $i < count($args); $i++) {
 						if (call_user_func('is_' . $param->getType()->getName(), $args[$i])) {
 							$parameters[] = array_splice($args, $i, 1)[0];
+							break;
 						}
 					}
 				}
