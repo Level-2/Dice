@@ -111,11 +111,17 @@ class Dice
 
     /**
      * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied
-     * @param string name The name of the class to instantiate
+     * @template T
+
+     * @param string $name The name of the class to instantiate
+     * @psalm-param class-string<T> $name
      * @param array $args An array with any additional arguments to be passed into the constructor upon instantiation
      * @param array $share a list of defined in shareInstances for objects higher up the object graph, should only be used internally
+
      * @return object A fully constructed object based on the specified input arguments
+     * @psalm-return T
      */
+
     public function create(string $name, array $args = [], array $share = [])
     {
         // Is there a shared instance set? Return it. Better here than a closure for this, calling a closure is slower.
