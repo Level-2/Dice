@@ -235,7 +235,7 @@ class Dice {
 					$parameters[] = $match;
 				}
 				// Do the same with $share
-				else if ($share && ($match = $this->matchParam($param, $class, $share)) !== false)  {
+				else if (($copy = $share) && ($match = $this->matchParam($param, $class, $copy)) !== false)  {
 					$parameters[] = $match;
 				}
 				// When nothing from $args or $share matches but a class is type hinted, create an instance to use, using a substitution if set
