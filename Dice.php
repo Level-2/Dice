@@ -55,8 +55,8 @@ class Dice {
         if (isset($rule['substitutions'])) foreach($rule['substitutions'] as $key => $value) $rule['substitutions'][ltrim($key,  '\\')] = $value;
         //Clear any existing instance or cache for this class
         unset($dice->instances[$name], $dice->cache[$name]);
-        $dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
-    }
+		$dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive($dice->getRule($name), $rule);
+	}
 
 	/**
 	 * Returns the rule that will be applied to the class $name when calling create()
@@ -65,7 +65,7 @@ class Dice {
 	 */
 	public function getRule(string $name): array {
 		$lcName = strtolower(ltrim($name, '\\'));
-		if (isset($this->rules[$lcName])) return $this->rules[$lcName];
+		if (isset($this->rules[$lcName])) return $this->appendGlobalRule($lcName, $this->rules[$lcName]);
 
 		foreach ($this->rules as $key => $rule) { 							// Find a rule which matches the class described in $name where:
 			if (empty($rule['instanceOf']) 		 							// It's not a named instance, the rule is applied to a class name
@@ -76,6 +76,18 @@ class Dice {
 		}
 		// No rule has matched, return the default rule if it's set
 		return isset($this->rules['*']) ? $this->rules['*'] : [];
+	}
+
+	private function appendGlobalRule(string $name, array $rules) : array
+	{
+		if ($name === '*') return $rules;
+
+		$globalRules = isset($this->rules['*']) ? $this->rules['*'] : [];
+		if (!isset($globalRules['substitutions'])) return $rules;
+
+		$subs = isset($rules['substitutions']) ? $rules['substitutions'] : [];
+		$rules['substitutions'] = array_merge($globalRules['substitutions'], $subs);
+		return $rules;
 	}
 
 	/**
@@ -191,8 +203,7 @@ class Dice {
 	}
 	/**
 	* Looks through the array $search for any object which can be used to fulfil $param
-	The original array $search is modifed so must be passed by reference.
-
+	* The original array $search is modifed so must be passed by reference.
 	*/
 	private function matchParam(\ReflectionParameter $param, $class, array &$search) {
 		foreach ($search as $i => $arg) {
