@@ -5,10 +5,12 @@
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  * @version 3.0 */
 class TestSharedInstancesTop {
+	public $shared;
 	public $share1;
 	public $share2;
 
-	public function __construct(SharedInstanceTest1 $share1, SharedInstanceTest2 $share2) {
+	public function __construct(Shared $shared, SharedInstanceTest1 $share1, SharedInstanceTest2 $share2) {
+		$this->shared = $shared;
 		$this->share1 = $share1;
 		$this->share2 = $share2;
 	}
