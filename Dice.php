@@ -253,10 +253,18 @@ class Dice {
 
 				//Find a match in $args for scalar types
 				else if ($args && $param->getType()) {
+					$type = $param->getType();
+					if ($type instanceof \ReflectionNamedType) {
+						$types = [$type];
+					} else if (version_compare(PHP_VERSION, '8.0.0', '>=') && $type instanceof \ReflectionUnionType) {
+						$types = $type->getTypes();
+					}
 					for ($i = 0; $i < count($args); $i++) {
-						if (call_user_func('is_' . $param->getType()->getName(), $args[$i])) {
-							$parameters[] = array_splice($args, $i, 1)[0];
-                            break;
+						foreach ($types as $type) {
+							if (call_user_func('is_' . $type->getName(), $args[$i])) {
+								$parameters[] = array_splice($args, $i, 1)[0];
+								break;
+							}
 						}
 					}
 				}
