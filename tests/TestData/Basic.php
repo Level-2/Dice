@@ -3,10 +3,10 @@
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
- * @version 3.0 */
+ */
 class NoConstructor
 {
-    public $a = 'b';
+    public $a = "b";
 }
 
 class CyclicA
@@ -114,7 +114,7 @@ class MethodWithDefaultValue
     public $a;
     public $foo;
 
-    public function __construct(A $a, $foo = 'bar')
+    public function __construct(A $a, $foo = "bar")
     {
         $this->a = $a;
         $this->foo = $foo;

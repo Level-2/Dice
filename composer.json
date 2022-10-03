@@ -3,18 +3,24 @@
     "description": "A minimalist Dependency injection container (DIC) for PHP 7.1+ and PHP 8.0+.",
     "license": "BSD-2-Clause",
     "homepage": "https://github.com/moddengine/Dice",
-    "keywords": ["Dependency injection", "ioc", "Dependency injection container", "DI"],
+    "keywords": [
+        "Dependency injection",
+        "ioc",
+        "Dependency injection container",
+        "DI"
+    ],
     "authors": [
-    	{
-    		"name": "Tom Butler",
-    		"email": "tom@r.je"
-    	}
+        {
+            "name": "Tom Butler",
+            "email": "tom@r.je"
+        }
     ],
     "require": {
-        "php": ">=7.1.0"
+        "php": ">=7.1.0",
+        "ext-json": "*"
     },
     "autoload": {
-    	"psr-4": {
+        "psr-4": {
             "Dice\\": "./src/"
         }
     },

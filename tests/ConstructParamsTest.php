@@ -3,133 +3,139 @@
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
- * @version 3.0 */
-class ConstructParamsTest extends DiceTest {
+ */
+class ConstructParamsTest extends DiceTest
+{
+    public function testConstructParams()
+    {
+        $rule = [];
+        $rule["constructParams"] = ["foo", "bar"];
+        $dice = $this->dice->addRule("RequiresConstructorArgsA", $rule);
 
-	public function testConstructParams() {
-		$rule = [];
-		$rule['constructParams'] = array('foo', 'bar');
-		$dice = $this->dice->addRule('RequiresConstructorArgsA', $rule);
+        $obj = $dice->create("RequiresConstructorArgsA");
 
-		$obj = $dice->create('RequiresConstructorArgsA');
+        $this->assertEquals($obj->foo, "foo");
+        $this->assertEquals($obj->bar, "bar");
+    }
 
-		$this->assertEquals($obj->foo, 'foo');
-		$this->assertEquals($obj->bar, 'bar');
-	}
+    public function testInternalClass()
+    {
+        $rule = [];
+        $rule["constructParams"][] = ".";
 
+        $dice = $this->dice->addRule("DirectoryIterator", $rule);
 
-	public function testInternalClass() {
-		$rule = [];
-		$rule['constructParams'][] = '.';
+        $dir = $dice->create("DirectoryIterator");
 
-		$dice = $this->dice->addRule('DirectoryIterator', $rule);
+        $this->assertInstanceOf("DirectoryIterator", $dir);
+    }
 
-		$dir = $dice->create('DirectoryIterator');
+    public function testInternalClassExtended()
+    {
+        $rule = [];
+        $rule["constructParams"][] = ".";
 
-		$this->assertInstanceOf('DirectoryIterator', $dir);
-	}
+        $dice = $this->dice->addRule("MyDirectoryIterator", $rule);
 
-	public function testInternalClassExtended() {
-		$rule = [];
-		$rule['constructParams'][] = '.';
+        $dir = $dice->create("MyDirectoryIterator");
 
-		$dice = $this->dice->addRule('MyDirectoryIterator', $rule);
+        $this->assertInstanceOf("MyDirectoryIterator", $dir);
+    }
 
-		$dir = $dice->create('MyDirectoryIterator');
+    public function testInternalClassExtendedConstructor()
+    {
+        $rule = [];
+        $rule["constructParams"][] = ".";
 
-		$this->assertInstanceOf('MyDirectoryIterator', $dir);
-	}
+        $dice = $this->dice->addRule("MyDirectoryIterator2", $rule);
 
+        $dir = $dice->create("MyDirectoryIterator2");
 
-	public function testInternalClassExtendedConstructor() {
-		$rule = [];
-		$rule['constructParams'][] = '.';
+        $this->assertInstanceOf("MyDirectoryIterator2", $dir);
+    }
 
-		$dice = $this->dice->addRule('MyDirectoryIterator2', $rule);
+    public function testDefaultNullAssigned()
+    {
+        $rule = [];
+        $rule["constructParams"] = [[\Dice\Dice::INSTANCE => "A"], null];
+        $dice = $this->dice->addRule("MethodWithDefaultNull", $rule);
+        $obj = $dice->create("MethodWithDefaultNull");
+        $this->assertNull($obj->b);
+    }
 
-		$dir = $dice->create('MyDirectoryIterator2');
+    public function testConstructParamsNested()
+    {
+        $rule = [];
+        $rule["constructParams"] = ["foo", "bar"];
+        $dice = $this->dice->addRule("RequiresConstructorArgsA", $rule);
 
-		$this->assertInstanceOf('MyDirectoryIterator2', $dir);
-	}
+        $rule = [];
+        $rule["shareInstances"] = ["D"];
+        $dice = $dice->addRule("ParamRequiresArgs", $rule);
 
-	public function testDefaultNullAssigned() {
-		$rule = [];
-		$rule['constructParams'] = [ [\Dice\Dice::INSTANCE => 'A'], null];
-		$dice = $this->dice->addRule('MethodWithDefaultNull', $rule);
-		$obj = $dice->create('MethodWithDefaultNull');
-		$this->assertNull($obj->b);
-	}
+        $obj = $dice->create("ParamRequiresArgs");
 
-	public function testConstructParamsNested() {
-		$rule = [];
-		$rule['constructParams'] = array('foo', 'bar');
-		$dice = $this->dice->addRule('RequiresConstructorArgsA', $rule);
+        $this->assertEquals($obj->a->foo, "foo");
+        $this->assertEquals($obj->a->bar, "bar");
+    }
 
-		$rule = [];
-		$rule['shareInstances'] = array('D');
-		$dice = $dice->addRule('ParamRequiresArgs', $rule);
+    public function testConstructParamsMixed()
+    {
+        $rule = [];
+        $rule["constructParams"] = ["foo", "bar"];
+        $dice = $this->dice->addRule("RequiresConstructorArgsB", $rule);
 
-		$obj = $dice->create('ParamRequiresArgs');
+        $obj = $dice->create("RequiresConstructorArgsB");
 
-		$this->assertEquals($obj->a->foo, 'foo');
-		$this->assertEquals($obj->a->bar, 'bar');
-	}
+        $this->assertEquals($obj->foo, "foo");
+        $this->assertEquals($obj->bar, "bar");
+        $this->assertInstanceOf("A", $obj->a);
+    }
 
+    public function testSharedClassWithTraitExtendsInternalClass()
+    {
+        $rule = [];
+        $rule["constructParams"] = ["."];
 
-	public function testConstructParamsMixed() {
-		$rule = [];
-		$rule['constructParams'] = array('foo', 'bar');
-		$dice = $this->dice->addRule('RequiresConstructorArgsB', $rule);
+        $dice = $this->dice->addRule("MyDirectoryIteratorWithTrait", $rule);
 
-		$obj = $dice->create('RequiresConstructorArgsB');
+        $dir = $dice->create("MyDirectoryIteratorWithTrait");
 
-		$this->assertEquals($obj->foo, 'foo');
-		$this->assertEquals($obj->bar, 'bar');
-		$this->assertInstanceOf('A', $obj->a);
-	}
+        $this->assertInstanceOf("MyDirectoryIteratorWithTrait", $dir);
+    }
 
+    public function testConstructParamsPrecedence()
+    {
+        $rule = [];
+        $rule["constructParams"] = ["A", "B"];
+        $dice = $this->dice->addRule("RequiresConstructorArgsA", $rule);
 
-	public function testSharedClassWithTraitExtendsInternalClass()	{
-		$rule = [];
-		$rule['constructParams'] = ['.'];
+        $a1 = $dice->create("RequiresConstructorArgsA");
+        $this->assertEquals("A", $a1->foo);
+        $this->assertEquals("B", $a1->bar);
 
-		$dice = $this->dice->addRule('MyDirectoryIteratorWithTrait', $rule);
+        $a2 = $dice->create("RequiresConstructorArgsA", ["C", "D"]);
+        $this->assertEquals("C", $a2->foo);
+        $this->assertEquals("D", $a2->bar);
+    }
 
-		$dir = $dice->create('MyDirectoryIteratorWithTrait');
+    public function testNullScalar()
+    {
+        $rule = [];
+        $rule["constructParams"] = [null];
+        $dice = $this->dice->addRule("NullScalar", $rule);
 
-		$this->assertInstanceOf('MyDirectoryIteratorWithTrait', $dir);
-	}
+        $obj = $dice->create("NullScalar");
+        $this->assertEquals(null, $obj->string);
+    }
 
-	public function testConstructParamsPrecedence() {
-		$rule = [];
-		$rule['constructParams'] = ['A', 'B'];
-		$dice = $this->dice->addRule('RequiresConstructorArgsA', $rule);
+    public function testNullScalarNested()
+    {
+        $rule = [];
+        $rule["constructParams"] = [null];
+        $dice = $this->dice->addRule("NullScalar", $rule);
 
-		$a1 = $dice->create('RequiresConstructorArgsA');
-		$this->assertEquals('A', $a1->foo);
-		$this->assertEquals('B', $a1->bar);
-
-		$a2 = $dice->create('RequiresConstructorArgsA', ['C', 'D']);
-		$this->assertEquals('C', $a2->foo);
-		$this->assertEquals('D', $a2->bar);
-	}
-
-	public function testNullScalar() {
-		$rule = [];
-		$rule['constructParams'] = [null];
-		$dice = $this->dice->addRule('NullScalar', $rule);
-
-		$obj = $dice->create('NullScalar');
-		$this->assertEquals(null, $obj->string);
-	}
-
-	public function testNullScalarNested() {
-		$rule = [];
-		$rule['constructParams'] = [null];
-		$dice = $this->dice->addRule('NullScalar', $rule);
-
-		$obj = $dice->create('NullScalarNested');
-		$this->assertEquals(null, $obj->nullScalar->string);
-	}
-
+        $obj = $dice->create("NullScalarNested");
+        $this->assertEquals(null, $obj->nullScalar->string);
+    }
 }

@@ -4,21 +4,21 @@
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
- * @version 3.0 */
+ */
 class ShareInstancesTest extends DiceTest
 {
     public function testShareInstances()
     {
         $rule = [];
-        $rule['shareInstances'] = ['Shared'];
-        $dice = $this->dice->addRule('TestSharedInstancesTop', $rule);
+        $rule["shareInstances"] = ["Shared"];
+        $dice = $this->dice->addRule("TestSharedInstancesTop", $rule);
 
-        $shareTest = $dice->create('TestSharedInstancesTop');
+        $shareTest = $dice->create("TestSharedInstancesTop");
 
-        $this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+        $this->assertinstanceOf("TestSharedInstancesTop", $shareTest);
 
-        $this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
-        $this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+        $this->assertInstanceOf("SharedInstanceTest1", $shareTest->share1);
+        $this->assertInstanceOf("SharedInstanceTest2", $shareTest->share2);
 
         $this->assertSame(
             $shareTest->share1->shared,
@@ -33,19 +33,19 @@ class ShareInstancesTest extends DiceTest
     public function testNamedShareInstances()
     {
         $rule = [];
-        $rule['instanceOf'] = 'Shared';
+        $rule["instanceOf"] = "Shared";
         $dice = $this->dice->addRule('$Shared', $rule);
 
         $rule = [];
-        $rule['shareInstances'] = ['$Shared'];
-        $dice = $dice->addRule('TestSharedInstancesTop', $rule);
+        $rule["shareInstances"] = ['$Shared'];
+        $dice = $dice->addRule("TestSharedInstancesTop", $rule);
 
-        $shareTest = $dice->create('TestSharedInstancesTop');
+        $shareTest = $dice->create("TestSharedInstancesTop");
 
-        $this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+        $this->assertinstanceOf("TestSharedInstancesTop", $shareTest);
 
-        $this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
-        $this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+        $this->assertInstanceOf("SharedInstanceTest1", $shareTest->share1);
+        $this->assertInstanceOf("SharedInstanceTest2", $shareTest->share2);
 
         $this->assertSame(
             $shareTest->share1->shared,
@@ -56,7 +56,7 @@ class ShareInstancesTest extends DiceTest
             $shareTest->share2->shared->uniq
         );
 
-        $shareTest2 = $dice->create('TestSharedInstancesTop');
+        $shareTest2 = $dice->create("TestSharedInstancesTop");
         $this->assertNotSame(
             $shareTest2->share1->shared,
             $shareTest->share2->shared
@@ -66,24 +66,24 @@ class ShareInstancesTest extends DiceTest
     public function testShareInstancesNested()
     {
         $rule = [];
-        $rule['shareInstances'] = ['F'];
-        $dice = $this->dice->addRule('A4', $rule);
-        $a = $dice->create('A4');
+        $rule["shareInstances"] = ["F"];
+        $dice = $this->dice->addRule("A4", $rule);
+        $a = $dice->create("A4");
         $this->assertTrue($a->m1->f === $a->m2->e->f);
     }
 
     public function testShareInstancesMultiple()
     {
         $rule = [];
-        $rule['shareInstances'] = ['Shared'];
-        $dice = $this->dice->addRule('TestSharedInstancesTop', $rule);
+        $rule["shareInstances"] = ["Shared"];
+        $dice = $this->dice->addRule("TestSharedInstancesTop", $rule);
 
-        $shareTest = $dice->create('TestSharedInstancesTop');
+        $shareTest = $dice->create("TestSharedInstancesTop");
 
-        $this->assertinstanceOf('TestSharedInstancesTop', $shareTest);
+        $this->assertinstanceOf("TestSharedInstancesTop", $shareTest);
 
-        $this->assertInstanceOf('SharedInstanceTest1', $shareTest->share1);
-        $this->assertInstanceOf('SharedInstanceTest2', $shareTest->share2);
+        $this->assertInstanceOf("SharedInstanceTest1", $shareTest->share1);
+        $this->assertInstanceOf("SharedInstanceTest2", $shareTest->share2);
 
         $this->assertSame(
             $shareTest->share1->shared,
@@ -94,7 +94,7 @@ class ShareInstancesTest extends DiceTest
             $shareTest->share2->shared->uniq
         );
 
-        $shareTest2 = $dice->create('TestSharedInstancesTop');
+        $shareTest2 = $dice->create("TestSharedInstancesTop");
         $this->assertSame(
             $shareTest2->share1->shared,
             $shareTest2->share2->shared
@@ -118,12 +118,12 @@ class ShareInstancesTest extends DiceTest
     {
         $dice = new Dice\Dice();
         $dice = $dice->addRule(SharedInstanceFactory::class, [
-            'shared' => true,
+            "shared" => true,
         ]);
         $dice = $dice->addRule(SharedInstanceInterface::class, [
-            'shared' => true,
-            'instanceOf' => SharedInstanceFactory::class,
-            'call' => [['factory', [], Dice\Dice::CHAIN_CALL]],
+            "shared" => true,
+            "instanceOf" => SharedInstanceFactory::class,
+            "call" => [["factory", [], Dice\Dice::CHAIN_CALL]],
         ]);
         $in1 = $dice->create(SharedInstanceInterface::class);
         $in2 = $dice->create(SharedInstanceFactory::class)->factory();
