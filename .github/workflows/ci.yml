@@ -1,0 +1,41 @@
+name: Dice CI
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php: [ '7.1', '7.4', '8.0', '8.1' ]
+
+        steps:
+            - name: Setup PHP with PECL extension
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  coverage: xdebug
+                  ini-file: development
+                  tools: composer
+            - uses: actions/checkout@v2
+            - name: Install PHP Dependancies
+              run: composer install
+            -   name: Run tests with coverage
+                env:
+                    XDEBUG_MODE: coverage
+                run: composer test-coverage
+            -   name: Upload coverage results to Coveralls
+                uses: nick-invision/retry@v2
+                env:
+                    COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    COVERALLS_PARALLEL: true
+                    COVERALLS_FLAG_NAME: "PHP${{ matrix.php }}"
+                with:
+                    timeout_seconds: 60
+                    max_attempts: 3
+                    command: php vendor/bin/php-coveralls -x clover.xml -o coveralls-upload.json -v

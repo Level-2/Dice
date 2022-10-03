@@ -1,9 +1,11 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
  * @license http:// www.opensource.org/licenses/bsd-license.php BSD License *
  */
+
 class NamespaceTest extends DiceTest
 {
     public function testNamespaceBasic()
@@ -22,7 +24,7 @@ class NamespaceTest extends DiceTest
     {
         $rule = [];
         $rule["substitutions"]["Foo\\A"] = [
-            \Dice\Dice::INSTANCE => "Foo\\ExtendedA",
+            Dice\Dice::INSTANCE => "Foo\\ExtendedA",
         ];
         $dice = $this->dice->addRule("\\Foo\\B", $rule);
 
@@ -34,7 +36,7 @@ class NamespaceTest extends DiceTest
     {
         $rule = [];
         $rule["substitutions"]["Foo\\A"] = [
-            \Dice\Dice::INSTANCE => "Foo\\ExtendedA",
+            Dice\Dice::INSTANCE => "Foo\\ExtendedA",
         ];
         $dice = $this->dice->addRule("\\Foo\\B", $rule);
 
@@ -69,7 +71,7 @@ class NamespaceTest extends DiceTest
     {
         $rule = [];
         $rule["substitutions"]["Foo\\A"] = [
-            \Dice\Dice::INSTANCE => "Foo\\ExtendedA",
+            Dice\Dice::INSTANCE => "Foo\\ExtendedA",
         ];
         $dice = $this->dice->addRule("Foo\\B", $rule);
 

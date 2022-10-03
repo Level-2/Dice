@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -84,6 +85,7 @@ class MethodWithTwoDefaultNullC
 {
     public $a;
     public $b;
+
     public function __construct($a = null, NB $b = null)
     {
         $this->a = $a;
@@ -96,10 +98,21 @@ class MethodWithTwoDefaultNullCC
     public $a;
     public $b;
     public $c;
+
     public function __construct($a = null, NB $b = null, NC $c = null)
     {
         $this->a = $a;
         $this->b = $b;
         $this->c = $c;
+    }
+}
+
+class NullableClassTypeHint
+{
+    public $obj;
+
+    public function __construct(?D $obj)
+    {
+        $this->obj = $obj;
     }
 }

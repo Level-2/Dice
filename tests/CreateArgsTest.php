@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -85,15 +86,18 @@ class CreateArgsTest extends DiceTest
     {
         $obj = $this->dice->create("MethodWithTwoDefaultNullC");
         $this->assertNull($obj->a);
-        $this->assertInstanceOf("NB", $obj->b);
+        $this->assertNull($obj->b);
+        //        $this->assertInstanceOf("NB", $obj->b);
     }
 
     public function testTwoDefaultNullClassClass()
     {
         $obj = $this->dice->create("MethodWithTwoDefaultNullCC");
         $this->assertNull($obj->a);
-        $this->assertInstanceOf("NB", $obj->b);
-        $this->assertInstanceOf("NC", $obj->c);
+        $this->assertNull($obj->b);
+        $this->assertNull($obj->c);
+        // $this->assertInstanceOf("NB", $obj->b);
+        // $this->assertInstanceOf("NC", $obj->c);
     }
 
     public function testScalarConstructorArgs()

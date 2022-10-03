@@ -4,6 +4,7 @@
  * @copyright 2012-2020 Tom Butler <tom@r.je> | https://r.je/dice
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+
 namespace Dice;
 class Dice
 {
@@ -112,12 +113,10 @@ class Dice
     /**
      * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied
      * @template T
-
      * @param string $name The name of the class to instantiate
      * @psalm-param class-string<T> $name
      * @param array $args An array with any additional arguments to be passed into the constructor upon instantiation
      * @param array $share a list of defined in shareInstances for objects higher up the object graph, should only be used internally
-
      * @return object A fully constructed object based on the specified input arguments
      * @psalm-return T
      */
@@ -204,7 +203,7 @@ class Dice
                     //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
                     if ($class->isInternal()) {
                         $this->instances[$name] = $this->instances[
-                            "\\" . $name
+                            "\\" . $class->name
                         ] = $closure($args, $share);
                     } else {
                         //Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
@@ -331,11 +330,11 @@ class Dice
             ? $this->create($param)
             : $param;
     }
-    /**
-	* Looks through the array $search for any object which can be used to fulfil $param
-	The original array $search is modifed so must be passed by reference.
 
-	*/
+    /**
+     * Looks through the array $search for any object which can be used to fulfil $param
+     * The original array $search is modifed so must be passed by reference.
+     */
     private function matchParam(
         \ReflectionParameter $param,
         $class,
@@ -353,6 +352,7 @@ class Dice
         }
         return false;
     }
+
     /**
      * Returns a closure that generates arguments for $method based on $rule and any $args passed into the closure
      * @param object $method An instance of ReflectionMethod (see: {@link http:// php.net/manual/en/class.reflectionmethod.php})
@@ -366,9 +366,7 @@ class Dice
         foreach ($method->getParameters() as $param) {
             $pType = $param->getType();
             $class =
-                $pType &&
-                !$pType->isBuiltin() &&
-                $pType instanceof \ReflectionNamedType
+                $pType instanceof \ReflectionNamedType && !$pType->isBuiltin()
                     ? $pType->getName()
                     : null;
             $paramInfo[] = [
@@ -407,8 +405,8 @@ class Dice
                 }
                 // Do the same with $share
                 elseif (
-                    $share &&
-                    ($match = $this->matchParam($param, $class, $share)) !==
+                    ($copy = $share) &&
+                    ($match = $this->matchParam($param, $class, $copy)) !==
                         false
                 ) {
                     $parameters[] = $match;
@@ -416,13 +414,17 @@ class Dice
                 // When nothing from $args or $share matches but a class is type hinted, create an instance to use, using a substitution if set
                 elseif ($class) {
                     try {
-                        $parameters[] = $sub
-                            ? $this->expand(
+                        if ($sub) {
+                            $parameters[] = $this->expand(
                                 $rule["substitutions"][$class],
                                 $share,
                                 true
-                            )
-                            : $this->create($class, [], $share);
+                            );
+                        } else {
+                            $parameters[] = !$param->allowsNull()
+                                ? $this->create($class, [], $share)
+                                : null;
+                        }
                     } catch (\InvalidArgumentException $e) {
                     }
                 }

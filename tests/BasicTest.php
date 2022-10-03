@@ -185,7 +185,7 @@ class BasicTest extends DiceTest
         $_GET["foo"] = "bar";
 
         $dice = $this->dice->addRule("CheckConstructorArgs", [
-            "constructParams" => [[\Dice\Dice::GLOBAL => "_GET"]],
+            "constructParams" => [[Dice\Dice::GLOBAL => "_GET"]],
         ]);
 
         $obj = $dice->create("CheckConstructorArgs");
@@ -218,7 +218,7 @@ class BasicTest extends DiceTest
     public function testPassSelf()
     {
         $dice = $this->dice->addRule("CheckConstructorArgs", [
-            "constructParams" => [[\Dice\Dice::INSTANCE => \Dice\Dice::SELF]],
+            "constructParams" => [[Dice\Dice::INSTANCE => Dice\Dice::SELF]],
         ]);
 
         $obj = $dice->create("CheckConstructorArgs");

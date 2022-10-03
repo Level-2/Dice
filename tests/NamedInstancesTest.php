@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -24,8 +25,8 @@ class NamedInstancesTest extends DiceTest
 
         $rule = [];
         $rule["constructParams"] = [
-            [\Dice\Dice::INSTANCE => "Y"],
-            [\Dice\Dice::INSTANCE => "[Y2]"],
+            [Dice\Dice::INSTANCE => "Y"],
+            [Dice\Dice::INSTANCE => "[Y2]"],
         ];
 
         $dice = $dice->addRule("Z", $rule);
@@ -42,7 +43,7 @@ class NamedInstancesTest extends DiceTest
         $dice = $this->dice->addRule('$B', $rule);
 
         $rule = [];
-        $rule["constructParams"][] = [\Dice\Dice::INSTANCE => '$B'];
+        $rule["constructParams"][] = [Dice\Dice::INSTANCE => '$B'];
         $dice = $dice->addRule("A", $rule);
 
         $a = $dice->create("A");
@@ -63,7 +64,7 @@ class NamedInstancesTest extends DiceTest
 
         $rule = [];
 
-        $rule["constructParams"][] = [\Dice\Dice::INSTANCE => '$Y2'];
+        $rule["constructParams"][] = [Dice\Dice::INSTANCE => '$Y2'];
         $dice = $dice->addRule("Y1", $rule);
 
         $y1 = $dice->create("Y1");
@@ -77,7 +78,7 @@ class NamedInstancesTest extends DiceTest
         $dice = $this->dice->addRule('$B', $rule);
 
         $rule = [];
-        $rule["substitutions"]["B"] = [\Dice\Dice::INSTANCE => '$B'];
+        $rule["substitutions"]["B"] = [Dice\Dice::INSTANCE => '$B'];
 
         $dice = $dice->addRule("A", $rule);
         $a = $dice->create("A");
@@ -99,8 +100,8 @@ class NamedInstancesTest extends DiceTest
 
         $rule = [];
         $rule["constructParams"] = [
-            [\Dice\Dice::INSTANCE => '$Y2A'],
-            [\Dice\Dice::INSTANCE => '$Y2B'],
+            [Dice\Dice::INSTANCE => '$Y2A'],
+            [Dice\Dice::INSTANCE => '$Y2B'],
         ];
         $dice = $dice->addRule("HasTwoSameDependencies", $rule);
 

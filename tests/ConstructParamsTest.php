@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -57,7 +58,7 @@ class ConstructParamsTest extends DiceTest
     public function testDefaultNullAssigned()
     {
         $rule = [];
-        $rule["constructParams"] = [[\Dice\Dice::INSTANCE => "A"], null];
+        $rule["constructParams"] = [[Dice\Dice::INSTANCE => "A"], null];
         $dice = $this->dice->addRule("MethodWithDefaultNull", $rule);
         $obj = $dice->create("MethodWithDefaultNull");
         $this->assertNull($obj->b);
@@ -137,5 +138,12 @@ class ConstructParamsTest extends DiceTest
 
         $obj = $dice->create("NullScalarNested");
         $this->assertEquals(null, $obj->nullScalar->string);
+    }
+
+    public function testNullableClassTypeHint()
+    {
+        $nullableClassTypeHint = $this->dice->create("NullableClassTypeHint");
+
+        $this->assertEquals(null, $nullableClassTypeHint->obj);
     }
 }

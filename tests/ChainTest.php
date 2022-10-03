@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -26,8 +27,8 @@ class ChainTest extends DiceTest
             '$someClass' => [
                 "instanceOf" => "Factory",
                 "call" => [
-                    ["get", [], \Dice\Dice::CHAIN_CALL],
-                    ["getBar", [], \Dice\Dice::CHAIN_CALL],
+                    ["get", [], Dice\Dice::CHAIN_CALL],
+                    ["getBar", [], Dice\Dice::CHAIN_CALL],
                 ],
             ],
         ]);
@@ -43,7 +44,7 @@ class ChainTest extends DiceTest
             '$someClass' => [
                 "shared" => true,
                 "instanceOf" => "Factory",
-                "call" => [["get", [], \Dice\Dice::CHAIN_CALL]],
+                "call" => [["get", [], Dice\Dice::CHAIN_CALL]],
             ],
         ]);
 
@@ -57,7 +58,7 @@ class ChainTest extends DiceTest
         $dice = $this->dice->addRules([
             "FactoryDependency" => [
                 "instanceOf" => "Factory",
-                "call" => [["get", [], \Dice\Dice::CHAIN_CALL]],
+                "call" => [["get", [], Dice\Dice::CHAIN_CALL]],
             ],
         ]);
 
@@ -72,7 +73,7 @@ class ChainTest extends DiceTest
             "FactoryDependency" => [
                 "shared" => true,
                 "instanceOf" => "Factory",
-                "call" => [["get", [], \Dice\Dice::CHAIN_CALL]],
+                "call" => [["get", [], Dice\Dice::CHAIN_CALL]],
             ],
         ]);
 

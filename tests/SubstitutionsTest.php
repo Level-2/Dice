@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -35,7 +36,7 @@ class SubstitutionsTest extends DiceTest
     public function testSubstitutionText()
     {
         $rule = [];
-        $rule["substitutions"]["B"] = [\Dice\Dice::INSTANCE => "ExtendedB"];
+        $rule["substitutions"]["B"] = [Dice\Dice::INSTANCE => "ExtendedB"];
         $dice = $this->dice->addRule("A", $rule);
 
         $a = $dice->create("A");
@@ -46,7 +47,7 @@ class SubstitutionsTest extends DiceTest
     public function testSubstitutionTextMixedCase()
     {
         $rule = [];
-        $rule["substitutions"]["B"] = [\Dice\Dice::INSTANCE => "exTenDedb"];
+        $rule["substitutions"]["B"] = [Dice\Dice::INSTANCE => "exTenDedb"];
         $dice = $this->dice->addRule("A", $rule);
 
         $a = $dice->create("A");
@@ -59,7 +60,7 @@ class SubstitutionsTest extends DiceTest
         $rule = [];
         $injection = $this->dice;
         $rule["substitutions"]["B"] = [
-            \Dice\Dice::INSTANCE => function () use ($injection) {
+            Dice\Dice::INSTANCE => function () use ($injection) {
                 return $injection->create("ExtendedB");
             },
         ];
@@ -87,7 +88,7 @@ class SubstitutionsTest extends DiceTest
     {
         $rule = [];
 
-        $rule["substitutions"]["B"] = [\Dice\Dice::INSTANCE => "ExtendedB"];
+        $rule["substitutions"]["B"] = [Dice\Dice::INSTANCE => "ExtendedB"];
 
         $dice = $this->dice->addRule("A", $rule);
 
@@ -112,7 +113,7 @@ class SubstitutionsTest extends DiceTest
         $rule = [];
 
         $rule["substitutions"]["Bar"] = [
-            \Dice\Dice::INSTANCE => ["Foo2", "bar"],
+            Dice\Dice::INSTANCE => ["Foo2", "bar"],
         ];
 
         $dice = $this->dice->addRule("Foo", $rule);
@@ -125,6 +126,7 @@ class SubstitutionsTest extends DiceTest
 class Foo
 {
     public $bar;
+
     public function __construct(Bar $bar)
     {
         $this->bar = $bar;

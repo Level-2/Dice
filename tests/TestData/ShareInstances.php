@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -6,13 +7,16 @@
  */
 class TestSharedInstancesTop
 {
+    public $shared;
     public $share1;
     public $share2;
 
     public function __construct(
+        Shared $shared,
         SharedInstanceTest1 $share1,
         SharedInstanceTest2 $share2
     ) {
+        $this->shared = $shared;
         $this->share1 = $share1;
         $this->share2 = $share2;
     }
@@ -41,6 +45,7 @@ class SharedInstanceTest2
 class M1
 {
     public $f;
+
     public function __construct(F $f)
     {
         $this->f = $f;
@@ -50,6 +55,7 @@ class M1
 class M2
 {
     public $e;
+
     public function __construct(E $e)
     {
         $this->e = $e;

@@ -1,4 +1,5 @@
 <?php
+
 /* @description Dice - A minimal Dependency Injection Container for PHP *
  * @author Tom Butler tom@r.je *
  * @copyright 2012-2018 Tom Butler <tom@r.je> | https:// r.je/dice.html *
@@ -72,6 +73,7 @@ class D
 class E
 {
     public $f;
+
     public function __construct(F $f)
     {
         $this->f = $f;
@@ -125,6 +127,7 @@ class MethodWithDefaultNull
 {
     public $a;
     public $b;
+
     public function __construct(A $a, B $b = null)
     {
         $this->a = $a;
@@ -143,6 +146,7 @@ class InterfaceTestClass implements interfaceTest
 class ParentClass
 {
 }
+
 class Child extends ParentClass
 {
 }
@@ -181,6 +185,7 @@ class someclass
 class someotherclass
 {
     public $obj;
+
     public function __construct(someclass $obj)
     {
         $this->obj = $obj;
@@ -189,7 +194,7 @@ class someotherclass
 
 class TenParameters
 {
-    /** @var string[]  */
+    /** @var string[] */
     public $params = [];
 
     public function __construct(
