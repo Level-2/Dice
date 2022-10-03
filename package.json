@@ -1,0 +1,12 @@
+{
+  "name": "Dice",
+  "version": "dev",
+  "main": "index.js",
+  "repository": "https://github.com/moddengine/Dice",
+  "author": "Chris Seufert <chris@modd.com.au>",
+  "license": "MIT",
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.19.1",
+    "prettier": "^2.7.1"
+  }
+}

@@ -3,15 +3,15 @@
  * @author Tom Butler tom@r.je
  * @copyright 2012-2020 Tom Butler <tom@r.je> | https://r.je/dice
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
- * @version 4.0 */
+ */
 namespace Dice;
 class Dice
 {
-    const CONSTANT = 'Dice::CONSTANT';
-    const GLOBAL = 'Dice::GLOBAL';
-    const INSTANCE = 'Dice::INSTANCE';
-    const CHAIN_CALL = 'Dice::CHAIN_CALL';
-    const SELF = 'Dice::SELF';
+    const CONSTANT = "Dice::CONSTANT";
+    const GLOBAL = "Dice::GLOBAL";
+    const INSTANCE = "Dice::INSTANCE";
+    const CHAIN_CALL = "Dice::CHAIN_CALL";
+    const SELF = "Dice::SELF";
     /**
      * @var array $rules Rules which have been set using addRule()
      */
@@ -58,23 +58,23 @@ class Dice
     private function addRuleTo(Dice $dice, string $name, array $rule)
     {
         if (
-            isset($rule['instanceOf']) &&
-            (!array_key_exists('inherit', $rule) || $rule['inherit'] === true)
+            isset($rule["instanceOf"]) &&
+            (!array_key_exists("inherit", $rule) || $rule["inherit"] === true)
         ) {
             $rule = array_replace_recursive(
-                $dice->getRule($rule['instanceOf']),
+                $dice->getRule($rule["instanceOf"]),
                 $rule
             );
         }
         //Allow substitutions rules to be defined with a leading a slash
-        if (isset($rule['substitutions'])) {
-            foreach ($rule['substitutions'] as $key => $value) {
-                $rule['substitutions'][ltrim($key, '\\')] = $value;
+        if (isset($rule["substitutions"])) {
+            foreach ($rule["substitutions"] as $key => $value) {
+                $rule["substitutions"][ltrim($key, "\\")] = $value;
             }
         }
         //Clear any existing instance or cache for this class
         unset($dice->instances[$name], $dice->cache[$name]);
-        $dice->rules[ltrim(strtolower($name), '\\')] = array_replace_recursive(
+        $dice->rules[ltrim(strtolower($name), "\\")] = array_replace_recursive(
             $dice->getRule($name),
             $rule
         );
@@ -87,7 +87,7 @@ class Dice
      */
     public function getRule(string $name): array
     {
-        $lcName = strtolower(ltrim($name, '\\'));
+        $lcName = strtolower(ltrim($name, "\\"));
         if (isset($this->rules[$lcName])) {
             return $this->rules[$lcName];
         }
@@ -95,18 +95,18 @@ class Dice
         foreach ($this->rules as $key => $rule) {
             // Find a rule which matches the class described in $name where:
             if (
-                empty($rule['instanceOf']) && // It's not a named instance, the rule is applied to a class name
-                $key !== '*' && // It's not the default rule
+                empty($rule["instanceOf"]) && // It's not a named instance, the rule is applied to a class name
+                $key !== "*" && // It's not the default rule
                 is_subclass_of($name, $key) && // The rule is applied to a parent class
-                (!array_key_exists('inherit', $rule) ||
-                    $rule['inherit'] === true)
+                (!array_key_exists("inherit", $rule) ||
+                    $rule["inherit"] === true)
             ) {
                 // And that rule should be inherited to subclasses
                 return $rule;
             }
         }
         // No rule has matched, return the default rule if it's set
-        return isset($this->rules['*']) ? $this->rules['*'] : [];
+        return isset($this->rules["*"]) ? $this->rules["*"] : [];
     }
 
     /**
@@ -132,7 +132,7 @@ class Dice
         // Create a closure for creating the object if there isn't one already
         if (empty($this->cache[$name])) {
             $this->cache[$name] = $this->getClosure(
-                ltrim($name, '\\'),
+                ltrim($name, "\\"),
                 $this->getRule($name)
             );
         }
@@ -150,11 +150,11 @@ class Dice
     private function getClosure(string $name, array $rule)
     {
         if (
-            ($rule['instanceOf'] ?? false) &&
-            !empty($rule['call']) &&
-            ($this->getRule($rule['instanceOf'])['shared'] ?? false)
+            ($rule["instanceOf"] ?? false) &&
+            !empty($rule["call"]) &&
+            ($this->getRule($rule["instanceOf"])["shared"] ?? false)
         ) {
-            $className = $rule['instanceOf'];
+            $className = $rule["instanceOf"];
             $class = new \ReflectionClass($className);
             $closure = $this->getClosure(
                 $className,
@@ -162,7 +162,7 @@ class Dice
             );
         } else {
             // Reflect the class and constructor, this should only ever be done once per class and get cached
-            $class = new \ReflectionClass($rule['instanceOf'] ?? $name);
+            $class = new \ReflectionClass($rule["instanceOf"] ?? $name);
             $constructor = $class->getConstructor();
 
             // Create parameter generating function in order to cache reflection on the parameters. This way $reflect->getParameters() only ever gets called once
@@ -173,7 +173,7 @@ class Dice
             if ($class->isInterface()) {
                 $closure = function () {
                     throw new \InvalidArgumentException(
-                        'Cannot instantiate interface'
+                        "Cannot instantiate interface"
                     );
                 };
             }
@@ -193,7 +193,7 @@ class Dice
                 };
             }
 
-            if (!empty($rule['shared'])) {
+            if (!empty($rule["shared"])) {
                 $closure = function (array $args, array $share) use (
                     $class,
                     $name,
@@ -204,12 +204,12 @@ class Dice
                     //Internal classes may not be able to be constructed without calling the constructor and will not suffer from #7, construct them normally.
                     if ($class->isInternal()) {
                         $this->instances[$name] = $this->instances[
-                            '\\' . $name
+                            "\\" . $name
                         ] = $closure($args, $share);
                     } else {
                         //Otherwise, create the class without calling the constructor (and write to \$name and $name, see issue #68)
                         $this->instances[$name] = $this->instances[
-                            '\\' . $name
+                            "\\" . $name
                         ] = $class->newInstanceWithoutConstructor();
                         // Now call this constructor after constructing all the dependencies. This avoids problems with cyclic references (issue #7)
                         if ($constructor) {
@@ -223,12 +223,12 @@ class Dice
                 };
             }
             // If there are shared instances, create them and merge them with shared instances higher up the object graph
-            if (isset($rule['shareInstances'])) {
+            if (isset($rule["shareInstances"])) {
                 $closure = function (array $args, array $share) use (
                     $closure,
                     $rule
                 ) {
-                    foreach ($rule['shareInstances'] as $instance) {
+                    foreach ($rule["shareInstances"] as $instance) {
                         $share[] = $this->create($instance, [], $share);
                     }
                     return $closure($args, $share);
@@ -237,7 +237,7 @@ class Dice
         }
         // When $rule['call'] is set, wrap the closure in another closure which will call the required methods after constructing the object
         // By putting this in a closure, the loop is never executed unless call is actually set
-        return isset($rule['call'])
+        return isset($rule["call"])
             ? function (array $args, array $share) use (
                 $closure,
                 $class,
@@ -247,17 +247,17 @@ class Dice
                 // Construct the object using the original closure
                 $object = $closure($args, $share);
 
-                foreach ($rule['call'] as $call) {
+                foreach ($rule["call"] as $call) {
                     // Generate the method arguments using getParams() and call the returned closure
                     $params = $this->getParams($class->getMethod($call[0]), [
-                        'shareInstances' => isset($rule['shareInstances'])
-                            ? $rule['shareInstances']
+                        "shareInstances" => isset($rule["shareInstances"])
+                            ? $rule["shareInstances"]
                             : [],
                     ])($this->expand(isset($call[1]) ? $call[1] : []), $share);
                     $return = $object->{$call[0]}(...$params);
                     if (isset($call[2])) {
                         if ($call[2] === self::CHAIN_CALL) {
-                            if (!empty($rule['shared'])) {
+                            if (!empty($rule["shared"])) {
                                 $this->instances[$name] = $return;
                             }
                             if (is_object($return)) {
@@ -296,8 +296,8 @@ class Dice
                 }
                 //Check for 'params' which allows parameters to be sent to the instance when it's created
                 //Either as a callback method or to the constructor of the instance
-                $args = isset($param['params'])
-                    ? $this->expand($param['params'])
+                $args = isset($param["params"])
+                    ? $this->expand($param["params"])
                     : [];
 
                 //Support Dice::INSTANCE by creating/fetching the specified instance
@@ -374,8 +374,8 @@ class Dice
             $paramInfo[] = [
                 $class,
                 $param,
-                isset($rule['substitutions']) &&
-                array_key_exists($class, $rule['substitutions']),
+                isset($rule["substitutions"]) &&
+                array_key_exists($class, $rule["substitutions"]),
             ];
         }
 
@@ -385,10 +385,10 @@ class Dice
             array $share = []
         ) use ($paramInfo, $rule) {
             // If the rule has construtParams set, construct any classes reference and use them as $args
-            if (isset($rule['constructParams'])) {
+            if (isset($rule["constructParams"])) {
                 $args = array_merge(
                     $args,
-                    $this->expand($rule['constructParams'], $share)
+                    $this->expand($rule["constructParams"], $share)
                 );
             }
 
@@ -418,7 +418,7 @@ class Dice
                     try {
                         $parameters[] = $sub
                             ? $this->expand(
-                                $rule['substitutions'][$class],
+                                $rule["substitutions"][$class],
                                 $share,
                                 true
                             )
@@ -432,7 +432,7 @@ class Dice
                     for ($i = 0; $i < count($args); $i++) {
                         if (
                             call_user_func(
-                                'is_' . $param->getType()->getName(),
+                                "is_" . $param->getType()->getName(),
                                 $args[$i]
                             )
                         ) {
