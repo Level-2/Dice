@@ -140,10 +140,25 @@ class ConstructParamsTest extends DiceTest
         $this->assertEquals(null, $obj->nullScalar->string);
     }
 
-    public function testNullableClassTypeHint()
+	public function testNullableClassTypeHint()
     {
-        $nullableClassTypeHint = $this->dice->create("NullableClassTypeHint");
+		$nullableClassTypeHint = $this->dice->create('NullableClassTypeHint');
 
-        $this->assertEquals(null, $nullableClassTypeHint->obj);
-    }
+		$this->assertEquals(null, $nullableClassTypeHint->obj);
+	}
+
+	public function testUnionScalarTypeHint()
+    {
+		if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+			$rule = [];
+			$rule['constructParams'] = ['someString'];
+			$dice = $this->dice->addRule('UnionScalar', $rule);
+
+			$unionScalar = $dice->create('UnionScalar');
+			$this->assertEquals('someString', $unionScalar->a);
+		} else {
+			$this->markTestSkipped('PHP < 8.0.0 does not support union type hints');
+		}
+	}
+
 }

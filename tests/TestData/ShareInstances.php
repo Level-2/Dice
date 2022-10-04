@@ -8,7 +8,7 @@
 class TestSharedInstancesTop
 {
     public $shared;
-    public $share1;
+	public $share1;
     public $share2;
 
     public function __construct(

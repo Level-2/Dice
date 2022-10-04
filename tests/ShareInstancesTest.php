@@ -21,10 +21,12 @@ class ShareInstancesTest extends DiceTest
         $this->assertInstanceOf("SharedInstanceTest2", $shareTest->share2);
 
         $this->assertSame($shareTest->shared, $shareTest->share1->shared);
+		$this->assertSame($shareTest->shared, $shareTest->share1->shared);
         $this->assertSame(
             $shareTest->share1->shared,
             $shareTest->share2->shared
         );
+		$this->assertEquals($shareTest->shared->uniq, $shareTest->share1->shared->uniq);
         $this->assertEquals(
             $shareTest->shared->uniq,
             $shareTest->share1->shared->uniq
@@ -92,7 +94,9 @@ class ShareInstancesTest extends DiceTest
 
         $this->assertinstanceOf("TestSharedInstancesTop", $shareTest);
 
-        $this->assertInstanceOf("SharedInstanceTest1", $shareTest->share1);
+        $this->assertSame($shareTest->shared, $shareTest->share1->shared);
+		$this->assertInstanceOf("SharedInstanceTest1", $shareTest->share1);
+		$this->assertEquals($shareTest->shared->uniq, $shareTest->share1->shared->uniq);
         $this->assertInstanceOf("SharedInstanceTest2", $shareTest->share2);
 
         $this->assertSame($shareTest->shared, $shareTest->share1->shared);
@@ -109,35 +113,16 @@ class ShareInstancesTest extends DiceTest
             $shareTest->share2->shared->uniq
         );
 
-        $shareTest2 = $dice->create("TestSharedInstancesTop");
-        $this->assertSame($shareTest2->shared, $shareTest2->share1->shared);
-        $this->assertSame(
-            $shareTest2->share1->shared,
-            $shareTest2->share2->shared
-        );
-        $this->assertEquals(
-            $shareTest2->shared->uniq,
-            $shareTest2->share1->shared->uniq
-        );
-        $this->assertEquals(
-            $shareTest2->share1->shared->uniq,
-            $shareTest2->share2->shared->uniq
-        );
+		$shareTest2 = $dice->create('TestSharedInstancesTop');
+		$this->assertSame($shareTest2->shared, $shareTest2->share1->shared);
+		$this->assertSame($shareTest2->share1->shared, $shareTest2->share2->shared);
+		$this->assertEquals($shareTest2->shared->uniq, $shareTest2->share1->shared->uniq);
+		$this->assertEquals($shareTest2->share1->shared->uniq, $shareTest2->share2->shared->uniq);
 
-        $this->assertNotSame($shareTest->shared, $shareTest2->shared);
-        $this->assertNotSame(
-            $shareTest->share1->shared,
-            $shareTest2->share2->shared
-        );
-        $this->assertNotEquals(
-            $shareTest->shared->uniq,
-            $shareTest2->shared->uniq
-        );
-        $this->assertNotEquals(
-            $shareTest->share1->shared->uniq,
-            $shareTest2->share2->shared->uniq
-        );
-    }
+		$this->assertNotSame($shareTest->shared, $shareTest2->shared);
+		$this->assertNotSame($shareTest->share1->shared, $shareTest2->share2->shared);
+		$this->assertNotEquals($shareTest->shared->uniq, $shareTest2->shared->uniq);
+		$this->assertNotEquals($shareTest->share1->shared->uniq, $shareTest2->share2->shared->uniq);
 
     public function testSharedInstanceFactory()
     {
