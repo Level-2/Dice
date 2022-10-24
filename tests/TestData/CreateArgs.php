@@ -93,3 +93,25 @@ class ScalarConstructors
         $this->null = $null;
     }
 }
+
+class ArrayArgRenderer {
+    public $a;
+    public $list;
+    public $b;
+
+    public function __construct(string $a = '', array $list = [], string $b = '') {
+        $this->a = $a;
+        $this->list = $list;
+        $this->b = $b;
+    }
+}
+
+class ArrayArgController {
+
+    /** @var ArrayArgRenderer  */
+    public  $renderer;
+
+    public function __construct(ArrayArgRenderer $r) {
+        $this->renderer = $r;
+    }
+}

@@ -106,4 +106,28 @@ class CreateArgsTest extends DiceTest
         $this->assertEquals("string", $obj->string);
         $this->assertEquals(null, $obj->null);
     }
+
+    /**
+     * Test case for issue #8
+     * @link https://github.com/moddengine/Dice/issues/8
+     */
+    public function testArrayArgConstructors() {
+        $dice = $this->dice->addRule('$defaultRenderer', [
+            'shared' => true,
+            'instanceOf' => ArrayArgRenderer::class,
+            'constructParams' => [
+                'foo',
+                [1,2,3 => ['test']],
+                'bar'
+            ]
+        ])->addRule('*', [
+            'substitutions' => [
+                ArrayArgRenderer::class => '$defaultRenderer'
+            ]
+        ]);
+        $obj = $dice->create(ArrayArgController::class);
+        $this->assertEquals('foo', $obj->renderer->a);
+        $this->assertEquals([1,2,3=>['test']], $obj->renderer->list);
+        $this->assertEquals('bar', $obj->renderer->b);
+    }
 }
